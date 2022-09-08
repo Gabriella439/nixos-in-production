@@ -1,0 +1,21 @@
+- Talk about the broad strategies for getting Nix adopted
+  - Using NixOS as the host operating system (the approach this book will cover)
+  - Building containers
+- Explain the benefits of using NixOS and (later on) Nix more pervasively
+- Go into more detail about what the adoption model looks like
+- Continuous integration
+- Continuous deployment
+- Migrating existing workflows to Nix
+- One-step build and publish
+- Nix under the hood / Interpretation pipeline
+  - Evaluation / Instantiation
+  - Derivations
+  - Realization
+  - Example: Building your own distributed build system
+- Debugging Nix
+  - `nix show-derivation`
+  - `nix-diff`
+  - Debugging type errors
+  - Understanding NixOS modules and overlays (possibly its own section)
+- Scaling
+  - Instantiation
