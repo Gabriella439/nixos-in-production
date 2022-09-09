@@ -19,3 +19,9 @@
   - Understanding NixOS modules and overlays (possibly its own section)
 - Scaling
   - Instantiation
+- Integration testing (i.e. NixOS tests)
+- Other forms of testing, too (e.g. Nix builds as tests)
+  - Serving test results
+- Using Hydra (even if it is shitty)
+- Probably include sample repo as companion to the book
+- Mine old blog posts, presentations, and tweets for material
