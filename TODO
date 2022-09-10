@@ -1,6 +1,11 @@
+- What is NixOS well-suited for
+  - NixOS has certain risks in offline environments
+- What does a mature NixOS enterprise look like?
 - Talk about the broad strategies for getting Nix adopted
   - Using NixOS as the host operating system (the approach this book will cover)
   - Building containers
+- Talk about using `system.extraDependencies`
+- Generating AMIs
 - Explain the benefits of using NixOS and (later on) Nix more pervasively
 - Go into more detail about what the adoption model looks like
 - Continuous integration
@@ -25,3 +30,8 @@
 - Using Hydra (even if it is shitty)
 - Probably include sample repo as companion to the book
 - Mine old blog posts, presentations, and tweets for material
+- Talk about using stock NixOS services instead of containers
+- How to author your own NixOS service
+- Project layout - code organization best practices
+
+- Read through various nix CLI commands to see if new functionality was added
