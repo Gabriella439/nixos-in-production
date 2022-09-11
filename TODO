@@ -33,5 +33,13 @@
 - Talk about using stock NixOS services instead of containers
 - How to author your own NixOS service
 - Project layout - code organization best practices
+- Containers
+  - Docker containers
+  - NixOS containers
+  - OCI containers
+- How to query NixOS options (e.g. using `nixos-option` or evaluation)
+- Limitations of rollbacks
+- Software supply chain security
+- Security hardening
 
 - Read through various nix CLI commands to see if new functionality was added
