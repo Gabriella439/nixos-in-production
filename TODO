@@ -41,5 +41,10 @@
 - Limitations of rollbacks
 - Software supply chain security
 - Security hardening
+- Talk about how to work around restricted network environments
+- Talk about virtualization
+  - Host OS
+  - Guest OS
+  - Application containers
 
 - Read through various nix CLI commands to see if new functionality was added
