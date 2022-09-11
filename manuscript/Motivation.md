@@ -230,13 +230,31 @@ NixOS this way.
 You can still use NixOS in other capacities, but the further you depart from the
 above "killer app" the more you will need to roll up your sleeves.
 
+## Profile of a NixOS adopter
+
+NixOS is a [DevOps](https://www.atlassian.com/devops) tool, meaning that NixOS
+blurs the boundary software development and operations.
+
+The reason why NixOS fits the DevOps space so well is because NixOS unifies all
+aspects of managing a system through the uniform NixOS options interface.  In
+other words, you can use NixOS options to configure operational details (e.g.
+RAID, encryption, boot loaders) and also software development details (e.g.
+dependency versions, patches, build flags).
+
+This means that a DevOps engineer or DevOps team is best situated to introduce
+NixOS within an engineering organization.  I know that DevOps is more of a set
+of cultural practices than a team, but you still need a person or team to
+maintain tools supporting those practices.  For example, if you introduce NixOS
+within an organization you will need people to support the organization's use of
+NixOS; those people would be the DevOps team.
+
 ## What does NixOS replace?
 
 If NixOS is a server operating system, does that mean that NixOS competes with
-Ubuntu Server, Debian or Fedora?
+Ubuntu Server, Debian or Fedora?  Not really.
 
-Actually, NixOS competes more with the Docker ecosystem, meaning that a lot of
-the value that NixOS adds overlaps with Docker:
+NixOS competes more with the Docker ecosystem, meaning that a lot of the value
+that NixOS adds overlaps with Docker:
 
 - NixOS supports declarative system specification
 
@@ -250,18 +268,17 @@ the value that NixOS adds overlaps with Docker:
 
   … analogous to `Dockerfile`s
 
-So NixOS is the Docker killer more than it is the Debian killer.  The killer use
-case for NixOS overlaps substantially with the use case for the Docker
-ecosystem.
+So you can think of NixOS as the Docker killer.  The use cases for NixOS overlap
+substantially with the use case for the Docker ecosystem.
 
-You can use NixOS in conjunction with just Docker containers since NixOS
-supports declaratively orchestrating containers (like `docker compose`), but
-you probably want to avoid buying further into the broader Docker ecosystem.
+You *can* use NixOS in conjunction with Docker containers since NixOS supports
+declaratively orchestrating containers (like `docker compose`), but you probably
+want to avoid buying further into the broader Docker ecosystem if you use NixOS.
 You don't want to be in a situation where your engineering organization does
 everything in two different ways, the NixOS way and the Docker way, because then
 you'll fragment your tooling and developer workflows.
 
 Or to put it another way: **NixOS is like Gentoo, but for Docker**.  Like
 Gentoo, NixOS is an operating system that provides unparalleled control over the
-machine due to everything being rebuildable from source while targeting use
-cases and workflows similar to the Docker ecosystem.
+machine (even more so than Gentoo) while targeting cases and workflows similar
+to the Docker ecosystem.
