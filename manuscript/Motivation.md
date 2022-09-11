@@ -130,6 +130,138 @@ You can deploy NixOS in restricted network environments and I will cover that in
 a later chapter, but you will have a much better time using NixOS to host
 software as a service.
 
-## TODO:
+## Virtualization
 
-- Explain why not to endorse NixOS for immature use cases.
+You might be interested in how NixOS fares with respect to virtualization or
+containers, so I'll break things down into these four potential use cases:
+
+- NixOS without virtualization
+
+  You can run NixOS on a bare metal machine (e.g. a desktop or rack server)
+  without any virtual machines or containers.  This implies that services run
+  directly on the bare metal machine.
+
+- NixOS as a host operating system
+
+  You can also run NixOS on a bare metal machine (i.e the "host") but then on
+  that machine you run containers or virtual machines (i.e. the "guests").
+  Typically, you do this if you want services to run inside the guest machines.
+
+- NixOS as a guest operating system
+
+  Virtual machines or "OS containers" can run a full-fledged operating system
+  inside of them, which can itself be a NixOS operating system.  I consider this
+  morally the same as the "no virtualization" use case because in both cases the
+  services run directly on NixOS.
+
+- Application containers
+
+  Containers technically do not need to run an entire operating system and can
+  instead run a single process (e.g. one service).  You can do this using
+  Nixpkgs (not NixOS), which provides support for building application
+  containers.
+
+So which use cases are NixOS/Nixpkgs well-suited for?  If I had to rank these
+deployment models then my preference (in descending order) would be:
+
+1.  NixOS as a guest operating system
+
+    Specifically, this means that you would run NixOS as a virtual machine on a
+    cloud provider (e.g. AWS) and all of your services run within that NixOS
+    guest machine with no intervening containers.
+
+    I prefer this because this is the leanest deployment model and the lowest
+    maintenance to administer.
+
+1.  NixOS without virtualization
+
+    This typically entails running NixOS on a bare-metal rack server and you
+    still use NixOS to manage all of your services without containers.
+
+    This is the most cost-effective deployment model if you're willing to manage
+    your own hardware (including RAID and backup/restore) or you operate your
+    own data center.
+
+1.  NixOS as a host operating system - Static containers
+
+    NixOS is amazing if you can statically specify the set of containers that
+    you want to run.  You can not only run Docker / OCI containers, but you
+    get even better vertical integration if you run "NixOS containers" (which
+    are `systemd-nspawn` containers under the hood) or application containers
+    built by Nixpkgs.
+
+    I rank this lower than "NixOS without virtualization" because NixOS obviates
+    some (but not all) of the reasons for using containers, which means that the
+    added cost of containerizing things can dwarf the benefit.
+
+1.  NixOS as a host operating system - Dynamic containers
+
+    You can also use NixOS to run containers dynamically, but NixOS is not
+    special in this regard.  At best, NixOS might simplify administering a
+    container orchestration service (e.g.  `kubernetes`), but that alone might
+    not justify the switching costs of using NixOS.
+
+1.  Application containers sans NixOS
+
+    This is technically a use case for Nixpkgs and not NixOS, but I mention it
+    for completeness.  Application containers built by Nixpkgs work best if you
+    are trying to introduce the Nix ecosystem (but not NixOS) within a legacy
+    environment.
+
+    However, you lose out on the benefits of using NixOS because, well, you're
+    no longer using NixOS.
+
+## The killer app for NixOS
+
+Based on the above guidelines, we can outline the ideal use case for NixOS:
+
+- NixOS shines as a server operating system for SaaS deployments
+
+- The services should be statically defined via the NixOS configuration
+
+- NixOS can containerize these services, but it's simpler to skip the containers
+
+- NixOS should handle service orchestration
+
+If your deployment model matches that outline then NixOS is not only a safe
+choice, but likely the best choice!  You will be in good company if you use
+NixOS this way.
+
+You can still use NixOS in other capacities, but the further you depart from the
+above "killer app" the more you will need to roll up your sleeves.
+
+## What does NixOS replace?
+
+If NixOS is a server operating system, does that mean that NixOS competes with
+Ubuntu Server, Debian or Fedora?
+
+Actually, NixOS competes more with the Docker ecosystem, meaning that a lot of
+the value that NixOS adds overlaps with Docker:
+
+- NixOS supports declarative system specification
+
+  … analogous to `docker compose`.
+
+- NixOS provides better service isolation
+
+  … analogous to containers.
+
+- NixOS uses the Nix package manager to declaratively assemble software
+
+  … analogous to `Dockerfile`s
+
+So NixOS is the Docker killer more than it is the Debian killer.  The killer use
+case for NixOS overlaps substantially with the use case for the Docker
+ecosystem.
+
+You can use NixOS in conjunction with just Docker containers since NixOS
+supports declaratively orchestrating containers (like `docker compose`), but
+you probably want to avoid buying further into the broader Docker ecosystem.
+You don't want to be in a situation where your engineering organization does
+everything in two different ways, the NixOS way and the Docker way, because then
+you'll fragment your tooling and developer workflows.
+
+Or to put it another way: **NixOS is like Gentoo, but for Docker**.  Like
+Gentoo, NixOS is an operating system that provides unparalleled control over the
+machine due to everything being rebuildable from source while targeting use
+cases and workflows similar to the Docker ecosystem.
