@@ -1,5 +1,3 @@
-- What is NixOS well-suited for
-  - NixOS has certain risks in offline environments
 - What does a mature NixOS enterprise look like?
 - Talk about the broad strategies for getting Nix adopted
   - Using NixOS as the host operating system (the approach this book will cover)
