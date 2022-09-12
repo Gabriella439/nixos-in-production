@@ -1,2 +1,3 @@
 Introduction.md
 Motivation.md
+Setup.md
