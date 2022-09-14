@@ -103,33 +103,33 @@ You might be interested in how NixOS fares with respect to virtualization or con
 
 So which use cases are NixOS/Nixpkgs well-suited for?  If I had to rank these deployment models then my preference (in descending order) would be:
 
-1.  NixOS as a guest operating system
+- NixOS as a guest operating system
 
-    Specifically, this means that you would run NixOS as a virtual machine on a cloud provider (e.g. AWS) and all of your services run within that NixOS guest machine with no intervening containers.
+  Specifically, this means that you would run NixOS as a virtual machine on a cloud provider (e.g. AWS) and all of your services run within that NixOS guest machine with no intervening containers.
 
-    I prefer this because this is the leanest deployment model and the lowest maintenance to administer.
+  I prefer this because this is the leanest deployment model and the lowest maintenance to administer.
 
-1.  NixOS without virtualization
+- NixOS without virtualization
 
-    This typically entails running NixOS on a bare-metal rack server and you still use NixOS to manage all of your services without containers.
+  This typically entails running NixOS on a bare-metal rack server and you still use NixOS to manage all of your services without containers.
 
-    This is the most cost-effective deployment model if you're willing to manage your own hardware (including RAID and backup/restore) or you operate your own data center.
+  This is the most cost-effective deployment model if you're willing to manage your own hardware (including RAID and backup/restore) or you operate your own data center.
 
-1.  NixOS as a host operating system - Static containers
+- NixOS as a host operating system - Static containers
 
-    NixOS is amazing if you can statically specify the set of containers that you want to run.  You can not only run Docker / OCI containers, but you get even better vertical integration if you run "NixOS containers" (which are `systemd-nspawn` containers under the hood) or application containers built by Nixpkgs.
+  NixOS is amazing if you can statically specify the set of containers that you want to run.  You can not only run Docker / OCI containers, but you get even better vertical integration if you run "NixOS containers" (which are `systemd-nspawn` containers under the hood) or application containers built by Nixpkgs.
 
-    I rank this lower than "NixOS without virtualization" because NixOS obviates some (but not all) of the reasons for using containers, which means that the added cost of containerizing things can dwarf the benefit.
+  I rank this lower than "NixOS without virtualization" because NixOS obviates some (but not all) of the reasons for using containers, which means that the added cost of containerizing things can dwarf the benefit.
 
-1.  NixOS as a host operating system - Dynamic containers
+- NixOS as a host operating system - Dynamic containers
 
-    You can also use NixOS to run containers dynamically, but NixOS is not special in this regard.  At best, NixOS might simplify administering a container orchestration service (e.g.  `kubernetes`), but that alone might not justify the switching costs of using NixOS.
+  You can also use NixOS to run containers dynamically, but NixOS is not special in this regard.  At best, NixOS might simplify administering a container orchestration service (e.g.  `kubernetes`), but that alone might not justify the switching costs of using NixOS.
 
-1.  Application containers sans NixOS
+- Application containers sans NixOS
 
-    This is technically a use case for Nixpkgs and not NixOS, but I mention it for completeness.  Application containers built by Nixpkgs work best if you are trying to introduce the Nix ecosystem (but not NixOS) within a legacy environment.
+  This is technically a use case for Nixpkgs and not NixOS, but I mention it for completeness.  Application containers built by Nixpkgs work best if you are trying to introduce the Nix ecosystem (but not NixOS) within a legacy environment.
 
-    However, you lose out on the benefits of using NixOS because, well, you're no longer using NixOS.
+  However, you lose out on the benefits of using NixOS because, well, you're no longer using NixOS.
 
 ## The killer app for NixOS
 
