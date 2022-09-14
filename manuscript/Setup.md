@@ -6,9 +6,9 @@ Some of these initial setup instructions are only appropriate for personal use. 
 
 On the other hand, some of these initial setup instructions are "production-grade", so throughout this book I will highlight when I'm teaching you the best way to do something, using an insert like this:
 
-{icon: sparkles}
+{icon: star}
 {blurb}
-If you see sparkles, that means that I endorse something for production use
+If you see a star, that means that I endorse something for production use
 {/blurb}
 
 ## Install Nix
@@ -39,7 +39,7 @@ You may freely use shorter option names if you prefer, though, but I still highl
 
 The script will stop and warn the end user if the system doesn't use `systemd`, in which case you can switch to the single-user script if you so desire.
 
-Note the absence of sparkles for the above command!  That's because we can still improve upon the command in a few ways.
+Note the absence of star for the above command!  That's because we can still improve upon the command in a few ways.
 
 First, you will also want to pin the version of Nix that you install if you're creating setup instructions for others to follow.  For example, this book will be based on Nix version 2.11.0, so we will want to use a different URL to pin the Nix version:
 
@@ -117,9 +117,9 @@ So what we're going to do is:
 
   We'll use this setting throughout the rest of this book so that we can make use of Nix's newer support for flakes.
 
-So the final installation script we'll end up with (complete with sparkles!) is:
+So the final installation script we'll end up with (complete with a star!) is:
 
-{icon: sparkles}
+{icon: star}
 {blurb}
 ```bash
 $ sh <(curl --location https://releases.nixos.org/nix/nix-2.11.0/install) --daemon --no-channel-add --nix-extra-conf-file <(<<< 'experimental-features = nix-command flakes')
