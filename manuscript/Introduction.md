@@ -20,7 +20,7 @@ questions:
 
 I'm writing this book because I cultivated years of professional experience
 doing all of the above, back when no such resource existed.  I learned NixOS the
-hard way and I'm writing this book so that you don't have to make the same
+hard way 😅 and I'm writing this book so that you don't have to make the same
 mistakes I did.
 
 Currently, most educational resources for NixOS (including the NixOS manual) are

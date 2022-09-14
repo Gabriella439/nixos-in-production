@@ -266,7 +266,7 @@ that NixOS adds overlaps with Docker:
 
 - NixOS uses the Nix package manager to declaratively assemble software
 
-  … analogous to `Dockerfile`s
+  … analogous to `Dockerfile`s.
 
 So you can think of NixOS as the Docker killer.  The use cases for NixOS overlap
 substantially with the use case for the Docker ecosystem.
