@@ -44,7 +44,9 @@ Note the absence of star for the above command!  That's because we can still imp
 First, you will also want to pin the version of Nix that you install if you're creating setup instructions for others to follow.  For example, this book will be based on Nix version 2.11.0, so we will want to use a different URL to pin the Nix version:
 
 ```bash
-$ sh <(curl --location https://releases.nixos.org/nix/nix-2.11.0/install) --daemon
+$ VERSION='2.11.0'
+$ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
+$ sh <(curl --location "${URL}") --daemon
 ```
 
 … and you can find the full set of available releases by visiting the [release file server](https://releases.nixos.org/?prefix=nix/)
@@ -52,7 +54,9 @@ $ sh <(curl --location https://releases.nixos.org/nix/nix-2.11.0/install) --daem
 However, there are a few more options that the script accepts that we're going to make good use of, and we can list those options by supplying `--help` to the script:
 
 ```bash
-$ sh <(curl --location https://releases.nixos.org/nix/nix-2.11.0/install) --help
+$ VERSION='2.11.0'
+$ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
+$ sh <(curl --location "${URL}") --help
 …
 
 Nix Installer [--daemon|--no-daemon] [--daemon-user-count INT] [--no-channel-add] [--no-modify-profile] [--nix-extra-conf-file FILE]
@@ -122,20 +126,18 @@ So the final installation script we'll end up with (complete with a star!) is:
 {icon: star}
 {blurb}
 ```bash
-$ sh <(curl --location https://releases.nixos.org/nix/nix-2.11.0/install) --daemon --no-channel-add --nix-extra-conf-file <(<<< 'experimental-features = nix-command flakes')
+$ VERSION='2.11.0'
+$ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
+$ CONFIGURATION='experimental-features = nix-command flakes'
+$ sh <(curl --location "${URL}") \
+    --daemon \
+    --no-channel-add \
+    --nix-extra-conf-file <(<<< "${CONFIGURATION}")
 ```
 {/blurb}
 
 {blurb, class:information}
-The prior command only works if your shell is Bash and all shell commands throughout assume the use of Bash.  This isn't due to some aesthetic preference of mine for Bash; rather, I'm relying on certain Bash features which are unavailable in a standard POSIX shell.
+The prior command only works if your shell is Bash and all shell commands throughout assume the use of Bash.  This isn't due to some aesthetic preference of mine for Bash; rather, I lean quite a bit on certain Bash features which are unavailable in a standard POSIX shell.
 
-As an example, the above command uses process substitution so that we don't have to split the command into smaller commands like this:
-
-```bash
-$ EXTRA_CONFIG=$(mktemp)
-$ echo 'experimental-features = nix-command flakes' > "${EXTRA_CONFIG}"
-$ sh <(curl --location https://releases.nixos.org/nix/nix-2.11.0/install) --daemon --no-channel-add --nix-extra-conf-file "${EXTRA_CONFIG}"
-```
-
-This is not only longer, but less reliable, because the temporary file might be deleted in between creation and usage.  This might seem paranoid, but I've had to debug much weirder failure modes than that.
+As an example, the above command uses process substitution so that we don't have to create or clean up an intermediate file.
 {/blurb}
