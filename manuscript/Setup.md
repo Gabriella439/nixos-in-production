@@ -118,7 +118,7 @@ So what we're going to do is:
 - Append the following setting to `nix.conf`
 
   ```bash
-  experimental-features = nix-command flakes
+  experimental-features = nix-command flakes repl-flake
   ```
 
   We'll use this setting throughout the rest of this book so that we can make use of Nix's newer support for flakes.
@@ -130,7 +130,7 @@ So the final installation script we'll end up with (complete with a star!) is:
 ```bash
 $ VERSION='2.11.0'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
-$ CONFIGURATION='experimental-features = nix-command flakes'
+$ CONFIGURATION='experimental-features = nix-command flakes repl-flake'
 $ sh <(curl --location "${URL}") \
     --daemon \
     --no-channel-add \
