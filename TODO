@@ -15,6 +15,7 @@
   - Derivations
   - Realization
   - Example: Building your own distributed build system
+- Setting up distributed builds architecture
 - Debugging Nix
   - `nix show-derivation`
   - `nix-diff`
