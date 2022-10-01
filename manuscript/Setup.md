@@ -83,7 +83,7 @@ Choose installation method.
  --tarball-url-prefix URL: Base URL to download the Nix tarball from.
 ```
 
-{blurb: warning}
+{blurb, class: warning}
 You might wonder if you can use the `--tarball-url-prefix` option for distributing a custom build of Nix, but that's not what this option is for.  You can only use this option to download Nix from a different location, because the new download still has to match the same integrity check as the old download.
 
 Don't worry, though; there still is a way to distribute a custom build of Nix, but we'll get to that further below.
@@ -101,7 +101,7 @@ The extra options of interest to us are:
 
 These two options are crucial because we are going to use them to disable the use of channels and replace them with the use of flakes.
 
-{blurb: warning}
+{blurb, class: warning}
 Channels are a trap and I treat them as a legacy Nix feature poorly suited for professional development, despite how ingrained they are in the Nix ecosystem.
 
 The issue with channels is that they essentially introduce impurity into your builds by depending on the `NIX_PATH` and there aren't great solutions for enforcing that every Nix user or every machine within your organization has the exact same `NIX_PATH`.
@@ -144,4 +144,10 @@ The prior command only works if your shell is Bash and all shell commands throug
 For example, the above command uses Bash's support for process substitution because otherwise we'd have to create a temporary file to store the `CONFIGURATION` and clean up the temporary file afterwards (which is tricky to do 100% reliably).  Process substitution is also more reliable than a temporary file because it happens entirely in memory and the intermediate result can't be accidentally deleted.
 
 This may seem paranoid, but I've encountered stranger shell script failures than that, so I program very defensively.
+{/blurb}
+
+{blurb, class:information}
+Feel free to use a Nix version newer than 2.11.0 if you want.  The above example installation script only pins the version 2.11.0 because that's what happened to be the latest stable version at the time of this writing.  That's also the Nix version that the examples from this book have been tested against.
+
+The only really important thing is that everyone within your organization uses the same version of Nix.
 {/blurb}
