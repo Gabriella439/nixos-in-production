@@ -1,6 +1,6 @@
 # Setting up your development environment
 
-I'd like you to be able to follow along with the examples in this book, so this chapter provides a quick setup guide to bootstrap from nothing to deploying a blank NixOS system using AWS EC2 that you can use for experimentation.  We're not going to speedrun the setup, though; instead I'll gently guide you through the setup process and the rationale behind each choice.
+I'd like you to be able to follow along with the examples in this book, so this chapter provides a quick setup guide to bootstrap from nothing to deploying a blank NixOS system that you can use for experimentation.  We're not going to speedrun the setup, though; instead I'll gently guide you through the setup process and the rationale behind each choice.
 
 ## Install Nix
 
@@ -54,6 +54,12 @@ $ sh <(curl --location "${URL}")
 
 … and you can find the full set of available releases by visiting the [release file server](https://releases.nixos.org/?prefix=nix/).
 
+{blurb, class:information}
+Feel free to use a Nix version newer than 2.11.0 if you want.  The above example installation script only pins the version 2.11.0 because that's what happened to be the latest stable version at the time of this writing.  That's also the Nix version that the examples from this book have been tested against.
+
+The only really important thing is that everyone within your organization uses the same version of Nix.
+{/blurb}
+
 However, there are a few more options that the script accepts that we're going to make good use of, and we can list those options by supplying `--help` to the script:
 
 ```bash
@@ -87,7 +93,7 @@ Choose installation method.
 ```
 
 {blurb, class: warning}
-You might wonder if you can use the `--tarball-url-prefix` option for distributing a custom build of Nix, but that's not what this option is for.  You can only use this option to download Nix from a different location, because the new download still has to match the same integrity check as the old download.
+You might wonder if you can use the `--tarball-url-prefix` option for distributing a custom build of Nix, but that's not what this option is for.  You can only use this option to download Nix from a different location (e.g. an internal mirror), because the new download still has to match the same integrity check as the old download.
 
 Don't worry, though; there still is a way to distribute a custom build of Nix, and we'll cover that further below.
 {/blurb}
@@ -98,13 +104,13 @@ The extra options of interest to us are:
 
 - `--nix-extra-conf-file`
 
-  This provides a hook you can use to extend the `nix.conf` if you want to make sure that all users within you organization share the same settings.
+  This lets you extend the `nix.conf` if you want to make sure that all users within your organization share the same settings.
 
 - `--no-channel-add`
 
   You can (and should) enable this option within a professional organization to disable the preinstallation of any channels.
 
-These two options are crucial because we are going to use them to disable the use of channels and replace them with the use of flakes.
+These two options are crucial because we are going to use them to systematically replace channels with flakes.
 
 {blurb, class: warning}
 Channels are a trap and I treat them as a legacy Nix feature poorly suited for professional development, despite how ingrained they are in the Nix ecosystem.
@@ -123,7 +129,7 @@ So what we're going to do is:
 - Append the following setting to `nix.conf` to enable the use of flakes:
 
   ```bash
-  experimental-features = nix-command flakes repl-flake
+  extra-experimental-features = nix-command flakes repl-flake
   ```
 
 So the final installation script we'll end up with is:
@@ -133,7 +139,7 @@ So the final installation script we'll end up with is:
 ```bash
 $ VERSION='2.11.0'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
-$ CONFIGURATION='experimental-features = nix-command flakes repl-flake'
+$ CONFIGURATION='extra-experimental-features = nix-command flakes repl-flake'
 $ sh <(curl --location "${URL}") \
     --no-channel-add \
     --nix-extra-conf-file <(<<< "${CONFIGURATION}")
@@ -143,15 +149,25 @@ Note: if you see a star next to an insert like this one, that means that I won't
 {/blurb}
 
 {blurb, class:information}
-The prior command only works if your shell is Bash or Zsh and all shell commands throughout this book assume the use of one of those two shells.
+The prior script only works if your shell is Bash or Zsh and all shell commands throughout this book assume the use of one of those two shells.
 
-For example, the above command uses support for process substitution (which is not available in POSIX shell) because otherwise we'd have to create a temporary file to store the `CONFIGURATION` and clean up the temporary file afterwards (which is tricky to do 100% reliably).  Process substitution is also more reliable than a temporary file because it happens entirely in memory and the intermediate result can't be accidentally deleted.
-
-This may seem paranoid, but I've encountered stranger shell script failures than that, so I program very defensively.
+For example, the above command uses support for process substitution (which is not available in a POSIX-only shell environment) because otherwise we'd have to create a temporary file to store the `CONFIGURATION` and clean up the temporary file afterwards (which is tricky to do 100% reliably).  Process substitution is also more reliable than a temporary file because it happens entirely in memory and the intermediate result can't be accidentally deleted.
 {/blurb}
 
-{blurb, class:information}
-Feel free to use a Nix version newer than 2.11.0 if you want.  The above example installation script only pins the version 2.11.0 because that's what happened to be the latest stable version at the time of this writing.  That's also the Nix version that the examples from this book have been tested against.
+## Blank NixOS virtual machine
 
-The only really important thing is that everyone within your organization uses the same version of Nix.
-{/blurb}
+Now that you've installed Nix I'll show you how to launch a NixOS virtual
+machine (VM) so that you can easily test the examples throughout this book.
+
+The instructions for provisioning a NixOS VM are highly platform-specific, so I'll provide self-contained instructions for each platform.
+
+### TODO: Setup a Nix builder on every platform
+
+```
+```
+
+### Linux or WSL
+
+### macOS
+
+Follow these instructions for the macOS
