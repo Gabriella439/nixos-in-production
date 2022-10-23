@@ -2,30 +2,19 @@
 
 I'd like you to be able to follow along with the examples in this book, so this chapter provides a quick setup guide to bootstrap from nothing to deploying a blank NixOS system using AWS EC2 that you can use for experimentation.  We're not going to speedrun the setup, though; instead I'll gently guide you through the setup process and the rationale behind each choice.
 
-Some of these initial setup instructions are only appropriate for personal use.  For example, this chapter will use NixOps to provision our first NixOS system, even though I would not endorse NixOps for use in production.  As the book progresses I'll show you how to evolve this casual setup into a more professional setup, but it will take time to get there.
-
-On the other hand, some of these initial setup instructions are "production-grade", so throughout this book I will highlight when I'm teaching you the most reliable way to do something, using an insert like this:
-
-{icon: star}
-{blurb}
-If you see a star next to an insert, that means that I endorse the corresponding advice for professional use.
-{/blurb}
-
 ## Install Nix
 
-You've likely already installed Nix if you're reading this book, but I'll still cover how to do this because I have a few tips to share.
+You've likely already installed Nix if you're reading this book, but I'll still cover how to do this because I have a few tips to share that can help you author a more reliable installation script for your colleagues.
 
-First off, I highly recommend installing Nix in multi-user mode if you have the option, even if nobody else is using your current machine.  In other words, multi-user mode is not just for production machines or shared infrastructure: even developers should install Nix in multi-user mode on their respective development machines.
+Needless to say, if you or any of your colleagues are using NixOS as your operating system then you don't need to install Nix and you can skip to the [Blank NixOS Virtual Machine](#blank-nixos-virtual-machine) section below.
 
-You will save yourself headaches if you consistently enforce multi-user mode across the board because it will protect Nix builds from tampering with user-owned files and, vice versa, protect users from unintentionally tampering with the `/nix/store`.  Multi-user mode also enforces good security defaults, meaning that end users would have to acquire `root` privileges if they want to do potentially dangerous things.
+### Default installation
 
-The main reason to not install multi-user mode is if your system just plain does not support it.  For example, if you use a Linux distribution that does not support `systemd` then you would have to manually configure your init system to launch the Nix daemon.  If you're not sure if this is the case, you can still try to run the multi-user installation script anyway:
+If you go to the [download page for Nix](https://nixos.org/download.html) it will tell you to run something similar to this:
 
 ```bash
-$ sh <(curl --location https://nixos.org/nix/install) --daemon
+$ sh <(curl --location https://nixos.org/nix/install)
 ```
-
-… since the installation script will stop and warn the end user if the system doesn't use `systemd`.
 
 {blurb, class: information}
 Throughout this book I'll use consistently long option names instead of short names (e.g. `--location` instead of `-L`), for two reasons:
@@ -39,14 +28,28 @@ For example, `tar --extract --file` is clearer and a better mnemonic than `tar x
 You may freely use shorter option names if you prefer, though, but I still highly recommend using long option names at least for non-interactive scripts.
 {/blurb}
 
-Note the absence of star for the above command!  That's because  I can think of a few ways we can still improve upon the command.
+Depending on your platform the download instructions might also tell you to pass the `--daemon` or `--no-daemon` option to the installation script to specify a single-user or multi-user installation.  For simplicity, the instructions in this chapter will omit the `--daemon` / `--no-daemon` flag since the default behavior on each platform is okay at the time of this writing:
 
-First, you will also want to pin the version of Nix that you install if you're creating setup instructions for others to follow.  For example, this book will be based on Nix version 2.11.0, and you can pin the Nix version like this:
+* On macOS the installer defaults to a multi-user Nix installation
+
+  macOS doesn't even support a single-user Nix installation, so this is a good default.
+
+* On Windows the installer defaults to a single-user Nix installation
+
+  This default is also the recommended option.
+
+* On Linux the installer defaults to a single-user Nix installation
+
+  This is one case where the default is questionable.  Multi-user Nix installations are typically better if your Linux distribution supports `systemd`, but it's not the end of the world if you do a single-user Nix installation.
+
+### Pinning the version
+
+First, we will want to pin the version of Nix that you install if you're creating setup instructions for others to follow.  For example, this book will be based on Nix version 2.11.0, and you can pin the Nix version like this:
 
 ```bash
 $ VERSION='2.11.0'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
-$ sh <(curl --location "${URL}") --daemon
+$ sh <(curl --location "${URL}")
 ```
 
 … and you can find the full set of available releases by visiting the [release file server](https://releases.nixos.org/?prefix=nix/).
@@ -86,8 +89,10 @@ Choose installation method.
 {blurb, class: warning}
 You might wonder if you can use the `--tarball-url-prefix` option for distributing a custom build of Nix, but that's not what this option is for.  You can only use this option to download Nix from a different location, because the new download still has to match the same integrity check as the old download.
 
-Don't worry, though; there still is a way to distribute a custom build of Nix, but we'll get to that further below.
+Don't worry, though; there still is a way to distribute a custom build of Nix, and we'll cover that further below.
 {/blurb}
+
+### Configuring the installation
 
 The extra options of interest to us are:
 
@@ -115,15 +120,13 @@ So what we're going to do is:
 
   Developers can still opt in to channels by installing them, but disabling channels by default will discourage people from contributing Nix code that depends on the `NIX_PATH`.
 
-- Append the following setting to `nix.conf`
+- Append the following setting to `nix.conf` to enable the use of flakes:
 
   ```bash
   experimental-features = nix-command flakes repl-flake
   ```
 
-  We'll use this setting throughout the rest of this book so that we can make use of Nix's newer support for flakes.
-
-So the final installation script we'll end up with (complete with a star!) is:
+So the final installation script we'll end up with is:
 
 {icon: star}
 {blurb}
@@ -132,16 +135,17 @@ $ VERSION='2.11.0'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
 $ CONFIGURATION='experimental-features = nix-command flakes repl-flake'
 $ sh <(curl --location "${URL}") \
-    --daemon \
     --no-channel-add \
     --nix-extra-conf-file <(<<< "${CONFIGURATION}")
 ```
+
+Note: if you see a star next to an insert like this one, that means that I won't suggest any further improvements to the instructions.
 {/blurb}
 
 {blurb, class:information}
-The prior command only works if your shell is Bash and all shell commands throughout this book assume the use of Bash.
+The prior command only works if your shell is Bash or Zsh and all shell commands throughout this book assume the use of one of those two shells.
 
-For example, the above command uses Bash's support for process substitution because otherwise we'd have to create a temporary file to store the `CONFIGURATION` and clean up the temporary file afterwards (which is tricky to do 100% reliably).  Process substitution is also more reliable than a temporary file because it happens entirely in memory and the intermediate result can't be accidentally deleted.
+For example, the above command uses support for process substitution (which is not available in POSIX shell) because otherwise we'd have to create a temporary file to store the `CONFIGURATION` and clean up the temporary file afterwards (which is tricky to do 100% reliably).  Process substitution is also more reliable than a temporary file because it happens entirely in memory and the intermediate result can't be accidentally deleted.
 
 This may seem paranoid, but I've encountered stranger shell script failures than that, so I program very defensively.
 {/blurb}
