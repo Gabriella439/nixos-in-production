@@ -2,7 +2,7 @@
 
 This book is a guide to using NixOS in production, where NixOS is an operating system built on top of the Nix package manager.
 
-This guide assumes that you have some familiarity with NixOS, so if you have never used NixOS before and you're looking for a tutorial or introduction to NixOS then this book might not be the best learning resource for you.  Some chapters will review basic concepts, but they will not be written for a beginner audience; meanwhile, other chapters will cover more advanced topics.
+This guide assumes that you have some familiarity with NixOS, so if you have never used NixOS before and you're looking for a tutorial or introduction then this book might not be for you.  Some chapters may review basic concepts, but in general they will not be written for a beginner audience.
 
 However, this book will appeal to you if you wish to answer the following questions:
 
