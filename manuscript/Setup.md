@@ -2,7 +2,7 @@
 
 I'd like you to be able to follow along with the examples in this book, so this chapter provides a quick setup guide to bootstrap from nothing to deploying a blank NixOS system that you can use for experimentation.  We're not going to speedrun the setup, though; instead I'll gently guide you through the setup process and the rationale behind each choice.
 
-## Install Nix
+## Installing Nix
 
 You've likely already installed Nix if you're reading this book, but I'll still cover how to do this because I have a few tips to share that can help you author a more reliable installation script for your colleagues.
 
@@ -154,7 +154,7 @@ The prior script only works if your shell is Bash or Zsh and all shell commands 
 For example, the above command uses support for process substitution (which is not available in a POSIX-only shell environment) because otherwise we'd have to create a temporary file to store the `CONFIGURATION` and clean up the temporary file afterwards (which is tricky to do 100% reliably).  Process substitution is also more reliable than a temporary file because it happens entirely in memory and the intermediate result can't be accidentally deleted.
 {/blurb}
 
-## Blank NixOS virtual machine
+## Running a NixOS virtual machine
 
 Now that you've installed Nix I'll show you how to launch a NixOS virtual machine (VM) so that you can easily test the examples throughout this book.
 
@@ -226,6 +226,7 @@ Save the following file to `flake.nix`:
 
 ```nix
 # module.nix
+
 { users.users.root.initialPassword = "";
 }
 ```
@@ -253,7 +254,34 @@ If you successfully log into the virtual machine then you're ready to follow alo
 
 ```nix
 # module.nix
+
 …
 ```
 
-… then that means that I want you to save that example code to the `module.nix` file and then restart the virtual machine by running `nix run`.  This run script also ensures that the virtual machine does not persist state in between runs.
+… then that means that I want you to save that example code to the `module.nix` file and then restart the virtual machine by running `nix run`.
+
+For example, let's test that right now; save the following file to `module.nix`:
+
+```nix
+# module.nix
+
+{ users.users.root.initialPassword = "";
+
+  services.postgresql.enable = true;
+}
+```
+
+… then start the virtual machine and log into the machine.  As the `root` user,
+run:
+
+```bash
+[root@nixos:~]# sudo --user postgres psql
+psql (14.5)
+Type "help" for help.
+
+postgres=#
+```
+
+… and now you should have command-line access to a `postgres` database.
+
+The run script in the `flake.nix` file ensures that the virtual machine does not persist state in between runs so that you can safely experiment inside of the virtual machine without breaking upcoming examples.
