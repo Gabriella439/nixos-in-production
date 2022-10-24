@@ -156,18 +156,104 @@ For example, the above command uses support for process substitution (which is n
 
 ## Blank NixOS virtual machine
 
-Now that you've installed Nix I'll show you how to launch a NixOS virtual
-machine (VM) so that you can easily test the examples throughout this book.
+Now that you've installed Nix I'll show you how to launch a NixOS virtual machine (VM) so that you can easily test the examples throughout this book.
 
-The instructions for provisioning a NixOS VM are highly platform-specific, so I'll provide self-contained instructions for each platform.
+### macOS-specific instructions
 
-### TODO: Setup a Nix builder on every platform
+If you are using macOS, then follow the instructions in the [`macos-builder`](https://github.com/Gabriella439/macos-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
+
+If you are using Linux (including NixOS or the Windows Subsystem for Linux) you can skip to the next step.
+
+### Platform-independent instructions
+
+Save the following file to `flake.nix`:
+
+```nix
+# flake.nix
+
+{ inputs = {
+    flake-utils.url = "github:numtide/flake-utils/v1.0.0";
+
+    nixpkgs.url = "github:NixOS/nixpkgs/f1a49e20e1b4a7eeb43d73d60bae5be84a1e7610";
+  };
+
+  outputs = { flake-utils, nixpkgs, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = nixpkgs.legacyPackages."${system}";
+
+        base = { lib, modulesPath, ... }: {
+          imports = [ "${modulesPath}/virtualisation/qemu-vm.nix" ];
+
+          # https://github.com/utmapp/UTM/issues/2353
+          networking.nameservers = lib.mkIf pkgs.stdenv.isDarwin [ "8.8.8.8" ];
+
+          virtualisation = {
+            graphics = false;
+
+            host = { inherit pkgs; };
+          };
+        };
+
+        module = import ./module.nix;
+
+        machine = nixpkgs.lib.nixosSystem {
+          system = builtins.replaceStrings [ "darwin" ] [ "linux" ] system;
+
+          modules = [ base module ];
+        };
+
+        program = pkgs.writeShellScript "run-vm.sh" ''
+          export NIX_DISK_IMAGE=$(mktemp -u -t nixos.qcow2)
+
+          trap "rm -f $NIX_DISK_IMAGE" EXIT
+
+          ${machine.config.system.build.vm}/bin/run-nixos-vm
+        '';
+
+      in
+        { apps.default = {
+            type = "app";
+
+            program = "${program}";
+          };
+        }
+    );
+}
+```
+
+… and also save the following file to `module.nix` within the same directory:
+
+```nix
+# module.nix
+{ users.users.root.initialPassword = "";
+}
+```
+
+{blurb, class: warning}
+Obviously, the above NixOS configuration is not secure since it leaves the `root` account wide open.  We'll change this to something more secure later.
+{/blurb}
+
+Then run this command within the same directory to run our test virtual machine:
 
 ```
+$ nix run
+…
+
+<<< Welcome to NixOS 22.11.20220918.f1a49e2 (aarch64) - ttyAMA0 >>>
+
+Run 'nixos-help' for the NixOS manual.
+
+nixos login: 
 ```
 
-### Linux or WSL
+You can then log into the virtual machine as the `root` user and an empty password.  Once you successfully log in then shut down the virtual machine by typing `Ctrl`-`a` + `c` top open the `qemu` prompt and then type `quit` followed by `Enter` to exit.
 
-### macOS
+If you successfully log into the virtual machine then you're ready to follow along with the remaining examples throughout this book.  If you see an example in this book that begins with this line:
 
-Follow these instructions for the macOS
+```nix
+# module.nix
+…
+```
+
+… then that means that I want you to save that example code to the `module.nix` file and then restart the virtual machine by running `nix run`.  This run script also ensures that the virtual machine does not persist state in between runs.
