@@ -45,5 +45,7 @@
   - Host OS
   - Guest OS
   - Application containers
+- How to upgrade everyone within an organization to the same pinned version of
+  Nix
 
 - Read through various nix CLI commands to see if new functionality was added
