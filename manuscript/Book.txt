@@ -1,3 +1,4 @@
 Introduction.md
 Motivation.md
+BigPicture.md
 Setup.md
