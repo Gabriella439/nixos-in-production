@@ -4,37 +4,35 @@ Before diving in further you might want to get some idea of what a "real" NixOS 
 
 - What are the guiding principles for a NixOS-centric software architecture?
 
-- What would a "NixOS team" need to be prepared to support and maintain?
-
 - How does a NixOS-centric architecture differ from other architectures?
 
-- What does "success" look like?
+- What would a "NixOS team" need to be prepared to support and maintain?
 
-Here I'll answer those questions so that you can get a better idea of what you would be signing up for.
+Here I'll do my best to answer those questions so that you can get a better idea of what you would be signing up for.
 
 ## The Zen of NixOS
 
-I like to use the term "master cue" to denote an overarching sign that indicates that you're doing things right.  The "master cue" for NixOS is very similar to the "master cue" for the Nix ecosystem, which is this:
+I like to use the term "master cue" to denote an overarching sign that indicates that you're doing things right.  This "master" cue" might not tell you *how* to do things right, but it can still provide a high-level indicator of whether you are maturing as an engineering organization.
+
+The "master cue" for NixOS is very similar to the "master cue" for the Nix ecosystem, which is this:
 
 > Every common build/test/deploy-related activity should be possible with at most a single command using Nix's command line interface.
 
 I say "at most" because some activities (like continuous deployment) should ideally require no human intervention at all.  However, activities that do require human intervention should in principle be compressible into a single Nix command.
 
-I can explain this by providing an example of an architectural pattern that violates this master cue:
+I can explain this by providing an example of development workflow that ignores this master cue:
 
-Suppose that you want to test your local project's changes within the context of some larger system at work (i.e. an [integration test](https://en.wikipedia.org/wiki/Integration_testing).  The process for testing your code might hypothetically look like this:
+Suppose that you want to test your local project's changes within the context of some larger system at work (i.e. an [integration test](https://en.wikipedia.org/wiki/Integration_testing).  Your organization's process for testing your code might hypothetically look like this:
 
-- Create and publish a branch recording your changes so far in version control
+- Create and publish a branch in version control recording your changes
 
 - Manually trigger some job to build a software artifact containing your changes
 
   Perhaps the artifact is a container, executable binary, or JAR.
 
-- Update some repository to reference the newly-built software artifact
+- Update something to reference the newly-built software artifact
 
 - Run the appropriate integration test
-
-  Your organization scores "bonus" points (for terrible workflows) if the integration test is not automated and you have to manually exercise the code paths that you modified.
 
 Now what if I told you that the entire integration testing process from start to finish could be:
 
@@ -46,24 +44,23 @@ In other words:
 
   You could test uncommitted changes straight from your local project checkout.
 
-- There would be no multi-step publish and reference process
+- There would be no multi-step publication process
 
   All of the intermediate build products and internal references would be handled transparently by the Nix build tool.
 
 - The test itself would be managed by the Nix build tool
 
-  In other words, Nix would treat your test no differently than any other build product.  Tests and their outputs *are* build products.
+  In other words, Nix would treat your integration test no differently than any other build product.  Tests and their outputs *are* build products.
 
 - There would be no need to select the appropriate tests to rerun
 
-  Nix would automatically infer which tests depended on your project and rerun those.  Other test runs and their results would be cached if their dependency tree did not include your changes.
+  The Nix build tool would automatically infer which tests depended on your project and rerun those.  Other test runs and their results would be cached if their dependency tree did not include your changes.
 
-Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely run into several issues with respect to robustness and efficiency and inevitably reimplement what the Nix ecosystem gives you for free.  For example:
+Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely need to reimplement large swaths of the Nix ecosystem for this automation to be sufficiently robust and efficient.  For example:
 
-- Do you maintain an artifact repository or file server that you use for hosting
-  intermediate build products?
+- Do you maintain an artifact repository or file server that you use for publishing and sharing intermediate build products?
 
-  Congratulations, you're implementing your own version of the `/nix/store`.
+  Congratulations, you're implementing your own version of the Nix store and caching system
 
 - Do you generate unique labels for intermediate software artifact to isolate them?
 
@@ -73,19 +70,23 @@ Some of these potential improvements are not specific to the Nix ecosystem.  Aft
 
   This would be reinventing Nix's language support for updating dependency references.
 
-You can save yourself a lot of trouble by taking the time to use the Nix ecosystem as idiomatically as possible and in doing so you will greatly reduce your team's maintenance footprint.
+- Do you need to isolate your integration tests or run them in parallel?
+
+  You would likely reimplement the NixOS test framework.
+
+You can save yourself a lot of headaches and embarrassment by taking time to learn and use the Nix ecosystem as idiomatically as possible instead of learning these sorts of lessons the hard way.
 
 ## GitOps
 
-NixOS exemplifies the [Infrastructure as Code (IaC)](https://en.wikipedia.org/wiki/Infrastructure_as_code) paradigm, meaning that everything about your systems (including hardware/system/software configuration) is recorded in configuration files that are the source of truth for how to assemble your infrastructure.
+NixOS exemplifies the [Infrastructure as Code (IaC)](https://en.wikipedia.org/wiki/Infrastructure_as_code) paradigm, meaning that every aspect of your organization (including hardware/systems/software) is stored in code or configuration files that are the source of truth for how everything is built.  In particular, you don't make undocumented changes to your infrastructure that cause it to diverge from what is recorded within those files.
 
-This book will go even further and espouse a specific flavor of Infrastructure of Code known as [GitOps](https://about.gitlab.com/topics/gitops/) where:
+This book will go further and espouse a specific flavor of Infrastructure of Code known as [GitOps](https://about.gitlab.com/topics/gitops/) where:
 
-- The configuration files are (primarily) *declarative*
+- The code and configuration files are (primarily) *declarative*
 
-  In other words, they tend to specify the desired state of the system rather than the specific sequence of events to get there.
+  In other words, they tend to specify the desired state of the system rather than a sequence of steps to get there.
 
-- These configuration files are stored in version control
+- These files are stored in version control
 
   Proponents of this approach most commonly use `git` as their version control software, which is why it's called "GitOps".
 
@@ -95,7 +96,7 @@ This book will go even further and espouse a specific flavor of Infrastructure o
 
 ## DevOps
 
-NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) principle of breaking down boundaries between software developers ("Dev") and operations ("Ops").  Specifically, the NixOS option system goes further in this regard than most other tools in the same space by unifying both software configuration and system configuration.
+NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) principle of breaking down boundaries between software developers ("Dev") and operations ("Ops").  Specifically, NixOS goes further in this regard than most other tools by unifying both software configuration and system configuration underneath the NixOS option system.
 
 You can group NixOS options into three categories:
 
@@ -109,7 +110,7 @@ You can group NixOS options into three categories:
 
 - Hybrid systems/software options
 
-  These are options that live in the grey area between Dev and Ops, such as
+  These are options that live in the grey area between Dev and Ops, such as:
 
   - Service restart policies
   - Networking
@@ -127,16 +128,18 @@ In extreme cases, you can even embed non-Nix code and do "pure software developm
 
 An extreme example of this is my [`simple-twitter` project](https://github.com/Gabriella439/simple-twitter) which implements a bare-bones Twitter clone in a single Nix file.  There the server code is implemented in Haskell (a compiled language!) embedded inside of a NixOS option as a large multi-line string with some wrapping logic within the same file to build and run the Haskell code as a backend service.
 
-Embedding non-Nix code side-by-side with systems configuration within the same file is not advisable in general, but it's neat that it's possible *and* ergonomic.  This is one of many reasons why I view NixOS as the "king of DevOps" because no other tool comes close in terms of allowing software engineers and operations engineers to work side-by-side (literally within the same file).
+Embedding non-Nix code side-by-side with systems configuration within the same file is not advisable in general, but it's neat that NixOS makes this both possible *and* ergonomic.  This is one of many reasons why I view NixOS as the "king of DevOps" because no other tool encourages software engineers and operations engineers to work so closely side-by-side (literally within the same NixOS configuration file).
 
 ## Scope
 
-Here is a checklist of what you would need to understand in order to effectively support NixOS:
+So far we've covered NixOS from a high-level standpoint, but you might more interested in a more down-to-earth picture of the day-to-day requirements and responsibilities for a professional NixOS user.
 
-- Architectural components
+To that end, here is a checklist that will summarize what you would need to understand in order to effectively introduce and support NixOS within an organization:
+
+- Infrastructure setup
   - Continuous integration
   - Builders
-  - Cache
+  - Caching
 - Development
   - NixOS module system
   - Project organization
@@ -172,11 +175,11 @@ Here is a checklist of what you would need to understand in order to effectively
   - Images
   - Containers
 
-This book will cover all of the above topics and more.
+This book will cover all of the above topics and more, although they will not necessarily be grouped or organize in that exact order.
 
 There are two notable absences from the above checklist:
 
 - Familiarity with the Nix expression language
 - Familiarity with the Nixpkgs software distribution
 
-This book focuses primarily on NixOS and while NixOS does build on top of the Nix language and Nixpkgs I will not focus too much on those.  I assume that you have some passing familiarity with the Nix ecosystem if you're reading this book and I'll also cover you what you need to know that is relevant to NixOS.
+This book focuses primarily on NixOS and while it does build on top of the Nix expression language and the Nixpkgs software distribution I will not focus too much on those latter subjects.  I assume that you have some familiarity with the Nix ecosystem if you're reading this book, but I will still cover you what you need to know that is pertinent to NixOS administration.
