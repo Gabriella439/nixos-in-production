@@ -2,7 +2,9 @@
 - Talk about the broad strategies for getting Nix adopted
   - Using NixOS as the host operating system (the approach this book will cover)
   - Building containers
-- Talk about using `system.extraDependencies`
+- Important NixOS options
+  - `system.stateVersion`
+  - `system.extraDependencies`
 - Generating AMIs
 - Explain the benefits of using NixOS and (later on) Nix more pervasively
 - Go into more detail about what the adoption model looks like
@@ -36,16 +38,33 @@
   - Docker containers
   - NixOS containers
   - OCI containers
-- How to query NixOS options (e.g. using `nixos-option` or evaluation)
 - Limitations of rollbacks
-- Software supply chain security
-- Security hardening
+- Security
+  - Software supply chain security
+  - Security hardening flags
+  - Securing NixOS
 - Talk about how to work around restricted network environments
+  - i.e. on-premise deployments
 - Talk about virtualization
   - Host OS
   - Guest OS
   - Application containers
 - How to upgrade everyone within an organization to the same pinned version of
   Nix
+- NixOS options
+  - How to query NixOS options (e.g. using `nixos-option` or evaluation)
+  - How to browse/search NixOS options?
+- Manage secrets
+- Caching
+  - Setting up a cache
+  - Uploading to a cache
+- Flakes
+  - For managing NixOS systems
+- How to write your own deploy tool
+  - i.e. the same as my "NixOS in production" post
+- NixOS system administration
+- Show an example of embedding code inline within a NixOS configuration file
+ - … and also having that code reference NixOS options
+ - … and how to deal with the code getting rebuilt if the options changed
 
 - Read through various nix CLI commands to see if new functionality was added
