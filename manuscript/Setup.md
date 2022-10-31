@@ -54,7 +54,7 @@ $ sh <(curl --location "${URL}")
 
 … and you can find the full set of available releases by visiting the [release file server](https://releases.nixos.org/?prefix=nix/).
 
-{blurb, class:information}
+{blurb, class: information}
 Feel free to use a Nix version newer than 2.11.0 if you want.  The above example installation script only pins the version 2.11.0 because that's what happened to be the latest stable version at the time of this writing.  That's also the Nix version that the examples from this book have been tested against.
 
 The only really important thing is that everyone within your organization uses the same version of Nix.
@@ -148,7 +148,7 @@ $ sh <(curl --location "${URL}") \
 Note: if you see a star next to an insert like this one, that means that I won't suggest any further improvements to the instructions.
 {/blurb}
 
-{blurb, class:information}
+{blurb, class: information}
 The prior script only works if your shell is Bash or Zsh and all shell commands throughout this book assume the use of one of those two shells.
 
 For example, the above command uses support for process substitution (which is not available in a POSIX-only shell environment) because otherwise we'd have to create a temporary file to store the `CONFIGURATION` and clean up the temporary file afterwards (which is tricky to do 100% reliably).  Process substitution is also more reliable than a temporary file because it happens entirely in memory and the intermediate result can't be accidentally deleted.
@@ -169,6 +169,8 @@ If you are using Linux (including NixOS or the Windows Subsystem for Linux) you 
 Save the following file to `flake.nix`:
 
 ```nix
+# flake.nix
+
 # flake.nix
 
 { inputs = {
@@ -212,7 +214,9 @@ Save the following file to `flake.nix`:
         '';
 
       in
-        { apps.default = {
+        { packages = { inherit machine; };
+
+          apps.default = {
             type = "app";
 
             program = "${program}";
