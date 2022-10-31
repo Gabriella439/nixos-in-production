@@ -7,11 +7,11 @@ Now that we can build and run a local NixOS machine we can create our first toy 
 Let's build on the baseline `module.nix` by creating a machine that serves a simple static "Hello, world!" page on `http://localhost`:
 
 ```nix
+# ./module.nix
+
 { pkgs, ... }:
 
-{ networking.firewall.allowedTCPPorts = [ 80 ];
-
-  services.nginx = {
+{ services.nginx = {
     enable = true;
 
     virtualHosts.localhost = {
@@ -31,7 +31,15 @@ Let's build on the baseline `module.nix` by creating a machine that serves a sim
     };
   };
 
+  networking.firewall.allowedTCPPorts = [ 80 ];
+
+  virtualisation.forwardPorts = [
+    { from = "host"; guest.port = 80; host.port = 8080; }
+  ];
+
   users.users.root.initialPassword = "";
+
+  system.stateVersion = "22.11";
 }
 ```
 
@@ -41,15 +49,40 @@ You can read the above code as saying:
 
   In other words, `nginx` will only respond to requests addressed to `localhost` (e.g. `127.0.0.1`).
 
-- Open port 80 on the firewall
+- Serve a static web page
+
+  … which is a bare-bones "Hello, world!" HTML page.
+
+- Open port 80 on the virtual machine's firewall
 
   … since that is the port that `nginx` will listen on by default until we create a certificate and enable TLS.
 
-- Serve a static web page
+- Forward port 80 on the "guest" to port 8080 on the "host"
 
-  … which is a very bare-bones "Hello, world!" HTML page.
+  The "guest" is the virtual machine and the "host" is your development machine.
 
-Following the same instructions as the previous chapter:
+- Allow the `root` user to log in with an empty password
+
+- Set the system "state version" to 22.11
+
+{blurb, class: information}
+You always want to specify a system state version that matches starting revision of Nixpkgs and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
+
+Nixpkgs uses the state version to migrate your NixOS system because in order to migrate your system Nixpkgs needs to know which Nixpkgs release your system first started from.
+
+Two common mistakes NixOS users sometimes make are:
+
+- updating the state version when they upgrade Nixpkgs
+
+  This will cause the machine to never be migrated because Nixpkgs will
+  believe that the machine was never deployed to an older version.
+
+- specifying a uniform state version for a fleet of long-lived NixOS machines
+
+  For example, you might have one NixOS machine in your data center that was first deployed using Nixpkgs 21.11 and another machine in your data center that was first deployed using Nixpkgs 22.05.  If you try to share the same state version across both machines then one or the other might not upgrade correctly.
+{/blurb}
+
+Now we can deploy the virtual machine by following the same instructions from the previous chapter:
 
 - begin from the `flake.nix` file included in the previous chapter
 
@@ -61,62 +94,13 @@ Following the same instructions as the previous chapter:
 
   … also from within the same directory
 
-You can then log into the server as the `root` user with an empty password:
-
-```bash
-nixos login: root<Enter>
-Password: <Enter>
-
-[root@nixos:~]# 
-```
-
-… and then use `curl` to verify that `nginx` is serving the web page on port 80:
-
-```bash
-[root@nixos:~]# curl http://localhost
-<html>
-<body>
-Hello, world!
-</body>
-</html>
-```
-
-{blurb, class: warning}
-In general I don't recommend testing things by hand like this.  Later on we'll automate this sort of testing using NixOS's support for integration tests.
-{/blurb}
-
-We need to make one additional change before we can open the same page in our
-browser.  Stop the NixOS server by:
-
-- Typing `Ctrl`-`a` + `c` to open the `qemu` console:
-
-  … which should look like this:
-
-  ```bash
-  [root@nixos:~]# <Ctrl-a><c>
-  QEMU 7.1.0 monitor - type 'help' for more information
-  (qemu) 
-  ```
-
-- Entering the `quit` command in the `qemu` console to stop the virtual machine
-
-  ```bash
-  (qemu) quit<Enter>
-  ```
-
-Now restart the server, but this time using the following modified run `command`:
-
-```bash
-$ QEMU_NET_OPTS='hostfwd=tcp::8080-:80' nix run
-```
-
-This instructs `qemu` to forward port 80 on the virtual machine (the "guest") to port 8080 on our development machine (the "host").  Once the above command succeeds you can open the web page in your browser by visiting:
-
-[`http://localhost:8080`](http://localhost:8080)
-
-… which should display the following web page>
+Once the above command succeeds you can open the web page in your browser by visiting [`http://localhost:8080`](http://localhost:8080) which should display the following contents:
 
 > Hello, world!
+
+{blurb, class: warning}
+In general I don't recommend testing things by hand like this.  In a later chapter we'll automate this sort of testing using NixOS's support for integration tests.
+{/blurb}
 
 ## DevOps
 
@@ -125,11 +109,11 @@ The above example illustrates how far you can take DevOps with NixOS.  If the we
 Just for fun: let's blur the boundary even further by templating the web page with some system configuration options:
 
 ```nix
+# ./module.nix
+
 { config, lib, pkgs, ... }:
 
-{ networking.firewall.allowedTCPPorts = [ 80 ];
-
-  services.nginx = {
+{ services.nginx = {
     enable = true;
 
     virtualHosts.localhost = {
@@ -159,11 +143,39 @@ Just for fun: let's blur the boundary even further by templating the web page wi
     };
   };
 
+  networking.firewall.allowedTCPPorts = [ 80 ];
+
+  virtualisation.forwardPorts = [
+    { from = "host"; guest.port = 80; host.port = 8080; }
+  ];
+
   users.users.root.initialPassword = "";
+
+  system.stateVersion = "22.11";
 }
 ```
 
-… which should now display the following web page:
+You can restart the server to incorporate these new changes by:
+
+- Typing `Ctrl`-`a` + `c` to open the `qemu` console:
+
+  … which should look like this:
+
+  ```bash
+  [root@nixos:~]# <Ctrl-a><c>
+  QEMU 7.1.0 monitor - type 'help' for more information
+  (qemu) 
+  ```
+
+- Entering the `quit` command in the `qemu` console to stop the virtual machine
+
+  ```bash
+  (qemu) quit<Enter>
+  ```
+
+- Running `nix run` again after the virtual machine shuts down
+
+If you refresh [http://localhost:8080](http://localhost:8080) the page should now display:
 
 > This server's firewall has the following open ports:
 > 
@@ -180,73 +192,86 @@ $ nix eval .#machine.config.networking.firewall.allowedTCPPorts
 I'll cover this in more detail in a later chapter on the NixOS module system.
 {/blurb}
 
-## Improving robustness
+## TODO list
 
-* * *
+Now we're going to create the first prototype of a toy web application: a TODO list implemented entirely in client-side in JavaScript (for now).
+
+Create a subdirectory named `www` within your current directory:
+
+```bash
+$ mkdir www
+```
+
+… and then save a file named `index.html` with the following contents underneath that subdirectory:
+
+```html
+<html>
+<body>
+<button id='add'>+</button>
+</body>
+<script>
+let add = document.getElementById('add');
+function newTask() {
+    let subtract = document.createElement('button');
+    subtract.textContent = "-";
+    let input = document.createElement('input');
+    input.setAttribute('type', 'text');
+    let div = document.createElement('div');
+    div.replaceChildren(subtract, input);
+    function remove() {
+      div.replaceChildren();
+      div.remove();
+    }
+    subtract.addEventListener('click', remove);
+    add.before(div);
+}
+add.addEventListener('click', newTask);
+</script>
+</html>
+```
+
+In other words, the above file should be located at `./www/index.html` relative to the directory where you keep your `module.nix` file.
+
+Now save the following NixOS configuration to `module.nix`:
 
 ```nix
-{ pkgs, ... }:
+# ./module.nix
 
-let
-  overlay = self: super: {
-    website = self.writeTextDir "index.html"
-      ''
-      <html>
-      <body>
-      <button id='add'>+</button>
-      </body>
-      <script>
-      let add = document.getElementById('add');
+{ services.nginx = {
+    enable = true;
 
-      function newTask() {
-          let subtract = document.createElement('button');
+    virtualHosts.localhost = {
+      default = true;
 
-          subtract.textContent = "-";
+      locations."/" = {
+        index = "index.html";
 
-          let input = document.createElement('input');
-
-          input.setAttribute('type', 'text');
-
-          let div = document.createElement('div');
-
-          div.replaceChildren(subtract, input);
-
-          function remove() {
-            div.replaceChildren();
-
-            div.remove();
-          }
-
-          subtract.addEventListener('click', remove);
-
-          add.before(div);
-      }
-
-      add.addEventListener('click', newTask);
-      </script>
-      </html>
-      '';
-  };
-
-in
-  { networking.firewall.allowedTCPPorts = [ 80 ];
-
-    nixpkgs.overlays = [ overlay ];
-
-    services.nginx = {
-      enable = true;
-
-      virtualHosts.localhost = {
-        default = true;
-
-        locations."/" = {
-          index = "index.html";
-
-          root = pkgs.website;
-        };
+        root = ./www;
       };
     };
+  };
 
-    users.users.root.initialPassword = "";
-  }
+  networking.firewall.allowedTCPPorts = [ 80 ];
+
+  virtualisation.forwardPorts = [
+    { from = "host"; guest.port = 80; host.port = 8080; }
+  ];
+
+  users.users.root.initialPassword = "";
+
+  system.stateVersion = "22.11";
+}
 ```
+
+If you restart the virtual machine and refresh the web page you'll see a web page with a single `+` button:
+
+![](./resources/plus-button.png)
+
+Each time you click the `+` button it will add a TODO list item consisting of:
+
+- A text entry field to record the TODO item
+- A `-` button to delete the TODO item
+
+![](./resources/todo-list.png)
+
+## Passing through the filesystem
