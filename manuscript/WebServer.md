@@ -275,3 +275,24 @@ Each time you click the `+` button it will add a TODO list item consisting of:
 ![](./resources/todo-list.png)
 
 ## Passing through the filesystem
+
+The previous NixOS configuration requires rebuilding and restarting the virtual machine every time we change the web page.  If you try to change the `./www/index.html` file while the virtual machine is running you won't see any changes take effect.
+
+However, we can pass through our local filesystem to the virtual machine so that we can easily test changes.  To do so, add the following option to the configuration:
+
+```nix
+  virtualisation.sharedDirectories.www = {
+    source = "$WWW";
+    target = "/var/www";
+  };
+```
+
+… and then restart the machine, except with a slightly modified version of our original `nix run` command:
+
+```bash
+WWW="$PWD/www" nix run
+```
+
+Now, we only need to refresh the page to view changes to `index.html`.
+
+**Exercise**: Add the title "TODO list" to the web page and refresh the page to confirm that your changes took effect.

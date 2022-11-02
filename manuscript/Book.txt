@@ -2,4 +2,4 @@ Introduction.md
 Motivation.md
 BigPicture.md
 Setup.md
-ExampleServer.md
+WebServer.md
