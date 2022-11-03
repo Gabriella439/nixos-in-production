@@ -169,10 +169,6 @@ If you are using Linux (including NixOS or the Windows Subsystem for Linux) you 
 Save the following file to `flake.nix`:
 
 ```nix
-# flake.nix
-
-# flake.nix
-
 { inputs = {
     flake-utils.url = "github:numtide/flake-utils/v1.0.0";
 

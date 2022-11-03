@@ -7,27 +7,23 @@ Now that we can build and run a local NixOS machine we can create our first toy 
 Let's build on the baseline `module.nix` by creating a machine that serves a simple static "Hello, world!" page on `http://localhost`:
 
 ```nix
-# ./module.nix
+# module.nix
 
 { pkgs, ... }:
 
 { services.nginx = {
     enable = true;
 
-    virtualHosts.localhost = {
-      default = true;
+    virtualHosts.localhost.locations."/" = {
+      index = "index.html";
 
-      locations."/" = {
-        index = "index.html";
-
-        root = pkgs.writeTextDir "index.html" ''
-         <html>
-         <body>
-         Hello, world!
-         </body>
-         </html>
-       '';
-      };
+      root = pkgs.writeTextDir "index.html" ''
+       <html>
+       <body>
+       Hello, world!
+       </body>
+       </html>
+     '';
     };
   };
 
@@ -66,7 +62,7 @@ You can read the above code as saying:
 - Set the system "state version" to 22.11
 
 {blurb, class: information}
-You always want to specify a system state version that matches starting revision of Nixpkgs and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
+You always want to specify a system state version that matches starting version of Nixpkgs and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
 
 Nixpkgs uses the state version to migrate your NixOS system because in order to migrate your system Nixpkgs needs to know which Nixpkgs release your system first started from.
 
@@ -109,37 +105,33 @@ The above example illustrates how far you can take DevOps with NixOS.  If the we
 Just for fun: let's blur the boundary even further by templating the web page with some system configuration options:
 
 ```nix
-# ./module.nix
+# module.nix
 
 { config, lib, pkgs, ... }:
 
 { services.nginx = {
     enable = true;
 
-    virtualHosts.localhost = {
-      default = true;
+    virtualHosts.localhost.locations."/" = {
+      index = "index.html";
 
-      locations."/" = {
-        index = "index.html";
+      root = pkgs.writeTextDir "index.html" ''
+       <html>
+       <body>
+       This server's firewall has the following open ports:
 
-        root = pkgs.writeTextDir "index.html" ''
-         <html>
-         <body>
-         This server's firewall has the following open ports:
+       <ul>
+       ${
+       let
+         renderPort = port: "<li>${toString port}</li>\n";
 
-         <ul>
-         ${
-         let
-           renderPort = port: "<li>${toString port}</li>\n";
-
-          in
-            lib.concatMapStrings renderPort config.networking.firewall.allowedTCPPorts
-         }
-         </ul>
-         </body>
-         </html>
-       '';
-      };
+        in
+          lib.concatMapStrings renderPort config.networking.firewall.allowedTCPPorts
+       }
+       </ul>
+       </body>
+       </html>
+     '';
     };
   };
 
@@ -235,19 +227,15 @@ In other words, the above file should be located at `./www/index.html` relative 
 Now save the following NixOS configuration to `module.nix`:
 
 ```nix
-# ./module.nix
+# module.nix
 
 { services.nginx = {
     enable = true;
 
-    virtualHosts.localhost = {
-      default = true;
+    virtualHosts.localhost.locations."/" = {
+      index = "index.html";
 
-      locations."/" = {
-        index = "index.html";
-
-        root = ./www;
-      };
+      root = ./www;
     };
   };
 
