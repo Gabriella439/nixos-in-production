@@ -63,6 +63,7 @@ You can read the above code as saying:
 
 - Allow the `root` user to log in with an empty password
 
+
 - Set the system "state version" to 22.11
 
 {blurb, class: information}
@@ -264,7 +265,8 @@ Now save the following NixOS configuration to `module.nix`:
 
 If you restart the virtual machine and refresh the web page you'll see a web page with a single `+` button:
 
-![](./resources/plus-button.png)
+{align: left}
+![](./plus-button.png)
 
 Each time you click the `+` button it will add a TODO list item consisting of:
 
@@ -272,7 +274,8 @@ Each time you click the `+` button it will add a TODO list item consisting of:
 
 - A `-` button to delete the TODO item
 
-![](./resources/todo-list.png)
+{align: left}
+![](./todo-list.png)
 
 ## Passing through the filesystem
 
