@@ -1,6 +1,6 @@
 # Our first web server
 
-Now that we can build and run a local NixOS machine we can create our first toy web server.  We will use this toy server throughout this book as the running example which will start off simple and slowly grow in maturity as we increase the realism of the example and build out the supporting infrastructure.
+Now that we can build and run a local NixOS virtual machine we can create our first toy web server.  We will use this server throughout this book as the running example which will start off simple and slowly grow in maturity as we increase the realism of the example and build out the supporting infrastructure.
 
 ## Hello, world!
 
@@ -45,17 +45,21 @@ You can read the above code as saying:
 
   In other words, `nginx` will only respond to requests addressed to `localhost` (e.g. `127.0.0.1`).
 
+
 - Serve a static web page
 
   … which is a bare-bones "Hello, world!" HTML page.
+
 
 - Open port 80 on the virtual machine's firewall
 
   … since that is the port that `nginx` will listen on by default until we create a certificate and enable TLS.
 
+
 - Forward port 80 on the "guest" to port 8080 on the "host"
 
   The "guest" is the virtual machine and the "host" is your development machine.
+
 
 - Allow the `root` user to log in with an empty password
 
@@ -73,9 +77,10 @@ Two common mistakes NixOS users sometimes make are:
   This will cause the machine to never be migrated because Nixpkgs will
   believe that the machine was never deployed to an older version.
 
-- specifying a uniform state version for a fleet of long-lived NixOS machines
 
-  For example, you might have one NixOS machine in your data center that was first deployed using Nixpkgs 21.11 and another machine in your data center that was first deployed using Nixpkgs 22.05.  If you try to share the same state version across both machines then one or the other might not upgrade correctly.
+- specifying a uniform state version across a fleet of NixOS machines
+
+  For example, you might have one NixOS machine in your data center that was first deployed using Nixpkgs 21.11 and another machine in your data center that was first deployed using Nixpkgs 22.05.  If you try to change their state versions to match then one or the other might not upgrade correctly.
 {/blurb}
 
 Now we can deploy the virtual machine by following the same instructions from the previous chapter:
@@ -86,23 +91,27 @@ Now we can deploy the virtual machine by following the same instructions from th
 
   … in the same directory as the `flake.nix` file.
 
+
 - Run `nix run`
 
   … also from within the same directory
+
 
 Once the above command succeeds you can open the web page in your browser by visiting [`http://localhost:8080`](http://localhost:8080) which should display the following contents:
 
 > Hello, world!
 
 {blurb, class: warning}
-In general I don't recommend testing things by hand like this.  In a later chapter we'll automate this sort of testing using NixOS's support for integration tests.
+In general I don't recommend testing things by hand like this.  Remember the "master cue":
+
+> Every common build/test/deploy-related activity should be possible with at most a single command using Nix’s command line interface.
+
+In a later chapter we'll cover how to automate this sort of testing using NixOS's support for integration tests.
 {/blurb}
 
 ## DevOps
 
-The above example illustrates how far you can take DevOps with NixOS.  If the web page represents the software development half of the project (the "Dev") and the `nginx` configuration represents the operational half of the project (the "Ops") then we can in principle store both the "Dev" and the "Ops" halves of our project within the same file.  In general, we typically don't want to do this, but we *can* and there's no limit to how far we can blur the boundary between Dev and Ops when we use NixOS.
-
-Just for fun: let's blur the boundary even further by templating the web page with some system configuration options:
+The above example illustrates how far you can take DevOps with NixOS.  If the inline web page represents the software development half of the project (the "Dev") and the `nginx` configuration represents the operational half of the project (the "Ops") then we can in principle store both the "Dev" and the "Ops" halves of our project within the same file.  As an extreme example, we can even template the web page with system configuration options!
 
 ```nix
 # module.nix
@@ -159,11 +168,13 @@ You can restart the server to incorporate these new changes by:
   (qemu) 
   ```
 
+
 - Entering the `quit` command in the `qemu` console to stop the virtual machine
 
   ```bash
   (qemu) quit<Enter>
   ```
+
 
 - Running `nix run` again after the virtual machine shuts down
 
@@ -186,7 +197,7 @@ I'll cover this in more detail in a later chapter on the NixOS module system.
 
 ## TODO list
 
-Now we're going to create the first prototype of a toy web application: a TODO list implemented entirely in client-side in JavaScript (for now).
+Now we're going to create the first prototype of a toy web application: a TODO list implemented entirely in client-side in JavaScript (for now; later we'll add a backend server).
 
 Create a subdirectory named `www` within your current directory:
 
@@ -258,6 +269,7 @@ If you restart the virtual machine and refresh the web page you'll see a web pag
 Each time you click the `+` button it will add a TODO list item consisting of:
 
 - A text entry field to record the TODO item
+
 - A `-` button to delete the TODO item
 
 ![](./resources/todo-list.png)
@@ -283,4 +295,4 @@ WWW="$PWD/www" nix run
 
 Now, we only need to refresh the page to view changes to `index.html`.
 
-**Exercise**: Add the title "TODO list" to the web page and refresh the page to confirm that your changes took effect.
+**Exercise**: Add a "TODO list" heading (i.e. `<h1>TODO list</h1>`)to the web page and refresh the page to confirm that your changes took effect.
