@@ -97,7 +97,7 @@ Choose installation method.
 {blurb, class: warning}
 You might wonder if you can use the `--tarball-url-prefix` option for distributing a custom build of Nix, but that's not what this option is for.  You can only use this option to download Nix from a different location (e.g. an internal mirror), because the new download still has to match the same integrity check as the old download.
 
-Don't worry, though; there still is a way to distribute a custom build of Nix, and we'll cover that in a later chapter.
+Don't worry, though; there still is a way to distribute a custom build of Nix, and we'll cover that at the end of this chapter.
 {/blurb}
 
 ### Configuring the installation
@@ -292,3 +292,94 @@ postgres=#
 … and now you should have command-line access to a `postgres` database.
 
 The run script in the `flake.nix` file ensures that the virtual machine does not persist state in between runs so that you can safely experiment inside of the virtual machine without breaking upcoming examples.
+
+## Appendix: Installing a custom Nix build tool
+
+Sometimes you need to patch the Nix build tool itself, perhaps because you need to incorporate a bug fix or a performance improvement.  There are essentially two ways that you can go about this:
+
+- Install a stock Nix release and then use that to install a custom build of Nix
+
+  This is simpler to build but this also entails more steps on behalf of the end user so there is more room for error.  However, you could automate those post-installation steps with a larger overarching install script.
+
+
+- Install a custom build of Nix from the very beginning
+
+  In other words, you can create an installation script just like the stock installer, except for your patched build of Nix.
+
+
+I'll teach you how to do the latter because it's actually much easier than you might think!
+
+### Patching Nix
+
+No matter which installation method you choose you will need to create a `git` branch containing your desired changes to the Nix build tool.
+
+If you don't already have a branch ready to go then you will need to hack on Nix by following the [development instructions from the Nix manual](https://nixos.org/manual/nix/stable/contributing/hacking.html).  However, if you already have a desired branch to install then you can skip that step.
+
+You (the person creating the custom installer) will need to have Nix installed, but for this purpose a stock Nix installation will do just fine.  However, you will still need to follow the instructions from this chapter when installing Nix in order to enable the use of flakes.
+
+You can now create a custom installation script from a branch of the Nix repository using the following command:
+
+```bash
+$ nix build "${BRANCH_REFERENCE}}#hydraJobs.installerScript"
+```
+
+… where in the common case `${BRANCH_REFERENCE}` will be one of the following:
+
+- … an absolute or relative path to a checkout of your branch
+
+  For example, if you `cd` into the local checkout of your repository you can specify `.` as the branch reference:
+
+  ```bash
+  $ nix build .#hydraJobs.installerScript
+  ```
+
+
+- A GitHub reference of the form: `github:${OWNER}/${REPOSITORY}/${BRANCH}`
+
+  For example, if the Nix repository had an experimental branch named `experimental-branch` then you could create an installer for that branch like this:
+
+  ```bash
+  $ nix build github:NixOS/nix/fix_segmentation_fault
+  ```
+
+For some more examples of supported branch references, run `nix flake --help`.
+
+{blurb, class: information}
+You might wonder what's the point of supporting a GitHub reference if you could just do something like:
+
+```bash
+$ git clone "https://github.com/${OWNER}/${REPOSITORY}.git"
+$ git checkout "${BRANCH}"
+$ nix build .#hydraJobs.installerScript
+```
+
+The reason we prefer the GitHub reference goes back to the "master cue" from the "big picture" chapter:
+
+> Every common build/test/deploy-related activity should be possible with at most one command using Nix's command line interface.
+
+Here, we want to adhere to the master cue because doing so will allow us to exploit the Nix build tool's built-in support for caching `git` repositories.
+{/blurb}
+
+The result of the build is an installation script stored at `./result/install` that anybody behaves just like the stock installation script, except that all of the integrity checks now match your custom build of Nix:
+
+```bash
+$ tree ./result
+./result
+├── install
+└── nix-support
+    └── hydra-build-products
+```
+
+However, the default URL for the installation script needs 
+
+If you were to host this installation script on a web server then users can install it using the same instructions as before:
+
+```bash
+$ VERSION='2.11.0'
+$ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
+$ CONFIGURATION='extra-experimental-features = nix-command flakes repl-flake'
+$ sh <(curl --location "${URL}") \
+    --no-channel-add \
+    --nix-extra-conf-file <(<<< "${CONFIGURATION}")
+```
+
