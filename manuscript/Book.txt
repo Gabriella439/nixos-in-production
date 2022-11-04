@@ -3,3 +3,4 @@ Motivation.md
 BigPicture.md
 Setup.md
 WebServer.md
+Modules.md
