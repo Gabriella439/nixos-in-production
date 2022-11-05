@@ -140,8 +140,6 @@ So what we're going to do is:
 
 So the final installation script we'll end up with is:
 
-{icon: star}
-{blurb}
 ```bash
 $ VERSION='2.11.0'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
@@ -150,9 +148,6 @@ $ sh <(curl --location "${URL}") \
     --no-channel-add \
     --nix-extra-conf-file <(<<< "${CONFIGURATION}")
 ```
-
-Note: if you see a star next to an insert like this one, that means that I won't suggest any further improvements to the instructions.  These starred inserts are the final "golden" instructions.
-{/blurb}
 
 {blurb, class: information}
 The prior script only works if your shell is Bash or Zsh and all shell commands throughout this book assume the use of one of those two shells.
