@@ -1,4 +1,4 @@
-# The module system under the hood
+# NixOS module system basics
 
 Alright, so by this point you may have copied and pasted some NixOS code, but perhaps you don't fully understand what is going on, especially if you're not an experienced NixOS user.  This chapter will slow down and help you solidify your understanding of the NixOS module system so that you can improve your ability to read, author, and debug modules.
 

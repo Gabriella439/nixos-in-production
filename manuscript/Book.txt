@@ -4,3 +4,4 @@ BigPicture.md
 Setup.md
 WebServer.md
 Modules.md
+AdvancedModules.md
