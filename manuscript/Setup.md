@@ -195,12 +195,10 @@ Save the following file to `flake.nix`:
           };
         };
 
-        module = import ./module.nix;
-
         machine = nixpkgs.lib.nixosSystem {
           system = builtins.replaceStrings [ "darwin" ] [ "linux" ] system;
 
-          modules = [ base module ];
+          modules = [ base ./module.nix ];
         };
 
         program = pkgs.writeShellScript "run-vm.sh" ''
