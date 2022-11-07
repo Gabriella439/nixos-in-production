@@ -1,17 +1,15 @@
-# Intermediate module system tricks
+# The NixOS option system
 
-The NixOS module system is actually much more sophisticated than the previous chapter let on.  However, at the time of this writing there is little documentation introducing intermediate module system features and this chapter will fill in that gap.
+The NixOS option system is actually much more sophisticated than the previous chapter let on.  In this chapter we'll cover some common tricks and pitfalls related to the option system so that you can author NixOS modules more idiomatically.
 
 Make sure that you followed the instructions from the "Setting up your development environment" chapter if you would like to test the examples in this chapter.
 
 ## Imports
 
 The NixOS module system lets you import other modules by their path, which merges their option declarations and configuration settings with the current module.
-We've already used this feature 
+But, did you know that the elements of an `imports` list don't have to be paths?
 
- However, 
-
-First off, the elements of an `imports` list don't have to be file paths.  You can put an inline NixOS configuration in the `imports` list, too, like this:
+You can put an inline NixOS configuration in the `imports` list, like this:
 
 ```nix
 { imports = [
@@ -35,7 +33,7 @@ In fact, anything that is a valid NixOS module can go in the import list, includ
 }
 ```
 
-For example, the last chapter concluded with an example split our code into two files: `top-level.nix` and `other.nix`.  However, we could have compressed the example into a single file, like this:
+The last chapter could have made use of this feature!  The final example from that chapter was split into two files: `top-level.nix` and `other.nix`.  However, we could have compressed the example into a single file, like this:
 
 ```nix
 let
