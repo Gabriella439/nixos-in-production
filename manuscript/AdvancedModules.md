@@ -4,6 +4,79 @@ The NixOS module system is actually much more sophisticated than the previous ch
 
 Make sure that you followed the instructions from the "Setting up your development environment" chapter if you would like to test the examples in this chapter.
 
+## Imports
+
+The NixOS module system lets you import other modules by their path, which merges their option declarations and configuration settings with the current module.
+We've already used this feature 
+
+ However, 
+
+First off, the elements of an `imports` list don't have to be file paths.  You can put an inline NixOS configuration in the `imports` list, too, like this:
+
+```nix
+{ imports = [
+    { services.openssh.enable = true; }
+
+    { users.users.root.initialPassword = ""; }
+  ];
+}
+```
+
+… and it will behave as if you had imported a file with the same contents.
+
+In fact, anything that is a valid NixOS module can go in the import list, including NixOS modules that are functions:
+
+```nix
+{ imports = [
+    { services.openssh.enable = true; }
+
+    ({ lib, ... }: { users.users.root.initialPassword = lib.mkDefault ""; })
+  ];
+}
+```
+
+For example, the last chapter concluded with an example split our code into two files: `top-level.nix` and `other.nix`.  However, we could have compressed the example into a single file, like this:
+
+```nix
+let
+  other =
+    { lib, ... }:
+
+    { options = {
+        system.nixos.release = lib.mkOption {
+          description = "The NixOS version";
+
+          type = lib.types.str;
+        };
+      };
+
+      config = {
+        system.nixos.release = "22.05";
+      };
+    };
+
+in
+  { config, lib, ... }:
+
+  { imports = [ other ];
+
+    options = {
+      system.build.toplevel = lib.mkOption {
+        description = "A fake NixOS, modeled as a string";
+
+        type = lib.types.str;
+      };
+    };
+
+    config = {
+      system.build.toplevel =
+        "Fake NixOS - version ${config.system.nixos.release}";
+    };
+  }
+```
+
+I plan to make use of this trick frequently in several examples below, so that we can simulate modules importing other modules within a single file.
+
 ## `lib` utilities
 
 Nixpkgs provides several utility functions for NixOS modules that are stored underneath the "`lib`" hierarchy, and you can find the source code for those functions in [`lib/modules.nix`](https://github.com/NixOS/nixpkgs/blob/22.05/lib/modules.nix).
@@ -17,13 +90,12 @@ That said, this chapter will still try to explain things enough so that you don'
 {/blurb}
 
 You do not need to use or understand all of the functions in there, but you do
-need to familiarize yourself with the following five primitive functions:
+need to familiarize yourself with the following four primitive functions:
 
 * `lib.mkMerge`
 * `lib.mkOverride`
-* `lib.mkOrder`
 * `lib.mkIf`
-* `lib.mkAssert`
+* `lib.mkOrder`
 
 By "primitive", I mean that these functions cannot be implemented in terms of other functions.  They all trigger special behavior built into `lib.evalModules`.
 
@@ -48,8 +120,6 @@ For example, the following NixOS module:
 … is equivalent to this NixOS module:
 
 ```nix
-{ lib, ... }:
-
 { config = {
     services.openssh.enable = true;
     users.users.root.initialPassword = "";
@@ -57,9 +127,36 @@ For example, the following NixOS module:
 }
 ```
 
-By itself, this is not a very useful thing to do and `mkMerge` is more useful in conjunction with other primitives (especially `mkIf`), but the reason we're starting with `mkMerge` is because everything else is easier to explain once we understand `mkMerge`.
+{blurb, class: information}
+You might wonder whether you should merge modules using `lib.mkMerge` or the `imports`.  After all, we could have also written the previous `mkMerge` example as:
 
-### Merging options
+```nix
+{ imports = [
+    { services.openssh.enable = true; }
+    { users.users.root.initialPassword = ""; }
+  ];
+}
+```
+
+… and that would have produced the same result.  So which is better?
+
+The short answer is: `lib.mkMerge` is usually what you want.
+
+The long answer is that the main trade-off between `imports` and `lib.mkMerge` is:
+
+- The `imports` section can merge NixOS modules that are functions
+
+  `lib.mkMerge` can only merge attribute sets and not functions
+
+
+- `imports` have to be statically known
+
+  In practice, this means that you can easily trigger an infinite loop if you try to do anything fancy and you can typically fix it by switching to `lib.mkMerge`
+
+The latter point is the reason why you should typically prefer using `lib.mkMerge`.
+{/blurb}
+
+#### Merging options
 
 You can merge configuration sets that define same option multiple times, like this:
 
@@ -172,7 +269,7 @@ You can also nest `lib.mkMerge` underneath an attribute.  For example, this:
 { config.networking.firewall.allowedTCPPorts = [ 80 443 ]; }
 ```
 
-### Conflicts
+#### Conflicts
 
 Duplicate options cannot necessarily always be merged.  For example, if you merge two configuration sets that disagree on whether to enable a service:
 
@@ -181,8 +278,6 @@ Duplicate options cannot necessarily always be merged.  For example, if you merg
 
 { config = {
     services.openssh.enable = lib.mkMerge [ true false ];
-
-    users.users.root.initialPassword = "";
   };
 }
 ```
@@ -231,9 +326,11 @@ $ nix eval .#machine.config.services.zookeeper.extraConf
 "initLimit=5\nsyncLimit=2"
 ```
 
-### `lib.mkOverride`
+### `mkOverride`
 
 The `lib.mkOverride` specifies the "priority" of a configuration setting, which comes in handy if you want to override a configuration value that another NixOS module already set.
+
+#### Higher priority overrides
 
 This most commonly comes up when we need to override an option that was already set by one of our dependencies (typically a NixOS module provided by Nixpkgs).  One example would be overriding the restart frequency of `nginx`:
 
@@ -270,7 +367,7 @@ However, we can use `mkOverride` to annotate our value with a higher priority so
 }
 ```
 
-… and now that works, since we specified a new priority of 50 which is a higher priority than the default priority.  There is also a pre-existing utility named `lib.mkForce` which sets the priority to 50, so we can use that instead:
+… and now that works, since we specified a new priority of `50` which is a higher priority than the default priority of `100`.  There is also a pre-existing utility named `lib.mkForce` which sets the priority to 50, so we can use that instead:
 
 ```nix
 { lib, ... }:
@@ -302,7 +399,7 @@ That is not equivalent, because it overrides not only the `RestartSec` attribute
 You always want to narrow your use of `lib.mkForce` as much as possible to protect against this common mistake.
 {/blurb}
 
-The default priority is 100 and **lower** numeric values actually represent **higher** priority.  In other words, a NixOS configuration setting with a priority of 50 takes precedence over a NixOS configuration setting with a priority of 100.
+The default priority is `100` and **lower** numeric values actually represent **higher** priority.  In other words, a NixOS configuration setting with a priority of `50` takes precedence over a NixOS configuration setting with a priority of 100.
 
 Yes, the NixOS module system confusingly uses lower numbers to indicate higher priorities, but in practice nobody uses explicit numeric priorities.  Instead, people use derived utilities like `lib.mkForce` or `lib.mkDefault` which select the appropriate numeric priority for you.
 
@@ -329,57 +426,82 @@ $ nix eval .#machine.config.systemd.services.nginx.serviceConfig.RestartSec
 "3s"
 ```
 
-However, leaning on higher-and-higher priorities is usually an anti-pattern and it's usually better to fix the upstream code if you can.  We'll revisit this dilemma in a later chapter when we talk in more depth about NixOS module design.
+#### Lower priority overrides
 
-## `lib.mkIf`
+The default values for options also have a priority, which is priority `1500` and there's a `lib.mkOptionDefault` that sets a configuration value to that same priority.
+
+That means that a NixOS module like this:
+
+```nix
+{ lib, ... }:
+
+{ options.foo = lib.mkOption {
+    default = 1;
+  };
+}
+```
+
+… is the exact same thing as a NixOS module like this:
+
+```nix
+{ lib, ... }:
+
+{ options.foo = lib.mkOption { };
+
+  config.foo = lib.mkOptionDefault 1;
+}
+```
+
+However, you will more commonly use `lib.mkDefault` which sets a configuration value with priority `1000`.  Typically you'll use `lib.mkDefault` if you want to override the default value of an option, while still allowing a downstream user to override the option yet again at the normal priority (`100`).
+
+## `mkIf`
 
 `mkIf` is far-and-away the most widely used NixOS module primitive, because you can use `mkIf` to selectively enable certain configuration settings based on the value of another configuration setting.
 
 An extremely common idiom from Nixpkgs is to use `mkIf` in conjunction with an `enable` option, like this:
 
 ```nix
-# cowsay.nix
-
-{ config, lib, pkgs, ... }:
-
-{ options.services.cowsay = {
-    enable = lib.mkEnableOption "cowsay";
-
-    greeting = lib.mkOption {
-      description = "The phrase the cow will greet you with";
-
-      type = lib.types.str;
-
-      default = "Hello, world!";
-    };
-  };
-
-  config = lib.mkIf config.services.cowsay.enable {
-    systemd.services.cowsay = {
-      wantedBy = [ "multi-user.target" ];
-
-      script = "${pkgs.cowsay}/bin/cowsay ${config.services.cowsay.greeting}";
-    };
-  };
-}
-```
-
-… with the intention that a downstream module would use the upstream module like this:
-
-```nix
 # module.nix
 
-{ imports = [ ./cowsay.nix ];
+let
+  # Pretend that this came from another file
+  cowsay =
+    { config, lib, pkgs, ... }:
 
-  config = {
-    services.cowsay.enable = true;
+    { options.services.cowsay = {
+        enable = lib.mkEnableOption "cowsay";
 
-    users.users.root.initialPassword = "";
-  };
-}
+        greeting = lib.mkOption {
+          description = "The phrase the cow will greet you with";
+
+          type = lib.types.str;
+
+          default = "Hello, world!";
+        };
+      };
+
+      config = lib.mkIf config.services.cowsay.enable {
+        systemd.services.cowsay = {
+          wantedBy = [ "multi-user.target" ];
+
+          script = "${pkgs.cowsay}/bin/cowsay ${config.services.cowsay.greeting}";
+        };
+      };
+    }
+
+in
+  { imports = [ cowsay ];
+
+    config = {
+      services.cowsay.enable = true;
+
+      users.users.root.initialPassword = "";
+    };
+  }
 ```
 
-Save the above two modules to `cowsay.nix` and `module.nix` respectively, then start the virtual machine and log in as `root`.  You should be able to check on the status of the `cowsay` service like this:
+If you launch the above NixOS configuration and log in as `root` you should be
+able to verify that the `cowsay` service is running like this:
 
 ```
 [root@nixos:~]# systemctl status cowsay
@@ -464,53 +586,136 @@ The reason why is because the recursion is not well-founded:
 
 … which makes the recursion well-founded.
 
-The second reason we use `lib.mkIf` is because it correctly handles the fallback case.  To see why that matters, consider this example that tries to create a `service.kafka.enable` short-hand synonym for `services.apache-kafka.enable`::
+The second reason we use `lib.mkIf` is because it correctly handles the fallback case.  To see why that matters, consider this example that tries to create a `service.kafka.enable` short-hand synonym for `services.apache-kafka.enable`:
 
 ```nix
-# ./just-kafka.nix
+let
+  kafkaSynonym =
+    { config, lib, ... }:
 
-{ config, lib, ... }:
+    { options.services.kafka.enable = lib.mkEnableOption "apache";
 
-{ options.services.kafka.enable = lib.mkEnableOption "apache";
+      config.services.apache-kafka.enable = config.services.kafka.enable;
+    };
 
-  config.services.apache-kafka.enable = config.services.kafka.enable;
-}
+in
+  { imports = [ kafkaSynonym ];
+
+    config.services.apache-kafka.enable = true;
+  }
 ```
 
-However, if a downstream module were to set `services.apache-kafka.enable`:
-
-```nix
-{ imports = [ ./just-kafka.nix ];
-
-  config.services.apache-kafka.enable = true;
-}
-```
-
-… then that would conflict because `just-kafka.nix` is explicitly setting `services.kafka.enable` to `false` by default (at priority 100), and our own module is setting `services.apache-kafka.enable` to `true` (also at priority 100).
+The above example leads to a conflict because the `kafkaSynonym` module sets `services.kafka.enable` to `false` (at priority 100), and the downstream module sets `services.apache-kafka.enable` to `true` (also at priority 100).
 
 Had we instead used `mkIf` like this:
 
 ```nix
-# ./just-kafka.nix
+let
+  kafkaSynonym =
+    { config, lib, ... }:
 
-{ config, lib, ... }:
+    { options.services.kafka.enable = lib.mkEnableOption "apache";
 
-{ options.services.kafka.enable = lib.mkEnableOption "apache";
+      config.services.apache-kafka.enable =
+        lib.mkIf config.services.kafka.enable true;
+    };
 
-  config.services.apache-kafka.enable =
-    lib.mkIf config.services.kafka.enable true;
-}
+in
+  { imports = [ kafkaSynonym ];
+
+    config.services.apache-kafka.enable = true;
+  }
 ```
 
-… then that would do the right thing because in the default case `services.apache-kafka.enable` would be unset, which would be the same thing as being set to `false` at priority 1500.
+… then that would do the right thing because in the default case `services.apache-kafka.enable` would remain unset, which would be the same thing as being set to `false` at priority `1500`.  That avoids setting the same option twice at the same priority.
 
-#### TODO
+### `mkOrder`
 
-- Explain that you want to import modules by path, not value
-- Explain the `cfg` idiom
-- Talk about merging option values
-- Talk about common pitfalls (especially related to `mkForce`)
-- Talk about `lib.mkDefault` trick and not creating an option default that
-  doesn't depend on another option's value
-- Exercise: Query another option/config value from command line or nix repl
-- Exercise: Why can't you set the same option twice without `mkMerge`?
+The NixOS module system strives to make the behavior of our system depend as little as possible on the order in which we import or `mkMerge` NixOS modules.  In other words, if we import two modules that we depend on:
+
+```nix
+{ imports = [ ./A.nix ./B.nix ]; }
+```
+
+… then ideally the behavior shouldn't change if we import those same two modules in a different order:
+
+```nix
+{ imports = [ ./B.nix ./A.nix ]; }
+```
+
+… and in *most cases* that is true.  99% of the time you can safely sort your import list and either your NixOS system will be *exactly* the same as before (down to the hash) or *essentially* the same as before, meaning that the difference is irrelevant.  However, for those 1% of cases where order matters we use the `lib.mkOrder` function.
+
+Here's a common example of where ordering matters:
+
+```nix
+let
+  moduleA = { pkgs, ... }: {
+    environment.defaultPackages = [ pkgs.gcc ];
+  };
+
+  moduleB = { pkgs, ... }: {
+    environment.defaultPackages = [ pkgs.clang ];
+  };
+
+in
+  { imports = [ moduleA moduleB ];
+
+    users.users.root.initialPassword = "";
+  }
+```
+
+Both the `gcc` and `clang` package add a `cc` executable to the `PATH`, so the order matters here because the first `cc` on the `PATH` wins.
+
+Surprisingly, `clang`'s `cc` is the first one on the `PATH`, even though we imported `moduleB` second:
+
+```bash
+[root@nixos:~]# readlink $(type -p cc)
+/nix/store/6szy6myf8vqrmp8mcg8ps7s782kygy5g-clang-wrapper-11.1.0/bin/cc
+```
+
+… and if we flip the order imports:
+
+```nix
+  { imports = [ cowsay moduleB moduleA ]; }
+```
+
+… then we `gcc`'s `cc` comes first on the `PATH`:
+
+```bash
+[root@nixos:~]# readlink $(type -p cc)
+/nix/store/9wqn04biky07333wkl35bfjv9zv009pl-gcc-wrapper-9.5.0/bin/cc
+```
+
+This sort of order-sensitivity frequently arises for "list-like" option types,
+including actual lists or string types that concatenate multiple definitions.
+
+Fortunately, we can fix situations like these with the `lib.mkOrder` function, which specifies a numeric ordering that NixOS will respect when merging multiple definitions of the same option.
+
+Every option's numeric order is `1000` by default, so if we set the numeric order of `clang` to `1001`:
+
+```
+let
+  moduleA = { pkgs, ... }: {
+    environment.defaultPackages = [ pkgs.gcc ];
+  };
+
+  moduleB = { lib, pkgs, ... }: {
+    environment.defaultPackages = lib.mkOrder 1001 [ pkgs.clang ];
+  };
+
+in
+  { imports = [ moduleA moduleB ];
+
+    users.users.root.initialPassword = "";
+  }
+```
+
+… then `gcc` will always come first on the `PATH`, no matter which order we import the modules.
+
+You can also use `lib.mkBefore` and `lib.mkAfter`, which provide convenient synonyms for numeric order `500` and `1500`, respectively:
+
+```nix
+mkBefore = mkOrder 500;
+
+mkAfter = mkOrder 1500;
+```
