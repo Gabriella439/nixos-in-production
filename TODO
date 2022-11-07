@@ -1,7 +1,3 @@
-- What does a mature NixOS enterprise look like?
-- Talk about the broad strategies for getting Nix adopted
-  - Using NixOS as the host operating system (the approach this book will cover)
-  - Building containers
 - Important NixOS options
   - `system.stateVersion`
   - `system.extraDependencies`
@@ -60,6 +56,7 @@
   - Uploading to a cache
 - Flakes
   - For managing NixOS systems
+  - Opening up a flake attribute in `nix repl`
 - How to write your own deploy tool
   - i.e. the same as my "NixOS in production" post
 - NixOS system administration
@@ -67,5 +64,17 @@
  - … and also having that code reference NixOS options
  - … and how to deal with the code getting rebuilt if the options changed
 - How to distribute and install a patched Nix build
+- Brief systemd tutorial
+- How to generate NixOS options documentation (and search?)
 
 - Read through various nix CLI commands to see if new functionality was added
+
+- Add exercises
+
+* * *
+
+Things to edit for:
+
+- Consistent Nix version
+- Consistent Nixpkgs version
+- Correct syntax highlighting for code blocks
