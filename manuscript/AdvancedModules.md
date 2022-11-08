@@ -6,8 +6,7 @@ Make sure that you followed the instructions from the "Setting up your developme
 
 ## Imports
 
-The NixOS module system lets you import other modules by their path, which merges their option declarations and configuration settings with the current module.
-But, did you know that the elements of an `imports` list don't have to be paths?
+The NixOS module system lets you import other modules by their path, which merges their option declarations and configuration settings with the current module.  But, did you know that the elements of an `imports` list don't have to be paths?
 
 You can put an inline NixOS configuration in the `imports` list, like this:
 
@@ -73,7 +72,7 @@ in
   }
 ```
 
-I plan to make use of this trick frequently in several examples below, so that we can simulate modules importing other modules within a single file.
+I will make use of this trick in a few examples below, so that we can simulate modules importing other modules within a single file.
 
 ## `lib` utilities
 
@@ -126,7 +125,7 @@ For example, the following NixOS module:
 ```
 
 {blurb, class: information}
-You might wonder whether you should merge modules using `lib.mkMerge` or the `imports`.  After all, we could have also written the previous `mkMerge` example as:
+You might wonder whether you should merge modules using `lib.mkMerge` or merge them using the `imports` list.  After all, we could have also written the previous `mkMerge` example as:
 
 ```nix
 { imports = [
@@ -147,11 +146,11 @@ The long answer is that the main trade-off between `imports` and `lib.mkMerge` i
   `lib.mkMerge` can only merge attribute sets and not functions
 
 
-- `imports` have to be statically known
+- The list of `imports` can't depend on any configuration values
 
-  In practice, this means that you can easily trigger an infinite loop if you try to do anything fancy and you can typically fix it by switching to `lib.mkMerge`
+  In practice, this means that you can easily trigger an infinite loop if you try to do anything fancy using `imports` and you can typically fix it by switching to `lib.mkMerge`
 
-The latter point is the reason why you should typically prefer using `lib.mkMerge`.
+The latter point is why you should typically prefer using `lib.mkMerge`.
 {/blurb}
 
 #### Merging options
@@ -178,7 +177,7 @@ $ nix eval .#machine.options.networking.firewall.allowedTCPPorts.type.descriptio
 "list of 16 bit unsigned integer; between 0 and 65535 (both inclusive)"
 ```
 
-… and list-like options, if you specify them twice the lists are combined.  In the above example, it's as if we had instead written this:
+If you specify a list-valued option twice, the lists are combined, so the above example reduces to this:
 
 ```nix
 { lib, ... }:
@@ -452,7 +451,7 @@ That means that a NixOS module like this:
 
 However, you will more commonly use `lib.mkDefault` which sets a configuration value with priority `1000`.  Typically you'll use `lib.mkDefault` if you want to override the default value of an option, while still allowing a downstream user to override the option yet again at the normal priority (`100`).
 
-## `mkIf`
+### `mkIf`
 
 `mkIf` is far-and-away the most widely used NixOS module primitive, because you can use `mkIf` to selectively enable certain configuration settings based on the value of another configuration setting.
 
