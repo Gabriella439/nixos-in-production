@@ -58,16 +58,16 @@ In other words:
   The Nix build tool would automatically infer which tests depended on your project and rerun those.  Other test runs and their results would be cached if their dependency tree did not include your changes.
 
 
-Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely need to reinvent large portions of the Nix ecosystem for this automation to be sufficiently robust and efficient.  For example:
+Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely need to reinvent large portions of the Nix ecosystem for this automation to be sufficiently robust and efficient:
 
 - *Do you maintain a file server for sharing intermediate build products?*
 
-  Congratulations, you're implementing your own version of the Nix store and caching system
+  You're likely implementing your own version of the Nix store and caching system
 
 
 - *Do you generate unique labels for build products to isolate them?*
 
-  In the best case scenario, the label is a hash of the artifact's transitive build-time dependencies and you've reinvented the hash component of `/nix/store` paths.  In the worst case scenario you're doing something different and worse (e.g. using timestamps in the labels instead of hashes).
+  In the best case scenario, you label build products by a hash of their dependencies and you've reinvented Nix's hashing scheme.  In the worst case scenario you're doing something less accurate (e.g. using timestamps in the labels instead of hashes).
 
 
 - *Do you have a custom script that updates references to these build products?*
@@ -134,7 +134,7 @@ NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) princi
   - Environment variables
 
 
-In extreme cases, you can even embed non-Nix code and do "pure software development" entirely within NixOS.  In other words, you can author inline code written within another language inside of a NixOS configuration file.  We'll walk through an example of this later on in the "Our first web server" chapter.
+In extreme cases, you can even embed non-Nix code inside of Nix and do "pure software development".  In other words, you can author inline code written within another language inside of a NixOS configuration file.  We'll walk through an example of this later on in the "Our first web server" chapter.
 
 ## Architecture
 
@@ -144,20 +144,22 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
 
   If we're going to use GitOps then we had better use `git`!  More specifically, we'll likely use a `git` hosting provider like [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) which support pull requests and continuous integration.
 
+  Most companies these days use version control, so this is not a surprising requirement.
+
 
 - *A central build server (the "hub")*
 
   This server initiates builds for continuous integration, which are delegated to builders.
 
 
-- *Builders for each platform (the "spokes")*
+- *Builders for each platform*
 
   These builders perform the actual Nix builds.  However, remember that everything (even an integration test) is going to be a Nix build, so these builders essentially do all the work.
 
-  These builders will perform distributed builds on behalf of two clients:
+  These builders will come in two flavors:
 
-  - The hub, for continuous integration
-  - Developers, when they need to build for a different platform
+  - Builders for the hub (the "spokes")
+  - Builders for developers, when they need to build for a different platform
 
 
 - *A cache*
@@ -167,7 +169,7 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
 
 - *One or more "utility" servers*
 
-  A "utility" server is a NixOS server that you can use to host IT infrastructure and miscellaneous utility services to support developers (e.g. web pages, chatbots).
+  A "utility" server is a NixOS server that you can use to host IT infrastructure and miscellaneous utility services to support developers (e.g. web pages, chat bots).
 
   This server will play a role analogous to a container engine or virtual machine hypervisor in other software architectures, except that we won't necessarily be using virtual machines or containers: many things will run natively on the host as NixOS services.  Of course, you can also use this machine to run a container engine or hypervisor in addition to running things natively on the host.
 
@@ -183,12 +185,12 @@ Notably absent from the above list are:
 
 - *Container-specific infrastructure*
 
-  A NixOS-centric architecture already mitigates some of the need for containerizing services, but even when you do need containers that doesn't introduce any additional architectural overhead.  For example, the cache doubles as a container registry when you build containers using Nixpkgs.
+  A NixOS-centric architecture already mitigates some of the need for containerizing services, but the architecture doesn't change even if you do use containers.  Third-party containers can run on a "utility" server and your organization's containers can be built using Nixpkgs and distributed via the cache.
 
 
 - *Programming-language-specific infrastructure*
 
-  If Nixpkgs supports a given language then we require no additional infrastructure to support building and deploying that language.  However,  might still host language-specific amenities (e.g. generated documentation) on our utility server.
+  If Nixpkgs supports a given language then we require no additional infrastructure to support building and deploying that language.  However,  we might still host language-specific amenities (e.g. generated documentation) on our utility server.
 
 
 - *Continuous-deployment services*
@@ -203,7 +205,7 @@ Notably absent from the above list are:
 
 ## Scope
 
-We've talked about NixOS so far from a birds-eye view, but you might prefer a more down-to-earth picture of the day-to-day requirements and responsibilities for a professional NixOS user.
+So far I've explained NixOS in high-level terms, but you might prefer a more down-to-earth picture of the day-to-day requirements and responsibilities for a professional NixOS user.
 
 To that end, here is a checklist that will summarize what you would need to understand in order to effectively introduce and support NixOS within an organization:
 
