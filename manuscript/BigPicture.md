@@ -22,7 +22,7 @@ I say "*at most* one command" because some activities (like continuous deploymen
 
 I can explain this by providing an example of a development workflow that disregards this master cue:
 
-Suppose that you want to test your local project's changes within the context of some larger system at work (i.e. an [integration test](https://en.wikipedia.org/wiki/Integration_testing).  Your organization's process for testing your code might hypothetically look like this:
+Suppose that you want to test your local project's changes within the context of some larger system at work (i.e. an [integration test](https://en.wikipedia.org/wiki/Integration_testing)).  Your organization's process for testing your code might hypothetically look like this:
 
 - Create and publish a branch in version control recording your changes
 
@@ -60,17 +60,17 @@ In other words:
 
 Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely need to reinvent large portions of the Nix ecosystem for this automation to be sufficiently robust and efficient.  For example:
 
-- *Do you maintain an artifact repository or file server that you use for publishing and sharing intermediate build products?*
+- *Do you maintain a file server for sharing intermediate build products?*
 
   Congratulations, you're implementing your own version of the Nix store and caching system
 
 
-- *Do you generate unique labels for intermediate software artifact to isolate them?*
+- *Do you generate unique labels for build products to isolate them?*
 
-  In the best case scenario, the label is a hash of the artifact's transitive build-time dependencies and you've reinvented the hash component of `/nix/store` paths.  In the worst case scenario you're doing something different and worse (e.g. using timestamps instead of hashes).
+  In the best case scenario, the label is a hash of the artifact's transitive build-time dependencies and you've reinvented the hash component of `/nix/store` paths.  In the worst case scenario you're doing something different and worse (e.g. using timestamps in the labels instead of hashes).
 
 
-- *Do you have some automation that updates references to these uniquely labeled build products?*
+- *Do you have a custom script that updates references to these build products?*
 
   This would be reinventing Nix's language support for updating dependency references.
 
@@ -86,7 +86,7 @@ You can save yourself a lot of headaches and professional embarrassment by takin
 
 NixOS exemplifies the [Infrastructure as Code (IaC)](https://en.wikipedia.org/wiki/Infrastructure_as_code) paradigm, meaning that every aspect of your organization (including hardware/systems/software) is stored in code or configuration files that are the source of truth for how everything is built.  In particular, you don't make undocumented changes to your infrastructure that cause it to diverge from what is recorded within those files.
 
-This book will go further and espouse a specific flavor of Infrastructure of Code known as [GitOps](https://about.gitlab.com/topics/gitops/) where:
+This book will espouse a specific flavor of Infrastructure of Code known as [GitOps](https://about.gitlab.com/topics/gitops/) where:
 
 - *The code and configuration files are (primarily) declarative*
 
@@ -105,9 +105,7 @@ This book will go further and espouse a specific flavor of Infrastructure of Cod
 
 ## DevOps
 
-NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) principle of breaking down boundaries between software developers ("Dev") and operations ("Ops").  Specifically, NixOS goes further in this regard than most other tools by unifying both software configuration and system configuration underneath the NixOS option system.
-
-You can group NixOS options into three categories:
+NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) principle of breaking down boundaries between software developers ("Dev") and operations ("Ops").  Specifically, NixOS goes further in this regard than most other tools by unifying both software configuration and system configuration underneath the NixOS option system.  These NixOS options fall into three categories:
 
 - *Systems configuration*
 
@@ -129,22 +127,83 @@ You can group NixOS options into three categories:
 
 - *Software configuration*
 
-  In other words, options that are mostly interesting to software engineers, such as:
+  These are options that are mostly interesting to software engineers, such as:
 
   - Patches
   - Command-line arguments
   - Environment variables
 
 
-In extreme cases, you can even embed non-Nix code and do "pure software development" entirely within NixOS.  In other words, you can author inline code written within another language inside of a NixOS configuration file.
+In extreme cases, you can even embed non-Nix code and do "pure software development" entirely within NixOS.  In other words, you can author inline code written within another language inside of a NixOS configuration file.  We'll walk through an example of this later on in the "Our first web server" chapter.
 
-An extreme example of this is my [`simple-twitter` project](https://github.com/Gabriella439/simple-twitter) which implements a bare-bones Twitter clone in a single Nix file.  There the server code is implemented in Haskell (a compiled language!) embedded inside of a NixOS option as a large multi-line string with some wrapping logic within the same file to build and run the Haskell code as a backend service.
+## Architecture
 
-Typically you don't want to embed non-Nix source code side-by-side with systems configuration options, but it's neat that NixOS makes this both possible *and* ergonomic.  This is one of many reasons why I view NixOS as the "king of DevOps" because no other tool encourages software engineers and operations engineers to work so closely side-by-side (literally within the same files).
+A NixOS-centric architecture tends to have the following key pieces of infrastructure:
+
+- *Version control*
+
+  If we're going to use GitOps then we had better use `git`!  More specifically, we'll likely use a `git` hosting provider like [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) which support pull requests and continuous integration.
+
+
+- *A central build server (the "hub")*
+
+  This server initiates builds for continuous integration, which are delegated to builders.
+
+
+- *Builders for each platform (the "spokes")*
+
+  These builders perform the actual Nix builds.  However, remember that everything (even an integration test) is going to be a Nix build, so these builders essentially do all the work.
+
+  These builders will perform distributed builds on behalf of two clients:
+
+  - The hub, for continuous integration
+  - Developers, when they need to build for a different platform
+
+
+- *A cache*
+
+  In simpler setups the "hub" can double as a cache, but as you grow you will likely want to upload build products to a dedicated cache.
+
+
+- *One or more "utility" servers*
+
+  A "utility" server is a NixOS server that you can use to host IT infrastructure and miscellaneous utility services to support developers (e.g. web pages, chatbots).
+
+  This server will play a role analogous to a container engine or virtual machine hypervisor in other software architectures, except that we won't necessarily be using virtual machines or containers: many things will run natively on the host as NixOS services.  Of course, you can also use this machine to run a container engine or hypervisor in addition to running things natively on the host.
+
+Moreover, you will either need a cloud platform (e.g. [AWS](https://aws.amazon.com/)) or data center for hosting these machines.  In this book we'll only cover hosting infrastructure on AWS.
+
+These are not the only components you will need to build out your product, but these should be the only components necessary to support DevOps workflows, including continuous integration and continuous deployment.
+
+{blurb, class:information}
+A "utility" server should **not** be part of your continuous integration or continuous deployment pipeline.  You should think of such a server as a "junk drawer" for stuff that does not belong in CI/CD.
+{/blurb}
+
+Notably absent from the above list are:
+
+- *Container-specific infrastructure*
+
+  A NixOS-centric architecture already mitigates some of the need for containerizing services, but even when you do need containers that doesn't introduce any additional architectural overhead.  For example, the cache doubles as a container registry when you build containers using Nixpkgs.
+
+
+- *Programming-language-specific infrastructure*
+
+  If Nixpkgs supports a given language then we require no additional infrastructure to support building and deploying that language.  However,  might still host language-specific amenities (e.g. generated documentation) on our utility server.
+
+
+- *Continuous-deployment services*
+
+  NixOS provides out-of-the-box services that we can use for continuous deployment, which we will cover in a later chapter.
+
+
+- *Cloud/Virtual development environments*
+
+  Nix's support for development shells (e.g. `nix develop`) will be our instrument of choice here.
+
 
 ## Scope
 
-So far we've covered NixOS from a high-level standpoint, but you might more interested in a more down-to-earth picture of the day-to-day requirements and responsibilities for a professional NixOS user.
+We've talked about NixOS so far from a birds-eye view, but you might prefer a more down-to-earth picture of the day-to-day requirements and responsibilities for a professional NixOS user.
 
 To that end, here is a checklist that will summarize what you would need to understand in order to effectively introduce and support NixOS within an organization:
 

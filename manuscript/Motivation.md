@@ -25,7 +25,7 @@ I would not confidently recommend NixOS as a desktop operating system because:
 
 - *Nixpkgs doesn't enjoy mainstream support for desktop-oriented applications*
 
-  … especially games and productivity tools.  Nixpkgs is a fairly large software distribution, especially compared to other Linux software distributions, but most desktop applications will not support the Nix ecosystem out-of-the-box and non-technical users rely on experts to package things on their behalf.
+  … especially games and productivity tools.  Nixpkgs is a fairly large software distribution, especially compared to other Linux software distributions, but most desktop applications will not support the Nix ecosystem out-of-the-box.
 
 
 - *The NixOS user experience differs from what most desktop users expect*
@@ -133,7 +133,7 @@ So which use cases are NixOS/Nixpkgs well-suited for?  If I had to rank these de
 
 - *NixOS as a host operating system - Static containers*
 
-  NixOS also works well when you want to statically specify a set of containers to run.  You can run Docker containers or OCI containers just fine, but NixOS particularly excels at running things inside "NixOS containers" (which are `systemd-nspawn` containers under the hood) or application containers built by Nixpkgs.
+  NixOS also works well when you want to statically specify a set of containers to run.  Not only can you run Docker containers or OCI containers, but NixOS particularly excels at running things inside "NixOS containers" (which are `systemd-nspawn` containers under the hood) or application containers built by Nixpkgs.
 
   I rank this lower than "NixOS without virtualization" because NixOS obviates some (but not all) of the reasons for using containers.  In other words, once you switch to using NixOS you might find that you can do just fine without containers.
 
