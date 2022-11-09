@@ -1,6 +1,6 @@
 # Setting up your development environment
 
-I'd like you to be able to follow along with the examples in this book, so this chapter provides a quick setup guide to bootstrap from nothing to deploying a blank NixOS system that you can use for experimentation.  We're not going to speedrun the setup, though; instead I'll gently guide you through the setup process and the rationale behind each choice.
+I'd like you to be able to follow along with the examples in this book, so this chapter provides a quick setup guide to bootstrap from nothing to deploying a blank NixOS system that you can use for experimentation.
 
 ## Installing Nix
 
@@ -114,10 +114,10 @@ The extra options of interest to us are:
   You can (and should) enable this option within a professional organization to disable the preinstallation of any channels.
 
 
-These two options are crucial because we are going to use them to systematically replace channels with flakes.
+These two options are crucial because we are going to use them to systematically replace Nix channels with flakes.
 
 {blurb, class: warning}
-Channels are a trap and I treat them as a legacy Nix feature poorly suited for professional development, despite how ingrained they are in the Nix ecosystem.
+Nix channels are a trap and I treat them as a legacy Nix feature poorly suited for professional development, despite how ingrained they are in the Nix ecosystem.
 
 The issue with channels is that they essentially introduce impurity into your builds by depending on the `NIX_PATH` and there aren't great solutions for enforcing that every Nix user or every machine within your organization has the exact same `NIX_PATH`.
 
@@ -248,7 +248,7 @@ Run 'nixos-help' for the NixOS manual.
 nixos login: 
 ```
 
-You can then log into the virtual machine as the `root` user and an empty password.  Once you successfully log in then shut down the virtual machine by typing `Ctrl`-`a` + `c` top open the `qemu` prompt and then type `quit` followed by `Enter` to exit.
+You can then log into the virtual machine as the `root` user and an empty password.  After you successfully log in, shut down the virtual machine by typing `Ctrl`-`a` + `c` to open the `qemu` prompt and then type `quit` followed by `Enter` to exit.
 
 If you successfully log into the virtual machine then you're ready to follow along with the remaining examples throughout this book.  If you see an example in this book that begins with this line:
 

@@ -56,7 +56,7 @@ You can read the above code as saying:
   … since that is the port that `nginx` will listen on by default until we create a certificate and enable TLS.
 
 
-- *Forward port 80 on the "guest" to port 8080 on the "host"*
+- *Forward port 8080 on the "host" to port 80 on the "guest"*
 
   The "guest" is the virtual machine and the "host" is your development machine.
 
@@ -64,19 +64,18 @@ You can read the above code as saying:
 - *Allow the `root` user to log in with an empty password*
 
 
-- *Set the system "state version" to 22.11*
+- *Set the system's "state version" to 22.11*
 
 {blurb, class: information}
-You always want to specify a system state version that matches starting version of Nixpkgs and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
+You always want to specify a system state version that matches the starting version of Nixpkgs for that machine and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
 
-Nixpkgs uses the state version to migrate your NixOS system because in order to migrate your system Nixpkgs needs to know which Nixpkgs release your system first started from.
+Nixpkgs uses the state version to migrate your NixOS system because in order to migrate your system because each migration needs to know where your system started from.
 
 Two common mistakes NixOS users sometimes make are:
 
 - *updating the state version when they upgrade Nixpkgs*
 
-  This will cause the machine to never be migrated because Nixpkgs will
-  believe that the machine was never deployed to an older version.
+  This will cause the machine to never be migrated because Nixpkgs will conclude that the machine was never deployed to an older version.
 
 
 - *specifying a uniform state version across a fleet of NixOS machines*
@@ -107,7 +106,7 @@ In general I don't recommend testing things by hand like this.  Remember the "ma
 
 > Every common build/test/deploy-related activity should be possible with at most a single command using Nix’s command line interface.
 
-In a later chapter we'll cover how to automate this sort of testing using NixOS's support for integration tests.
+In a later chapter we'll cover how to automate this sort of testing using NixOS's support for integration tests.  These tests will also take care of starting up and tearing down the virtual machine for you so that you don't have to do that by hand either.
 {/blurb}
 
 ## DevOps
@@ -157,49 +156,26 @@ The above example illustrates how far you can take DevOps with NixOS.  If the in
 }
 ```
 
-You can restart the server to incorporate these new changes by:
-
-- *Typing `Ctrl`-`a` + `c` to open the `qemu` console:*
-
-  … which should look like this:
-
-  ```bash
-  [root@nixos:~]# <Ctrl-a><c>
-  QEMU 7.1.0 monitor - type 'help' for more information
-  (qemu) 
-  ```
-
-
-- *Entering the `quit` command in the `qemu` console to stop the virtual
-  machine*
-
-  ```bash
-  (qemu) quit<Enter>
-  ```
-
-
-- *Running `nix run` again after the virtual machine shuts down*
-
-If you refresh [http://localhost:8080](http://localhost:8080) the page should now display:
+If you restart the machine and refresh [http://localhost:8080](http://localhost:8080) the page should now display:
 
 > This server's firewall has the following open ports:
 > 
 > - 80
 
 {blurb, class: information}
-There are less roundabout ways to query our system configuration.  For example, using the same `flake.nix` file we can query the open ports using:
+There are less roundabout ways to query our system's configuration.  For example, using the same `flake.nix` file we can query the open ports using:
 
 ```bash
 $ nix eval .#machine.config.networking.firewall.allowedTCPPorts
 [ 80 ]
 ```
 
-I'll cover this in more detail in a later chapter on the NixOS module system.
+I'll cover this in more detail later on.
 {/blurb}
 
 ## TODO list
 
-Now we're going to create the first prototype of a toy web application: a TODO list implemented entirely in client-side in JavaScript (for now; later we'll add a backend server).
+Now we're going to create the first prototype of a toy web application: a TODO list implemented entirely in client-side JavaScript (for now; later we'll add a backend service).
 
 Create a subdirectory named `www` within your current directory:
 
@@ -275,6 +251,8 @@ Each time you click the `+` button it will add a TODO list item consisting of:
 
 - A `-` button to delete the TODO item
 
+
+
 {align: left}
 ![](./todo-list.png)
 
@@ -297,6 +275,6 @@ However, we can pass through our local filesystem to the virtual machine so that
 WWW="$PWD/www" nix run
 ```
 
-Now, we only need to refresh the page to view changes to `index.html`.
+Now, we only need to refresh the page to view any changes we make to `index.html`.
 
 **Exercise**: Add a "TODO list" heading (i.e. `<h1>TODO list</h1>`)to the web page and refresh the page to confirm that your changes took effect.

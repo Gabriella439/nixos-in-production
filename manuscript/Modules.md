@@ -20,7 +20,7 @@ In the most general case, a NixOS module has the following "shape":
     …
   };
 
-  # Options that this module sets
+  # Options that this module defines
   config = {
     …
   };
@@ -44,9 +44,11 @@ To be precise, Nix uses the following terminology:
   }
   ```
 
+
 - an "attribute" is Nix's name for a key or a field of an "attribute set"
 
   For example, `bio`, `job`, `name`, and `age` are all attributes in the above example.
+
 
 - *an "attribute path" is a chain of one or more attributes separated by dots*
 
@@ -72,7 +74,7 @@ All elements of a NixOS module are optional.  For example, you can omit the modu
 }
 ```
 
-You can also omit any of the `imports`, `options`, or `config` attributes, too.  For example, you can have an `imports`-only module:
+You can also omit any of the `imports`, `options`, or `config` attributes, too, like in this `imports`-only module:
 
 ```nix
 { imports = [
@@ -82,7 +84,7 @@ You can also omit any of the `imports`, `options`, or `config` attributes, too. 
 }
 ```
 
-… or a `config`-only module:
+… or this `config`-only module:
 
 ```nix
 { config = {
@@ -124,7 +126,7 @@ My coding style for NixOS modules is:
 
 The Nix programming language does not provide any built-in support for NixOS modules.  This sometimes confuses people new to either the Nix programming language or the NixOS module system.
 
-The NixOS module system is a domain-specific language implemented within the Nix programming language.  Specifically, the NixOS modules system is (mostly) implemented within the [`lib/modules.nix` file included in Nixpkgs](https://search.nixos.org/options).  If you ever receive a stack trace related to the NixOS module system you will often see functions from `modules.nix` show up in the stack trace, because they are ordinary functions and not language features.
+The NixOS module system is a domain-specific language implemented within the Nix programming language.  Specifically, the NixOS module system is (mostly) implemented within the [`lib/modules.nix` file included in Nixpkgs](https://search.nixos.org/options).  If you ever receive a stack trace related to the NixOS module system you will often see functions from `modules.nix` show up in the stack trace, because they are ordinary functions and not language features.
 
 In fact, a NixOS module in isolation is essentially "inert" from the Nix language's point of view.  For example, if you save the following NixOS module to a file named `example.nix`:
 
@@ -185,7 +187,7 @@ Along the same lines, the following NixOS module:
 }
 ```
 
-… is just a function.  If we save that to `example.nix` and evaluate that the interpreter will simply say that the file evaluates to a "lambda" (an anonymous function):
+… is just a function.  If we save that to `example.nix` and then evaluate that the interpreter will simply say that the file evaluates to a "lambda" (an anonymous function):
 
 ```bash
 $ nix eval --file ./example.nix
@@ -211,9 +213,7 @@ nix-repl> output.config.services.apache-kafka.enable
 true
 ```
 
-This illustrates that our NixOS module really is just a function whose input is an attribute set and whose output is also an attribute set.  There is nothing
-special about this function other than it happens to be the same shape as what
-the NixOS module system expects.
+This illustrates that our NixOS module really is just a function whose input is an attribute set and whose output is also an attribute set.  There is nothing special about this function other than it happens to be the same shape as what the NixOS module system accepts.
 
 ## The NixOS module system
 
@@ -225,6 +225,7 @@ The answer is that this actually happens in two steps:
   attribute set*
 
   In other words all of the `imports`, `options` declarations, and `config` settings are fully resolved, resulting in one giant attribute set.  The code for combining these modules lives in [`lib/modules.nix`](https://search.nixos.org/options) in Nixpkgs.
+
 
 - *The final composite attribute set contains a special attribute that builds
   the system*
@@ -283,10 +284,7 @@ We can then materialize the final composite attribute set like this:
 
 ```bash
 $ nix repl github:NixOS/nixpkgs/22.05
-Welcome to Nix 2.11.0. Type :? for help.
-
-Loading installable 'github:NixOS/nixpkgs/22.05#'...
-Added 5 variables.
+…
 nix-repl> result = lib.evalModules { modules = [ ./top-level.nix ]; }
 
 nix-repl> :p result.config
@@ -298,11 +296,11 @@ nix-repl> result.config.system.build.toplevel
 
 In other words, `lib.evalModules` is the magic function that combines all of our NixOS modules into a composite attribute set.
 
-NixOS essentially does the same thing as in the above example, except on a much larger scale.  Also, in a real NixOS system the final `config.system.build.toplevel` attribute path stores a derivation instead of a string.
+NixOS essentially does the same thing as in the above example, except on a much larger scale.  Also, in a real NixOS system the final `config.system.build.toplevel` attribute path stores a buildable derivation instead of a string.
 
 ## Recursion
 
-The NixOS module system lets modules refer to the final composite configuration using the `config` function argument that is passed in to every NixOS module.  For example, this is how our `top-level.nix` module was able to refer to the `system.nixos.release` option that was set in the `other.nix` module:
+The NixOS module system lets modules refer to the final composite configuration using the `config` function argument that is passed into every NixOS module.  For example, this is how our `top-level.nix` module was able to refer to the `system.nixos.release` option that was set in the `other.nix` module:
 
 ```nix
 # This represents the final composite configuration

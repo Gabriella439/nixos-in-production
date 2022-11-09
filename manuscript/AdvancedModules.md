@@ -6,9 +6,9 @@ Make sure that you followed the instructions from the "Setting up your developme
 
 ## Imports
 
-The NixOS module system lets you import other modules by their path, which merges their option declarations and configuration settings with the current module.  But, did you know that the elements of an `imports` list don't have to be paths?
+The NixOS module system lets you import other modules by their path, which merges their option declarations and option definitions with the current module.  But, did you know that the elements of an `imports` list don't have to be paths?
 
-You can put an inline NixOS configuration in the `imports` list, like this:
+You can put inline NixOS configurations in the `imports` list, like these:
 
 ```nix
 { imports = [
@@ -19,7 +19,7 @@ You can put an inline NixOS configuration in the `imports` list, like this:
 }
 ```
 
-… and it will behave as if you had imported a file with the same contents.
+… and they will behave as if you had imported files with the same contents.
 
 In fact, anything that is a valid NixOS module can go in the import list, including NixOS modules that are functions:
 
@@ -81,13 +81,12 @@ Nixpkgs provides several utility functions for NixOS modules that are stored und
 {blurb, class: information}
 If you want to become a NixOS module system expert, take the time to read and understand all of the code in `lib/modules.nix`.
 
-Remember that the NixOS module system is implemented as a domain-specific language in Nix and `lib/modules.nix` contains the complete implementation of that domain-specific language, so if you understand everything in that file then you understand literally everything that there is to know about how the NixOS module system works under the hood.
+Remember that the NixOS module system is implemented as a domain-specific language in Nix and `lib/modules.nix` contains the implementation of that domain-specific language, so if you understand everything in that file then you understand essentially all that there is to know about how the NixOS module system works under the hood.
 
 That said, this chapter will still try to explain things enough so that you don't have to read through that code.
 {/blurb}
 
-You do not need to use or understand all of the functions in there, but you do
-need to familiarize yourself with the following four primitive functions:
+You do not need to use or understand all of the functions in `lib/modules.nix`, but you do need to familiarize yourself with the following four primitive functions:
 
 - `lib.mkMerge`
 - `lib.mkOverride`
@@ -95,8 +94,6 @@ need to familiarize yourself with the following four primitive functions:
 - `lib.mkOrder`
 
 By "primitive", I mean that these functions cannot be implemented in terms of other functions.  They all trigger special behavior built into `lib.evalModules`.
-
-We'll cover each one of those functions as well as useful derived functions.
 
 ### `mkMerge`
 
@@ -223,6 +220,21 @@ nix-repl> config.networking.firewall.allowedTCPPorts
 [ 80 443 ]
 ```
 
+> **Exercise**: Try to run the following NixOS module, which specifies the same option twice without using `lib.mkMerge`:
+>
+> ```nix
+> { lib, ... }:
+>
+> { config = {
+>     networking.firewall.allowedTCPPorts = [ 80 ];
+>     networking.firewall.allowedTCPPorts = [ 443 ];
+>     users.users.root.initialPassword = "";
+>   };
+> }
+> ```
+>
+> This will fail.  Do you understand why?  Specifically, is the failure a limitation of the NixOS module system or the Nix programming language?
+
 You can also nest `lib.mkMerge` underneath an attribute.  For example, this:
 
 ```nix
@@ -288,7 +300,7 @@ error: The option `services.openssh.enable' has conflicting definition values:
 (use '--show-trace' to show detailed location information)
 ```
 
-This is because `services.openssh.enable` is defined to be a boolean value, and you can only merge multiple boolean values if all occurrences agree.  You can verify this yourself by changing both occurrences to `true`, which will fix the error.
+This is because `services.openssh.enable` is declared to have a boolean type, and you can only merge multiple boolean values if all occurrences agree.  You can verify this yourself by changing both occurrences to `true`, which will fix the error.
 
 As a general rule of thumb:
 
@@ -301,7 +313,7 @@ As a general rule of thumb:
 
   e.g. lists will be concatenated and attribute sets will be unioned.
 
-The most common exception to this rule of thumb is the "lines" type (`lib.types.lines`), which is a string option type that you can set multiple times:
+The most common exception to this rule of thumb is the "lines" type (`lib.types.lines`), which is a string option type that you can define multiple times.  `services.zookeeper.extraConf` is an example of one such option that has this type:
 
 ```nix
 { lib, ... }:
@@ -316,7 +328,7 @@ The most common exception to this rule of thumb is the "lines" type (`lib.types.
 }
 ```
 
-… and merging concatenates lines with an intervening newline character:
+… and merging multiple occurrences of that option concatenates them as lines by inserting an intervening newline character:
 
 ```bash
 $ nix eval .#machine.config.services.zookeeper.extraConf
@@ -325,11 +337,11 @@ $ nix eval .#machine.config.services.zookeeper.extraConf
 
 ### `mkOverride`
 
-The `lib.mkOverride` specifies the "priority" of a configuration setting, which comes in handy if you want to override a configuration value that another NixOS module already set.
+The `lib.mkOverride` function specifies the "priority" of an option definition, which comes in handy if you want to override a configuration value that another NixOS module already defined.
 
 #### Higher priority overrides
 
-This most commonly comes up when we need to override an option that was already set by one of our dependencies (typically a NixOS module provided by Nixpkgs).  One example would be overriding the restart frequency of `nginx`:
+This most commonly comes up when we need to override an option that was already defined by one of our dependencies (typically a NixOS module provided by Nixpkgs).  One example would be overriding the restart frequency of `nginx`:
 
 ```nix
 { config = {
@@ -349,7 +361,7 @@ error: The option `systemd.services.nginx.serviceConfig.RestartSec' has conflict
 (use '--show-trace' to show detailed location information)
 ```
 
-The problem is that when we enable `nginx` that automatically sets a whole bunch of other NixOS options, [including `systemd.services.nginx.serviceConfig.RestartSec`](https://github.com/NixOS/nixpkgs/blob/nixos-22.05/nixos/modules/services/web-servers/nginx/default.nix#L890).  This option is a scalar string option that disallows multiple distinct values because the NixOS module system by default has no way to known which one to pick to resolve the conflict.
+The problem is that when we enable `nginx` that automatically defines a whole bunch of other NixOS options, [including `systemd.services.nginx.serviceConfig.RestartSec`](https://github.com/NixOS/nixpkgs/blob/nixos-22.05/nixos/modules/services/web-servers/nginx/default.nix#L890).  This option is a scalar string option that disallows multiple distinct values because the NixOS module system by default has no way to known which one to pick to resolve the conflict.
 
 However, we can use `mkOverride` to annotate our value with a higher priority so that it overrides the other conflicting definition:
 
@@ -378,7 +390,7 @@ However, we can use `mkOverride` to annotate our value with a higher priority so
 ```
 
 {blurb, class:warning}
-We do **not** want to do this:
+You do **not** want to do this:
 
 ```nix
 { lib, ... }:
@@ -396,11 +408,11 @@ That is not equivalent, because it overrides not only the `RestartSec` attribute
 You always want to narrow your use of `lib.mkForce` as much as possible to protect against this common mistake.
 {/blurb}
 
-The default priority is `100` and **lower** numeric values actually represent **higher** priority.  In other words, a NixOS configuration setting with a priority of `50` takes precedence over a NixOS configuration setting with a priority of 100.
+The default priority is `100` and **lower** numeric values actually represent **higher** priority.  In other words, an option definition with a priority of `50` takes precedence over an option definition with a priority of `100`.
 
-Yes, the NixOS module system confusingly uses lower numbers to indicate higher priorities, but in practice nobody uses explicit numeric priorities.  Instead, people use derived utilities like `lib.mkForce` or `lib.mkDefault` which select the appropriate numeric priority for you.
+Yes, the NixOS module system confusingly uses lower numbers to indicate higher priorities, but in practice you will rarely see explicit numeric priorities.  Instead, people tend to use derived utilities like `lib.mkForce` or `lib.mkDefault` which select the appropriate numeric priority for you.
 
-In extreme cases you might still need to specify an explicit numeric priority.  The most common example is when one of your dependencies already set an option using `lib.mkForce` and you need to override *that*.  In that scenario you could use `lib.mkOverride 49`, which would take precedence over `lib.mkForce`
+In extreme cases you might still need to specify an explicit numeric priority.  The most common example is when one of your dependencies already define an option using `lib.mkForce` and you need to override *that*.  In that scenario you could use `lib.mkOverride 49`, which would take precedence over `lib.mkForce`
 
 ```nix
 { lib, ... }:
@@ -449,11 +461,11 @@ That means that a NixOS module like this:
 }
 ```
 
-However, you will more commonly use `lib.mkDefault` which sets a configuration value with priority `1000`.  Typically you'll use `lib.mkDefault` if you want to override the default value of an option, while still allowing a downstream user to override the option yet again at the normal priority (`100`).
+However, you will more commonly use `lib.mkDefault` which defines a configuration option with priority `1000`.  Typically you'll use `lib.mkDefault` if you want to override the default value of an option, while still allowing a downstream user to override the option yet again at the normal priority (`100`).
 
 ### `mkIf`
 
-`mkIf` is far-and-away the most widely used NixOS module primitive, because you can use `mkIf` to selectively enable certain configuration settings based on the value of another configuration setting.
+`mkIf` is far-and-away the most widely used NixOS module primitive, because you can use `mkIf` to selectively enable certain options based on the value of another option.
 
 An extremely common idiom from Nixpkgs is to use `mkIf` in conjunction with an `enable` option, like this:
 
@@ -540,7 +552,7 @@ You might wonder why we need a `mkIf` primitive at all.  Couldn't we use an `if`
 }
 ```
 
-The first (and most important reason) why this doesn't work is because it triggers an infinite loop:
+The most important reason why this doesn't work is because it triggers an infinite loop:
 
 ```
 error: infinite recursion encountered
@@ -562,7 +574,7 @@ The reason why is because the recursion is not well-founded:
   config = if config.services.cowsay.enable then {
 ```
 
-… and the reason why `lib.mkIf` doesn't have this problem is because `evalModules` pushes `mkIf` conditions to the "leaves" of the configuration tree, as if we had instead written this:
+… and the reason why `lib.mkIf` doesn't share the same problem is because `evalModules` pushes `mkIf` conditions to the "leaves" of the configuration tree, as if we had instead written this:
 
 ```nix
 { config, lib, pkgs, ... }:
@@ -602,7 +614,7 @@ in
   }
 ```
 
-The above example leads to a conflict because the `kafkaSynonym` module sets `services.kafka.enable` to `false` (at priority 100), and the downstream module sets `services.apache-kafka.enable` to `true` (also at priority 100).
+The above example leads to a conflict because the `kafkaSynonym` module defines `services.kafka.enable` to `false` (at priority 100), and the downstream module defines `services.apache-kafka.enable` to `true` (also at priority 100).
 
 Had we instead used `mkIf` like this:
 
@@ -624,7 +636,7 @@ in
   }
 ```
 
-… then that would do the right thing because in the default case `services.apache-kafka.enable` would remain unset, which would be the same thing as being set to `false` at priority `1500`.  That avoids setting the same option twice at the same priority.
+… then that would do the right thing because in the default case `services.apache-kafka.enable` would remain undefined, which would be the same thing as being defined as `false` at priority `1500`.  That avoids defining the same option twice at the same priority.
 
 ### `mkOrder`
 
@@ -640,9 +652,9 @@ The NixOS module system strives to make the behavior of our system depend as lit
 { imports = [ ./B.nix ./A.nix ]; }
 ```
 
-… and in *most cases* that is true.  99% of the time you can safely sort your import list and either your NixOS system will be *exactly* the same as before (down to the hash) or *essentially* the same as before, meaning that the difference is irrelevant.  However, for those 1% of cases where order matters we use the `lib.mkOrder` function.
+… and in *most cases* that is true.  99% of the time you can safely sort your import list and either your NixOS system will be *exactly* the same as before (down to the hash) or *essentially* the same as before, meaning that the difference is irrelevant.  However, for those 1% of cases where order matters we need the `lib.mkOrder` function.
 
-Here's a common example of where ordering matters:
+Here's one example of where ordering matters:
 
 ```nix
 let
@@ -673,18 +685,17 @@ Surprisingly, `clang`'s `cc` is the first one on the `PATH`, even though we impo
 … and if we flip the order imports:
 
 ```nix
-  { imports = [ cowsay moduleB moduleA ]; }
+    imports = [ cowsay moduleB moduleA ];
 ```
 
-… then we `gcc`'s `cc` comes first on the `PATH`:
+… then `gcc`'s `cc` comes first on the `PATH`:
 
 ```bash
 [root@nixos:~]# readlink $(type -p cc)
 /nix/store/9wqn04biky07333wkl35bfjv9zv009pl-gcc-wrapper-9.5.0/bin/cc
 ```
 
-This sort of order-sensitivity frequently arises for "list-like" option types,
-including actual lists or string types that concatenate multiple definitions.
+This sort of order-sensitivity frequently arises for "list-like" option types, including actual lists or string types that concatenate multiple definitions.
 
 Fortunately, we can fix situations like these with the `lib.mkOrder` function, which specifies a numeric ordering that NixOS will respect when merging multiple definitions of the same option.
 
