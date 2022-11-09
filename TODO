@@ -73,8 +73,12 @@
 
 * * *
 
+- "Big picture"
+  - Architecture diagram
+
 Things to edit for:
 
 - Consistent Nix version
 - Consistent Nixpkgs version
 - Correct syntax highlighting for code blocks
+- Things that sound like bullshit
