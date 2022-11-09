@@ -41,30 +41,30 @@ Let's build on the baseline `module.nix` by creating a machine that serves a sim
 
 You can read the above code as saying:
 
-- Enable `nginx` which currently only listens on `localhost`
+- *Enable `nginx` which currently only listens on `localhost`*
 
   In other words, `nginx` will only respond to requests addressed to `localhost` (e.g. `127.0.0.1`).
 
 
-- Serve a static web page
+- *Serve a static web page*
 
   … which is a bare-bones "Hello, world!" HTML page.
 
 
-- Open port 80 on the virtual machine's firewall
+- *Open port 80 on the virtual machine's firewall*
 
   … since that is the port that `nginx` will listen on by default until we create a certificate and enable TLS.
 
 
-- Forward port 80 on the "guest" to port 8080 on the "host"
+- *Forward port 80 on the "guest" to port 8080 on the "host"*
 
   The "guest" is the virtual machine and the "host" is your development machine.
 
 
-- Allow the `root` user to log in with an empty password
+- *Allow the `root` user to log in with an empty password*
 
 
-- Set the system "state version" to 22.11
+- *Set the system "state version" to 22.11*
 
 {blurb, class: information}
 You always want to specify a system state version that matches starting version of Nixpkgs and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
@@ -73,27 +73,27 @@ Nixpkgs uses the state version to migrate your NixOS system because in order to 
 
 Two common mistakes NixOS users sometimes make are:
 
-- updating the state version when they upgrade Nixpkgs
+- *updating the state version when they upgrade Nixpkgs*
 
   This will cause the machine to never be migrated because Nixpkgs will
   believe that the machine was never deployed to an older version.
 
 
-- specifying a uniform state version across a fleet of NixOS machines
+- *specifying a uniform state version across a fleet of NixOS machines*
 
   For example, you might have one NixOS machine in your data center that was first deployed using Nixpkgs 21.11 and another machine in your data center that was first deployed using Nixpkgs 22.05.  If you try to change their state versions to match then one or the other might not upgrade correctly.
 {/blurb}
 
 Now we can deploy the virtual machine by following the same instructions from the previous chapter:
 
-- begin from the `flake.nix` file included in the previous chapter
+- *begin from the `flake.nix` file included in the previous chapter*
 
-- save the above NixOS configuration to a `module.nix` file
+- *save the above NixOS configuration to a `module.nix` file*
 
   … in the same directory as the `flake.nix` file.
 
 
-- Run `nix run`
+- *Run `nix run`*
 
   … also from within the same directory
 
@@ -159,7 +159,7 @@ The above example illustrates how far you can take DevOps with NixOS.  If the in
 
 You can restart the server to incorporate these new changes by:
 
-- Typing `Ctrl`-`a` + `c` to open the `qemu` console:
+- *Typing `Ctrl`-`a` + `c` to open the `qemu` console:*
 
   … which should look like this:
 
@@ -170,14 +170,15 @@ You can restart the server to incorporate these new changes by:
   ```
 
 
-- Entering the `quit` command in the `qemu` console to stop the virtual machine
+- *Entering the `quit` command in the `qemu` console to stop the virtual
+  machine*
 
   ```bash
   (qemu) quit<Enter>
   ```
 
 
-- Running `nix run` again after the virtual machine shuts down
+- *Running `nix run` again after the virtual machine shuts down*
 
 If you refresh [http://localhost:8080](http://localhost:8080) the page should now display:
 

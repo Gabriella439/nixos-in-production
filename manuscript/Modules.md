@@ -34,7 +34,7 @@ Nix supports data structures known "attribute sets" which are analogous to "maps
 
 To be precise, Nix uses the following terminology:
 
-- an "attribute set" is a data structure associating keys with values
+- *an "attribute set" is a data structure associating keys with values*
 
   For example, this is a nested attribute set:
 
@@ -48,7 +48,7 @@ To be precise, Nix uses the following terminology:
 
   For example, `bio`, `job`, `name`, and `age` are all attributes in the above example.
 
-- an "attribute path" is a chain of one or more attributes separated by dots
+- *an "attribute path" is a chain of one or more attributes separated by dots*
 
   For example, `bio.name` is an attribute path.
 
@@ -111,11 +111,11 @@ You might wonder if there should be some sort of coding style which specifies wh
 
 My coding style for NixOS modules is:
 
-- you should permit omitting the module arguments
+- *you should permit omitting the module arguments*
 
-- you should permit omitting the `imports`, `options`, or `config` attributes
+- *you should permit omitting the `imports`, `options`, or `config` attributes*
 
-- you should *avoid* eliding the `config` attribute
+- *you should **avoid** eliding the `config` attribute*
 
   In other words, if you do set any `config` options, always nest them underneath the `config` attribute.
 {/blurb}
@@ -221,13 +221,13 @@ So if NixOS modules are just pure functions or pure attribute sets, what turns t
 
 The answer is that this actually happens in two steps:
 
-- All NixOS modules your system depends on are combined into a single, composite
-  attribute set 
+- *All NixOS modules your system depends on are combined into a single, composite
+  attribute set*
 
   In other words all of the `imports`, `options` declarations, and `config` settings are fully resolved, resulting in one giant attribute set.  The code for combining these modules lives in [`lib/modules.nix`](https://search.nixos.org/options) in Nixpkgs.
 
-- The final composite attribute set contains a special attribute that builds
-  the system
+- *The final composite attribute set contains a special attribute that builds
+  the system*
 
   Specifically, there will be a `config.system.build.toplevel` attribute path which contains a derivation you can use to build a runnable NixOS system.  The top-level code for assembling an operating system lives in [`nixos/modules/system/activation/top-level.nix`](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/system/activation/top-level.nix) in Nixpkgs.
 

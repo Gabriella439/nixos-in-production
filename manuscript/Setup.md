@@ -30,17 +30,17 @@ You may freely use shorter option names if you prefer, though, but I still highl
 
 Depending on your platform the download instructions might also tell you to pass the `--daemon` or `--no-daemon` option to the installation script to specify a single-user or multi-user installation.  For simplicity, the instructions in this chapter will omit the `--daemon` / `--no-daemon` flag, but keep in mind the following platform-specific advice:
 
-- On macOS the installer defaults to a multi-user Nix installation
+- *On macOS the installer defaults to a multi-user Nix installation*
 
   macOS doesn't even support a single-user Nix installation, so this is a good default.
 
 
-- On Windows the installer defaults to a single-user Nix installation
+- *On Windows the installer defaults to a single-user Nix installation*
 
   This default is also the recommended option.
 
 
-- On Linux the installer defaults to a single-user Nix installation
+- *On Linux the installer defaults to a single-user Nix installation*
 
   This is the one case where the default behavior is questionable.  Multi-user Nix installations are typically better if your Linux distribution supports `systemd`, so you should explicitly specify `--daemon` if you use `systemd`.
 
@@ -126,12 +126,12 @@ Moreover, Nix now supports flakes, which you can think of as a more modern alter
 
 So what we're going to do is:
 
-- Disable channels by default
+- *Disable channels by default*
 
   Developers can still opt in to channels by installing them, but disabling channels by default will discourage people from contributing Nix code that depends on the `NIX_PATH`.
 
 
-- Append the following setting to `nix.conf` to enable the use of flakes:
+- *Append the following setting to `nix.conf` to enable the use of flakes:*
 
   ```bash
   extra-experimental-features = nix-command flakes repl-flake

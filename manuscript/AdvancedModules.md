@@ -89,10 +89,10 @@ That said, this chapter will still try to explain things enough so that you don'
 You do not need to use or understand all of the functions in there, but you do
 need to familiarize yourself with the following four primitive functions:
 
-* `lib.mkMerge`
-* `lib.mkOverride`
-* `lib.mkIf`
-* `lib.mkOrder`
+- `lib.mkMerge`
+- `lib.mkOverride`
+- `lib.mkIf`
+- `lib.mkOrder`
 
 By "primitive", I mean that these functions cannot be implemented in terms of other functions.  They all trigger special behavior built into `lib.evalModules`.
 
@@ -141,12 +141,12 @@ The short answer is: `lib.mkMerge` is usually what you want.
 
 The long answer is that the main trade-off between `imports` and `lib.mkMerge` is:
 
-- The `imports` section can merge NixOS modules that are functions
+- *The `imports` section can merge NixOS modules that are functions*
 
   `lib.mkMerge` can only merge attribute sets and not functions
 
 
-- The list of `imports` can't depend on any configuration values
+- *The list of `imports` can't depend on any configuration values*
 
   In practice, this means that you can easily trigger an infinite loop if you try to do anything fancy using `imports` and you can typically fix it by switching to `lib.mkMerge`
 
@@ -292,12 +292,12 @@ This is because `services.openssh.enable` is defined to be a boolean value, and 
 
 As a general rule of thumb:
 
-- Most scalar option types will fail to merge distinct values
+- *Most scalar option types will fail to merge distinct values*
 
   e.g. boolean values, strings, integers.
 
 
-- Most complex option types will successfully merge in the obvious way
+- *Most complex option types will successfully merge in the obvious way*
 
   e.g. lists will be concatenated and attribute sets will be unioned.
 

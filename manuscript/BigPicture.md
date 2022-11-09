@@ -38,44 +38,44 @@ Now what if I told you that the entire integration testing process from start to
 
 In other words:
 
-- There would be no need to create or publish your branch
+- *There would be no need to create or publish your branch*
 
   You could test uncommitted changes straight from your local project checkout.
 
 
-- There would be no multi-step publication process
+- *There would be no multi-step publication process*
 
   All of the intermediate build products and internal references would be handled transparently by the Nix build tool.
 
 
-- The test itself would be managed by the Nix build tool
+- *The test itself would be managed by the Nix build tool*
 
   In other words, Nix would treat your integration test no differently than any other build product.  Tests and their outputs *are* build products.
 
 
-- There would be no need to select the appropriate tests to rerun
+- *There would be no need to select the appropriate tests to rerun*
 
   The Nix build tool would automatically infer which tests depended on your project and rerun those.  Other test runs and their results would be cached if their dependency tree did not include your changes.
 
 
 Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely need to reinvent large portions of the Nix ecosystem for this automation to be sufficiently robust and efficient.  For example:
 
-- Do you maintain an artifact repository or file server that you use for publishing and sharing intermediate build products?
+- *Do you maintain an artifact repository or file server that you use for publishing and sharing intermediate build products?*
 
   Congratulations, you're implementing your own version of the Nix store and caching system
 
 
-- Do you generate unique labels for intermediate software artifact to isolate them?
+- *Do you generate unique labels for intermediate software artifact to isolate them?*
 
   In the best case scenario, the label is a hash of the artifact's transitive build-time dependencies and you've reinvented the hash component of `/nix/store` paths.  In the worst case scenario you're doing something different and worse (e.g. using timestamps instead of hashes).
 
 
-- Do you have some automation that updates references to these uniquely labeled build products?
+- *Do you have some automation that updates references to these uniquely labeled build products?*
 
   This would be reinventing Nix's language support for updating dependency references.
 
 
-- Do you need to isolate your integration tests or run them in parallel?
+- *Do you need to isolate your integration tests or run them in parallel?*
 
   You would likely reimplement the NixOS test framework.
 
@@ -88,17 +88,17 @@ NixOS exemplifies the [Infrastructure as Code (IaC)](https://en.wikipedia.org/wi
 
 This book will go further and espouse a specific flavor of Infrastructure of Code known as [GitOps](https://about.gitlab.com/topics/gitops/) where:
 
-- The code and configuration files are (primarily) *declarative*
+- *The code and configuration files are (primarily) declarative*
 
   In other words, they tend to specify the desired state of the system rather than a sequence of steps to get there.
 
 
-- These files are stored in version control
+- *These files are stored in version control*
 
   Proponents of this approach most commonly use `git` as their version control software, which is why it's called "GitOps".
 
 
-- Pull requests are the change management system
+- *Pull requests are the change management system*
 
   In other words, the pull request review process determines whether you have sufficient privileges, enough vetting, or the correct approvals from relevant maintainers.
 
@@ -109,7 +109,7 @@ NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) princi
 
 You can group NixOS options into three categories:
 
-- Systems configuration
+- *Systems configuration*
 
   These are options that are mostly interesting to operations engineers, such as:
 
@@ -118,7 +118,7 @@ You can group NixOS options into three categories:
   - disk encryption settings
 
 
-- Hybrid systems/software options
+- *Hybrid systems/software options*
 
   These are options that live in the grey area between Dev and Ops, such as:
 
@@ -127,7 +127,7 @@ You can group NixOS options into three categories:
   - Credentials/secrets management
 
 
-- Software configuration
+- *Software configuration*
 
   In other words, options that are mostly interesting to software engineers, such as:
 
