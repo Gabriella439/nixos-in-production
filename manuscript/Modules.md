@@ -1,6 +1,22 @@
-# NixOS module system basics
+# NixOS option definitions
 
 Alright, so by this point you may have copied and pasted some NixOS code, but perhaps you don't fully understand what is going on, especially if you're not an experienced NixOS user.  This chapter will slow down and help you solidify your understanding of the NixOS module system so that you can improve your ability to read, author, and debug modules.
+
+{blurb, class:information}
+Throughout this book I'll consistently use the following terminology to avoid ambiguity:
+
+- "Option declarations" will refer to the `options` attribute of a NixOS module
+
+- "Option definitions" will refer to the `config` attribute of a NixOS module
+
+Along the same lines:
+
+- "Declare an option" will mean to set an attribute nested underneath `options`
+
+- "Define an option" will mean to set an attribute nested underneath `config`
+
+In this chapter and the next chapter we'll focus mostly on option *definitions* and later on we'll cover option *declarations* in more detail.
+{/blurb}
 
 ## Anatomy of a NixOS module
 
@@ -57,7 +73,9 @@ To be precise, Nix uses the following terminology:
 I'm explaining all of this because I'll use the terms "attribute set", "attribute", and "attribute path" consistently throughout the text to match Nix's official terminology (even though no other language uses those terms).
 {/blurb}
 
-All elements of a NixOS module are optional.  For example, you can omit the module arguments if you don't use them:
+## Syntactic sugar
+
+All elements of a NixOS module are optional and the module supports "syntactic sugar" to simplify several common cases.  For example, you can omit the module arguments if you don't use them:
 
 ```nix
 { imports = [
@@ -74,7 +92,7 @@ All elements of a NixOS module are optional.  For example, you can omit the modu
 }
 ```
 
-You can also omit any of the `imports`, `options`, or `config` attributes, too, like in this `imports`-only module:
+You can also omit any of the `imports`, `options`, or `config` attributes, too, like in this module, which only imports other modules:
 
 ```nix
 { imports = [
@@ -97,7 +115,7 @@ You can also omit any of the `imports`, `options`, or `config` attributes, too, 
 }
 ```
 
-Additionally, the NixOS module system provides special support for `config`-only modules by letting you elide the `config` attribute and promote the attributes nested within to the "top level", like this:
+Additionally, the NixOS module system provides special support for modules which only define options by letting you elide the `config` attribute and promote the options defined within to the "top level", like this:
 
 ```nix
 { services = {
@@ -119,7 +137,7 @@ My coding style for NixOS modules is:
 
 - *you should **avoid** eliding the `config` attribute*
 
-  In other words, if you do set any `config` options, always nest them underneath the `config` attribute.
+  In other words, if you do define any options, always nest them underneath the `config` attribute.
 {/blurb}
 
 ## NixOS modules are not language features
@@ -198,8 +216,7 @@ $ nix eval --file ./example.nix
 
 ```bash
 $ nix repl
-Welcome to Nix 2.11.0. Type :? for help.
-
+…
 nix-repl> example = import ./example.nix
 
 nix-repl> input = { config = { services.zookeeper.enable = true; }; }
@@ -215,9 +232,9 @@ true
 
 This illustrates that our NixOS module really is just a function whose input is an attribute set and whose output is also an attribute set.  There is nothing special about this function other than it happens to be the same shape as what the NixOS module system accepts.
 
-## The NixOS module system
+## NixOS
 
-So if NixOS modules are just pure functions or pure attribute sets, what turns those functions or attribute sets into a useful operating system?
+So if NixOS modules are just pure functions or pure attribute sets, what turns those functions or attribute sets into a useful operating system?  In other words, what puts the "NixOS" in the "NixOS module system"?
 
 The answer is that this actually happens in two steps:
 

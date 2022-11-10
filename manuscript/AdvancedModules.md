@@ -1,6 +1,6 @@
-# The NixOS option system
+# Advanced option definitions
 
-The NixOS option system is actually much more sophisticated than the previous chapter let on.  In this chapter we'll cover some common tricks and pitfalls related to the option system so that you can author NixOS modules more idiomatically.
+NixOS option definitions are actually much more sophisticated than the previous chapter let on and in this chapter we'll cover some common tricks and pitfalls.
 
 Make sure that you followed the instructions from the "Setting up your development environment" chapter if you would like to test the examples in this chapter.
 
