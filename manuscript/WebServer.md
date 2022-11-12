@@ -4,6 +4,18 @@ Now that we can build and run a local NixOS virtual machine we can create our fi
 
 ## Hello, world!
 
+We'll begin from the template project from "Setting up your development environment".  You can either the project if you haven't done so already by running:
+
+```bash
+$ nix flake init --template github:Gabriella439/nixos-in-production#setup
+```
+
+… or if you want to skip straight to the final result at the end of this chapter you can run:
+
+```bash
+$ nix flake init --template github:Gabriella439/nixos-in-production#server
+```
+
 Let's build on the baseline `module.nix` by creating a machine that serves a simple static "Hello, world!" page on `http://localhost`:
 
 ```nix
@@ -272,7 +284,7 @@ However, we can pass through our local filesystem to the virtual machine so that
 … and then restart the machine, except with a slightly modified version of our original `nix run` command:
 
 ```bash
-WWW="$PWD/www" nix run
+$ WWW="$PWD/www" nix run
 ```
 
 Now, we only need to refresh the page to view any changes we make to `index.html`.
