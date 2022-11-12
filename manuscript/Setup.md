@@ -171,7 +171,13 @@ If you are using Linux (including NixOS or the Windows Subsystem for Linux) you 
 
 ### Platform-independent instructions
 
-Save the following file to `flake.nix`:
+Run the following command to generate your first project:
+
+```bash
+$ nix flake init --template github:Gabriella439/nixos-in-production#setup
+```
+
+… that will generate the following `flake.nix` file:
 
 ```nix
 { inputs = {
@@ -225,7 +231,7 @@ Save the following file to `flake.nix`:
 }
 ```
 
-… and also save the following file to `module.nix` within the same directory:
+… and also the following `module.nix` file:
 
 ```nix
 # module.nix

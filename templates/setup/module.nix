@@ -1,0 +1,2 @@
+{ users.users.root.initialPassword = "";
+}

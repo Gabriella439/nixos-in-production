@@ -66,6 +66,8 @@
 - How to distribute and install a patched Nix build
 - Brief systemd tutorial
 - How to generate NixOS options documentation (and search?)
+- Talk about the NixOS option idiom of using an attribute set instead of a list
+- Use flake templates to simplify authoring flakes
 
 - Read through various nix CLI commands to see if new functionality was added
 
@@ -73,11 +75,9 @@
 
 * * *
 
-- "Big picture"
-  - Architecture diagram
-
 Things to edit for:
 
+- Publish release of repository for templates
 - Consistent Nix version
 - Consistent Nixpkgs version
 - Correct syntax highlighting for code blocks
