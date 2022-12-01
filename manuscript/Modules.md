@@ -1,6 +1,6 @@
 # NixOS option definitions
 
-Alright, so by this point you may have copied and pasted some NixOS code, but perhaps you don't fully understand what is going on, especially if you're not an experienced NixOS user.  This chapter will slow down and help you solidify your understanding of the NixOS module system so that you can improve your ability to read, author, and debug modules.
+By this point in the book you may have copied and pasted some NixOS code, but perhaps you don't fully understand what is going on, especially if you're not an experienced NixOS user.  This chapter will slow down and help you solidify your understanding of the NixOS module system so that you can improve your ability to read, author, and debug modules.
 
 {blurb, class:information}
 Throughout this book I'll consistently use the following terminology to avoid ambiguity:
@@ -23,7 +23,7 @@ In this chapter and the next chapter we'll focus mostly on option *definitions* 
 In the most general case, a NixOS module has the following "shape":
 
 ```nix
-# Module arguments which our module can use to refer to its own configuration
+# Module arguments which our system can use to refer to its own configuration
 { config, lib, pkgs, ... }:
 
 { # Other modules to import
@@ -75,7 +75,7 @@ I'm explaining all of this because I'll use the terms "attribute set", "attribut
 
 ## Syntactic sugar
 
-All elements of a NixOS module are optional and the module supports "syntactic sugar" to simplify several common cases.  For example, you can omit the module arguments if you don't use them:
+All elements of a NixOS module are optional and NixOS supports "syntactic sugar" to simplify several common cases.  For example, you can omit the module arguments if you don't use them:
 
 ```nix
 { imports = [
@@ -115,7 +115,7 @@ You can also omit any of the `imports`, `options`, or `config` attributes, too, 
 }
 ```
 
-Additionally, the NixOS module system provides special support for modules which only define options by letting you elide the `config` attribute and promote the options defined within to the "top level", like this:
+Additionally, the NixOS module system provides special support for modules which only define options by letting you elide the `config` attribute and promote the options defined within to the "top level".  As an example, we can simplify the previous NixOS module to this:
 
 ```nix
 { services = {
@@ -144,7 +144,7 @@ My coding style for NixOS modules is:
 
 The Nix programming language does not provide any built-in support for NixOS modules.  This sometimes confuses people new to either the Nix programming language or the NixOS module system.
 
-The NixOS module system is a domain-specific language implemented within the Nix programming language.  Specifically, the NixOS module system is (mostly) implemented within the [`lib/modules.nix` file included in Nixpkgs](https://search.nixos.org/options).  If you ever receive a stack trace related to the NixOS module system you will often see functions from `modules.nix` show up in the stack trace, because they are ordinary functions and not language features.
+The NixOS module system is a domain-specific language implemented within the Nix programming language.  Specifically, the NixOS module system is (mostly) implemented within the [`lib/modules.nix` file included in Nixpkgs](https://github.com/NixOS/nixpkgs/blob/22.05/lib/modules.nix).  If you ever receive a stack trace related to the NixOS module system you will often see functions from `modules.nix` show up in the stack trace, because they are ordinary functions and not language features.
 
 In fact, a NixOS module in isolation is essentially "inert" from the Nix language's point of view.  For example, if you save the following NixOS module to a file named `example.nix`:
 
@@ -241,13 +241,13 @@ The answer is that this actually happens in two steps:
 - *All NixOS modules your system depends on are combined into a single, composite
   attribute set*
 
-  In other words all of the `imports`, `options` declarations, and `config` settings are fully resolved, resulting in one giant attribute set.  The code for combining these modules lives in [`lib/modules.nix`](https://search.nixos.org/options) in Nixpkgs.
+  In other words all of the `imports`, `options` declarations, and `config` settings are fully resolved, resulting in one giant attribute set.  The code for combining these modules lives in [`lib/modules.nix`](https://github.com/NixOS/nixpkgs/blob/22.05/lib/modules.nix) in Nixpkgs.
 
 
 - *The final composite attribute set contains a special attribute that builds
   the system*
 
-  Specifically, there will be a `config.system.build.toplevel` attribute path which contains a derivation you can use to build a runnable NixOS system.  The top-level code for assembling an operating system lives in [`nixos/modules/system/activation/top-level.nix`](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/system/activation/top-level.nix) in Nixpkgs.
+  Specifically, there will be a `config.system.build.toplevel` attribute path which contains a derivation you can use to build a runnable NixOS system.  The top-level code for assembling an operating system lives in [`nixos/modules/system/activation/top-level.nix`](https://github.com/NixOS/nixpkgs/blob/22.05/nixos/modules/system/activation/top-level.nix) in Nixpkgs.
 
 
 This will probably make more sense if we use the NixOS module system ourselves to create a fake placeholder value that will stand in for a real operating system.
@@ -367,7 +367,7 @@ As a concrete example of recursion, we can safely merge the `other.nix` module i
 
 … and this would still work, even though this module now refers to its own configuration values.  The Nix interpreter won't go into an infinite loop because the recursion is still well-founded.
 
-We can better understand why this works by simulating how `lib.evalModules` works by hand.  Conceptually what `lib.evalModules` does is:
+We can better understand why this recursion is well-founded by simulating how `lib.evalModules` works by hand.  Conceptually what `lib.evalModules` does is:
 
 - combine all of the input modules
 

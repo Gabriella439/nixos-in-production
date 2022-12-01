@@ -4,7 +4,7 @@ Now that we can build and run a local NixOS virtual machine we can create our fi
 
 ## Hello, world!
 
-We'll begin from the template project from "Setting up your development environment".  You can either the project if you haven't done so already by running:
+We'll begin from the template project from "Setting up your development environment".  You can either begin from the previous chapter by running the following command (if you haven't done so already):
 
 ```bash
 $ nix flake init --template github:Gabriella439/nixos-in-production#setup
@@ -16,7 +16,7 @@ $ nix flake init --template github:Gabriella439/nixos-in-production#setup
 $ nix flake init --template github:Gabriella439/nixos-in-production#server
 ```
 
-Let's build on the baseline `module.nix` by creating a machine that serves a simple static "Hello, world!" page on `http://localhost`:
+Let's modify `module.nix` to specify a machine that serves a simple static "Hello, world!" page on `http://localhost`:
 
 ```nix
 # module.nix
@@ -87,7 +87,7 @@ Two common mistakes NixOS users sometimes make are:
 
 - *updating the state version when they upgrade Nixpkgs*
 
-  This will cause the machine to never be migrated because Nixpkgs will conclude that the machine was never deployed to an older version.
+  This will cause the machine to never be migrated because Nixpkgs will think that the machine was never deployed to an older version.
 
 
 - *specifying a uniform state version across a fleet of NixOS machines*
@@ -95,21 +95,7 @@ Two common mistakes NixOS users sometimes make are:
   For example, you might have one NixOS machine in your data center that was first deployed using Nixpkgs 21.11 and another machine in your data center that was first deployed using Nixpkgs 22.05.  If you try to change their state versions to match then one or the other might not upgrade correctly.
 {/blurb}
 
-Now we can deploy the virtual machine by following the same instructions from the previous chapter:
-
-- *begin from the `flake.nix` file included in the previous chapter*
-
-- *save the above NixOS configuration to a `module.nix` file*
-
-  … in the same directory as the `flake.nix` file.
-
-
-- *Run `nix run`*
-
-  … also from within the same directory
-
-
-Once the above command succeeds you can open the web page in your browser by visiting [`http://localhost:8080`](http://localhost:8080) which should display the following contents:
+If you deploy that using `nix run` you can open the web page in your browser by visiting [`http://localhost:8080`](http://localhost:8080) which should display the following contents:
 
 > Hello, world!
 
@@ -123,7 +109,7 @@ In a later chapter we'll cover how to automate this sort of testing using NixOS'
 
 ## DevOps
 
-The above example illustrates how far you can take DevOps with NixOS.  If the inline web page represents the software development half of the project (the "Dev") and the `nginx` configuration represents the operational half of the project (the "Ops") then we can in principle store both the "Dev" and the "Ops" halves of our project within the same file.  As an extreme example, we can even template the web page with system configuration options!
+The previous example illustrates how NixOS promotes DevOps on a small scale.  If the inline web page represents the software development half of the project (the "Dev") and the `nginx` configuration represents the operational half of the project (the "Ops") then we can in principle store both the "Dev" and the "Ops" halves of our project within the same file.  As an extreme example, we can even template the web page with system configuration options!
 
 ```nix
 # module.nix
@@ -175,19 +161,17 @@ If you restart the machine and refresh [http://localhost:8080](http://localhost:
 > - 80
 
 {blurb, class: information}
-There are less roundabout ways to query our system's configuration.  For example, using the same `flake.nix` file we can query the open ports using:
+There are less roundabout ways to query our system's configuration that don't involve serving a web page.  For example, using the same `flake.nix` file we can more directly query the open ports using:
 
 ```bash
 $ nix eval .#machine.config.networking.firewall.allowedTCPPorts
 [ 80 ]
 ```
-
-I'll cover this in more detail later on.
 {/blurb}
 
 ## TODO list
 
-Now we're going to create the first prototype of a toy web application: a TODO list implemented entirely in client-side JavaScript (for now; later we'll add a backend service).
+Now we're going to create the first prototype of a toy web application: a TODO list implemented entirely in client-side JavaScript (later on we'll add a backend service).
 
 Create a subdirectory named `www` within your current directory:
 
@@ -223,7 +207,7 @@ add.addEventListener('click', newTask);
 </html>
 ```
 
-In other words, the above file should be located at `./www/index.html` relative to the directory where you keep your `module.nix` file.
+In other words, the above file should be located at `www/index.html` relative to the directory containing your `module.nix` file.
 
 Now save the following NixOS configuration to `module.nix`:
 
@@ -252,7 +236,7 @@ Now save the following NixOS configuration to `module.nix`:
 }
 ```
 
-If you restart the virtual machine and refresh the web page you'll see a web page with a single `+` button:
+If you restart the virtual machine and refresh the web page you'll see a single `+` button:
 
 {align: left}
 ![](./plus-button.png)
@@ -287,6 +271,6 @@ However, we can pass through our local filesystem to the virtual machine so that
 $ WWW="$PWD/www" nix run
 ```
 
-Now, we only need to refresh the page to view any changes we make to `index.html`.
+Now, we only need to refresh the page to view any changes we make to `index.html` and we no longer need to restart the virtual machine.
 
 **Exercise**: Add a "TODO list" heading (i.e. `<h1>TODO list</h1>`)to the web page and refresh the page to confirm that your changes took effect.

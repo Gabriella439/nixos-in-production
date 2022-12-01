@@ -19,7 +19,7 @@ You can put inline NixOS configurations in the `imports` list, like these:
 }
 ```
 
-… and they will behave as if you had imported files with the same contents.
+… and they will behave as if you had imported files with the same contents as those inline configurations.
 
 In fact, anything that is a valid NixOS module can go in the import list, including NixOS modules that are functions:
 
@@ -30,46 +30,6 @@ In fact, anything that is a valid NixOS module can go in the import list, includ
     ({ lib, ... }: { users.users.root.initialPassword = lib.mkDefault ""; })
   ];
 }
-```
-
-The last chapter could have made use of this feature!  The final example from that chapter was split into two files: `top-level.nix` and `other.nix`.  However, we could have compressed the example into a single file, like this:
-
-```nix
-let
-  other =
-    { lib, ... }:
-
-    { options = {
-        system.nixos.release = lib.mkOption {
-          description = "The NixOS version";
-
-          type = lib.types.str;
-        };
-      };
-
-      config = {
-        system.nixos.release = "22.05";
-      };
-    };
-
-in
-  { config, lib, ... }:
-
-  { imports = [ other ];
-
-    options = {
-      system.build.toplevel = lib.mkOption {
-        description = "A fake NixOS, modeled as a string";
-
-        type = lib.types.str;
-      };
-    };
-
-    config = {
-      system.build.toplevel =
-        "Fake NixOS - version ${config.system.nixos.release}";
-    };
-  }
 ```
 
 I will make use of this trick in a few examples below, so that we can simulate modules importing other modules within a single file.
@@ -93,7 +53,7 @@ You do not need to use or understand all of the functions in `lib/modules.nix`, 
 - `lib.mkIf`
 - `lib.mkOrder`
 
-By "primitive", I mean that these functions cannot be implemented in terms of other functions.  They all trigger special behavior built into `lib.evalModules`.
+By "primitive", I mean that these functions cannot be implemented in terms of other functions.  They all hook into special behavior built into `lib.evalModules`.
 
 ### `mkMerge`
 
@@ -140,12 +100,12 @@ The long answer is that the main trade-off between `imports` and `lib.mkMerge` i
 
 - *The `imports` section can merge NixOS modules that are functions*
 
-  `lib.mkMerge` can only merge attribute sets and not functions
+  `lib.mkMerge` can only merge configuration sets and not functions.
 
 
 - *The list of `imports` can't depend on any configuration values*
 
-  In practice, this means that you can easily trigger an infinite loop if you try to do anything fancy using `imports` and you can typically fix it by switching to `lib.mkMerge`
+  In practice, this means that you can easily trigger an infinite recursion if you try to do anything fancy using `imports` and you can typically fix the infinite recursion by switching to `lib.mkMerge`.
 
 The latter point is why you should typically prefer using `lib.mkMerge`.
 {/blurb}
@@ -220,7 +180,7 @@ nix-repl> config.networking.firewall.allowedTCPPorts
 [ 80 443 ]
 ```
 
-> **Exercise**: Try to run the following NixOS module, which specifies the same option twice without using `lib.mkMerge`:
+> **Exercise**: Try to save the following NixOS module to `module.nix`, which specifies the same option twice without using `lib.mkMerge`:
 >
 > ```nix
 > { lib, ... }:
@@ -233,7 +193,7 @@ nix-repl> config.networking.firewall.allowedTCPPorts
 > }
 > ```
 >
-> This will fail.  Do you understand why?  Specifically, is the failure a limitation of the NixOS module system or the Nix programming language?
+> This will fail to deploy.  Do you understand why?  Specifically, is the failure a limitation of the NixOS module system or the Nix programming language?
 
 You can also nest `lib.mkMerge` underneath an attribute.  For example, this:
 
@@ -311,7 +271,7 @@ As a general rule of thumb:
 
 - *Most complex option types will successfully merge in the obvious way*
 
-  e.g. lists will be concatenated and attribute sets will be unioned.
+  e.g. lists will be concatenated and attribute sets will be combined.
 
 The most common exception to this rule of thumb is the "lines" type (`lib.types.lines`), which is a string option type that you can define multiple times.  `services.zookeeper.extraConf` is an example of one such option that has this type:
 
@@ -376,7 +336,7 @@ However, we can use `mkOverride` to annotate our value with a higher priority so
 }
 ```
 
-… and now that works, since we specified a new priority of `50` which is a higher priority than the default priority of `100`.  There is also a pre-existing utility named `lib.mkForce` which sets the priority to 50, so we can use that instead:
+… and now that works, since we specified a new priority of `50` takes priority over the default priority of `100`.  There is also a pre-existing utility named `lib.mkForce` which sets the priority to 50, so we could have also used that instead:
 
 ```nix
 { lib, ... }:
@@ -673,7 +633,7 @@ in
   }
 ```
 
-Both the `gcc` and `clang` package add a `cc` executable to the `PATH`, so the order matters here because the first `cc` on the `PATH` wins.
+Both the `gcc` package and `clang` package add a `cc` executable to the `PATH`, so the order matters here because the first `cc` on the `PATH` wins.
 
 Surprisingly, `clang`'s `cc` is the first one on the `PATH`, even though we imported `moduleB` second:
 
@@ -685,7 +645,7 @@ Surprisingly, `clang`'s `cc` is the first one on the `PATH`, even though we impo
 … and if we flip the order imports:
 
 ```nix
-    imports = [ cowsay moduleB moduleA ];
+    imports = [ moduleB moduleA ];
 ```
 
 … then `gcc`'s `cc` comes first on the `PATH`:
@@ -695,13 +655,13 @@ Surprisingly, `clang`'s `cc` is the first one on the `PATH`, even though we impo
 /nix/store/9wqn04biky07333wkl35bfjv9zv009pl-gcc-wrapper-9.5.0/bin/cc
 ```
 
-This sort of order-sensitivity frequently arises for "list-like" option types, including actual lists or string types that concatenate multiple definitions.
+This sort of order-sensitivity frequently arises for "list-like" option types, including actual lists or string types like `lines` that concatenate multiple definitions.
 
 Fortunately, we can fix situations like these with the `lib.mkOrder` function, which specifies a numeric ordering that NixOS will respect when merging multiple definitions of the same option.
 
 Every option's numeric order is `1000` by default, so if we set the numeric order of `clang` to `1001`:
 
-```
+```nix
 let
   moduleA = { pkgs, ... }: {
     environment.defaultPackages = [ pkgs.gcc ];
@@ -726,4 +686,23 @@ You can also use `lib.mkBefore` and `lib.mkAfter`, which provide convenient syno
 mkBefore = mkOrder 500;
 
 mkAfter = mkOrder 1500;
+```
+
+… so we could have also written:
+
+```nix
+let
+  moduleA = { pkgs, ... }: {
+    environment.defaultPackages = [ pkgs.gcc ];
+  };
+
+  moduleB = { lib, pkgs, ... }: {
+    environment.defaultPackages = lib.mkAfter [ pkgs.clang ];
+  };
+
+in
+  { imports = [ moduleA moduleB ];
+
+    users.users.root.initialPassword = "";
+  }
 ```
