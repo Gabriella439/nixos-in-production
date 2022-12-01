@@ -165,7 +165,7 @@ Now that you've installed Nix I'll show you how to launch a NixOS virtual machin
 
 ### macOS-specific instructions
 
-If you are using macOS, then follow the instructions in the [`macos-builder`](https://github.com/Gabriella439/macos-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
+If you are using macOS, then follow the instructions in the [`macos-builder` repository](https://github.com/Gabriella439/macos-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
 
 If you are using Linux (including NixOS or the Windows Subsystem for Linux) you can skip to the next step.
 

@@ -12,9 +12,9 @@ Here I'll do my best to answer those questions so that you can get a better idea
 
 ## The Zen of NixOS
 
-I like to use the term "master cue" to denote an overarching sign that indicates that you're doing things right.  This "master" cue" might not tell you *how* to do things right, but it can still provide a high-level indicator of whether you are on the right track.
+I like to use the term "master cue" to denote an overarching sign that indicates that you're doing things right.  This master cue might not tell you *how* to do things right, but it can still provide a high-level indicator of whether you are on the right track.
 
-The "master cue" for NixOS is very similar to the "master cue" for the Nix ecosystem, which is this:
+The master cue for NixOS is very similar to the master cue for the Nix ecosystem, which is this:
 
 > Every common build/test/deploy-related activity should be possible with at most one command using Nix's command line interface.
 
@@ -26,7 +26,7 @@ Suppose that you want to test your local project's changes within the context of
 
 - Create and publish a branch in version control recording your changes
 
-- Manually trigger some job to build a software artifact containing your changes
+- Manually trigger some workflow to build a software artifact containing your changes
 
 - Update some configuration file to reference the newly-built software artifact
 
@@ -58,14 +58,14 @@ In other words:
   The Nix build tool would automatically infer which tests depended on your project and rerun those.  Other test runs and their results would be cached if their dependency tree did not include your changes.
 
 
-Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely need to reinvent large portions of the Nix ecosystem for this automation to be sufficiently robust and efficient:
+Some of these potential improvements are not specific to the Nix ecosystem.  After all, you could attempt to create a script that automates the more painstaking multi-step process.  However, you would likely need to reinvent large portions of the Nix ecosystem for this automation to be sufficiently robust and efficient.  For example:
 
 - *Do you maintain a file server for sharing intermediate build products?*
 
   You're likely implementing your own version of the Nix store and caching system
 
 
-- *Do you generate unique labels for build products to isolate them?*
+- *Do you generate unique labels for build products to isolate parallel workflows?*
 
   In the best case scenario, you label build products by a hash of their dependencies and you've reinvented Nix's hashing scheme.  In the worst case scenario you're doing something less accurate (e.g. using timestamps in the labels instead of hashes).
 
@@ -80,7 +80,7 @@ Some of these potential improvements are not specific to the Nix ecosystem.  Aft
   You would likely reimplement the NixOS test framework.
 
 
-You can save yourself a lot of headaches and professional embarrassment by taking time to learn and use the Nix ecosystem as idiomatically as possible instead of learning these lessons the hard way.
+You can save yourself a lot of headaches by taking time to learn and use the Nix ecosystem as idiomatically as possible instead of learning these lessons the hard way.
 
 ## GitOps
 
@@ -105,7 +105,7 @@ This book will espouse a specific flavor of Infrastructure of Code known as [Git
 
 ## DevOps
 
-NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) principle of breaking down boundaries between software developers ("Dev") and operations ("Ops").  Specifically, NixOS goes further in this regard than most other tools by unifying both software configuration and system configuration underneath the NixOS option system.  These NixOS options fall into three categories:
+NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) principle of breaking down boundaries between software developers ("Dev") and operations ("Ops").  Specifically, NixOS goes further in this regard than most other tools by unifying both software configuration and system configuration underneath the NixOS option system.  These NixOS options fall into roughly three categories:
 
 - *Systems configuration*
 
@@ -142,7 +142,7 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
 
 - *Version control*
 
-  If we're going to use GitOps then we had better use `git`!  More specifically, we'll likely use a `git` hosting provider like [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) which support pull requests and continuous integration.
+  If you're going to use GitOps then you had better use `git`!  More specifically, you'll likely use a `git` hosting provider like [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) which support pull requests and continuous integration.
 
   Most companies these days use version control, so this is not a surprising requirement.
 
@@ -159,7 +159,7 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
   These builders will come in two flavors:
 
   - Builders for the hub (the "spokes")
-  - Builders for developers, when they need to build for a different platform
+  - Builders for developers
 
 
 - *A cache*
@@ -173,11 +173,11 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
 
   This server will play a role analogous to a container engine or virtual machine hypervisor in other software architectures, except that we won't necessarily be using virtual machines or containers: many things will run natively on the host as NixOS services.  Of course, you can also use this machine to run a container engine or hypervisor in addition to running things natively on the host.
 
-Moreover, you will either need a cloud platform (e.g. [AWS](https://aws.amazon.com/)) or data center for hosting these machines.  In this book we'll only cover hosting infrastructure on AWS.
+Moreover, you will either need a cloud platform (e.g. [AWS](https://aws.amazon.com/)) or data center for hosting these machines.  In this book we'll primarily focus on hosting infrastructure on AWS.
 
 These are not the only components you will need to build out your product, but these should be the only components necessary to support DevOps workflows, including continuous integration and continuous deployment.
 
-{blurb, class:information}
+{blurb, class:warning}
 A "utility" server should **not** be part of your continuous integration or continuous deployment pipeline.  You should think of such a server as a "junk drawer" for stuff that does not belong in CI/CD.
 {/blurb}
 
@@ -185,12 +185,12 @@ Notably absent from the above list are:
 
 - *Container-specific infrastructure*
 
-  A NixOS-centric architecture already mitigates some of the need for containerizing services, but the architecture doesn't change even if you do use containers.  Third-party containers can run on a "utility" server and your organization's containers can be built using Nixpkgs and distributed via the cache.
+  A NixOS-centric architecture already mitigates some of the need for containerizing services, but the architecture doesn't change even if you do use containers.  Third-party containers can run on a "utility" server and your organization's containers can be built using Nixpkgs and distributed via the cache instead of a container registry.
 
 
 - *Programming-language-specific infrastructure*
 
-  If Nixpkgs supports a given language then we require no additional infrastructure to support building and deploying that language.  However,  we might still host language-specific amenities (e.g. generated documentation) on our utility server.
+  If Nixpkgs supports a given language then we require no additional infrastructure to support building and deploying that language.  However,  we might still host language-specific amenities on our utility server, such as generated documentation.
 
 
 - *Continuous-deployment services*
@@ -200,7 +200,7 @@ Notably absent from the above list are:
 
 - *Cloud/Virtual development environments*
 
-  Nix's support for development shells (e.g. `nix develop`) will be our instrument of choice here.
+  Nix's support for development shells (e.g. `nix develop`) will be our weapon of choice here.
 
 
 ## Scope
@@ -248,4 +248,4 @@ To that end, here is a checklist that will summarize what you would need to unde
   - Images
   - Containers
 
-This book will cover all of the above topics and more, although they will not necessarily be grouped or organize in that exact order.
+This book will cover all of the above topics and more, although they will not necessarily be grouped or organized in that exact order.

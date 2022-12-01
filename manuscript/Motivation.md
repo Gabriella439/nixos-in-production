@@ -97,7 +97,7 @@ You might be interested in how NixOS fares with respect to virtualization or con
 
 - *NixOS without virtualization*
 
-  You can run NixOS on a bare metal machine (e.g. a desktop or rack server) without any virtual machines or containers.  This implies that services run directly on the bare metal machine.
+  You can run NixOS on a bare metal machine (e.g. a desktop computer or rack server) without any virtual machines or containers.  This implies that services run directly on the bare metal machine.
 
 
 - *NixOS as a host operating system*
@@ -133,14 +133,14 @@ So which use cases are NixOS/Nixpkgs well-suited for?  If I had to rank these de
 
 - *NixOS as a host operating system - Static containers*
 
-  NixOS also works well when you want to statically specify a set of containers to run.  Not only can you run Docker containers or OCI containers, but NixOS particularly excels at running things inside "NixOS containers" (which are `systemd-nspawn` containers under the hood) or application containers built by Nixpkgs.
+  NixOS also works well when you want to statically specify a set of containers to run.  Not only can NixOS run Docker containers or OCI containers, but NixOS also provides special support for "NixOS containers" (which are `systemd-nspawn` containers under the hood) or application containers built by Nixpkgs.
 
   I rank this lower than "NixOS without virtualization" because NixOS obviates some (but not all) of the reasons for using containers.  In other words, once you switch to using NixOS you might find that you can do just fine without containers.
 
 
 - *NixOS as a host operating system - Dynamic containers*
 
-  You can also use NixOS to run containers dynamically, but NixOS is not special in this regard.  At best, NixOS might simplify administering a container orchestration service (e.g.  `kubernetes`), but that alone might not justify the switching costs of using NixOS.
+  You can also use NixOS to run containers dynamically, but NixOS is not special in this regard.  At best, NixOS might simplify administering a container orchestration service (e.g.  `kubernetes`).
 
 
 - *Application containers sans NixOS*
@@ -178,7 +178,7 @@ DevOps is more of a set of cultural practices than a team, but some organization
 
 ## What does NixOS replace?
 
-If NixOS is a server operating system, does that mean that NixOS competes with Ubuntu Server, Debian or Fedora?  Not exactly.
+If NixOS is a server operating system, does that mean that NixOS competes with other server operating systems like Ubuntu Server, Debian or Fedora?  Not exactly.
 
 NixOS competes more with the Docker ecosystem, meaning that a lot of the value that NixOS adds overlaps with Docker:
 
@@ -187,7 +187,7 @@ NixOS competes more with the Docker ecosystem, meaning that a lot of the value t
   … analogous to `docker compose`.
 
 
-- *NixOS provides better service isolation*
+- *NixOS provides better isolation*
 
   … analogous to containers.
 
