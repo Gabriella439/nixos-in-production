@@ -43,7 +43,7 @@ operating system:
 
 - *Nixpkgs provides amazing support for server-oriented software and services*
 
-  `nginx`, `postgres`, `redis`, … you name it, Nixpkgs most likely has the service you need and it's a dream to set up. 😍
+  `nginx`, `postgres`, `redis`, … you name it, Nixpkgs most likely has the service you need and it's a dream to set up.
 
 
 - *End users can more easily self-serve if they stray from the beaten path*

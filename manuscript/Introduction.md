@@ -12,7 +12,7 @@ However, this book will appeal to you if you wish to answer the following questi
 - What potential pitfalls of NixOS should I be mindful to avoid?
 - How can I effectively support and debug NixOS when things go wrong?
 
-I'm writing this book because I cultivated years of professional experience doing all of the above, back when no such resource existed.  I learned NixOS the hard way 😅 and I'm writing this book so that you don't have to make the same mistakes I did.
+I'm writing this book because I cultivated years of professional experience doing all of the above, back when no such resource existed.  I learned NixOS the hard way and I'm writing this book so that you don't have to make the same mistakes I did.
 
 Currently, most educational resources for NixOS (including the NixOS manual) are written with desktop users in mind, whereas I view NixOS as far better suited as a production operating system.  This book attempts to fill that documentation gap by catering to professional NixOS users instead of hobbyists.
 

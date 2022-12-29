@@ -321,7 +321,7 @@ The NixOS module system lets modules refer to the final composite configuration 
 
 ```nix
 # This represents the final composite configuration
-# ↓
+# v
 { config, lib, ... }:
 
 { …
@@ -329,7 +329,7 @@ The NixOS module system lets modules refer to the final composite configuration 
   config = {
     system.build.toplevel =
       "Fake NixOS - version ${config.system.nixos.release}";
-                            # ↑
+                            # ^
                             # … which we can use within our configuration
   };
 }
