@@ -79,7 +79,7 @@ Furthermore, NixOS possesses several unique advantages compared to other server-
 
 - *On-premises ("on-prem" for short)*
 
-  "On-premises" software runs within the within the end user's environment.  For example, if the software product is a server then an on-premises deployment runs within the customer's data center, either as a virtual machine or a rack server.
+  "On-premises" software runs within the within the end user's environment.  For example, if the software product is a server then an on-premises deployment runs within the customer's data center, either as a virtual machine or a physical rack server.
 
 
 - *Software as a service ("SaaS" for short)*
@@ -97,7 +97,7 @@ You might be interested in how NixOS fares with respect to virtualization or con
 
 - *NixOS without virtualization*
 
-  You can run NixOS on a bare metal machine (e.g. a desktop computer or rack server) without any virtual machines or containers.  This implies that services run directly on the bare metal machine.
+  You can run NixOS on a bare metal machine (e.g. a desktop computer or physical rack server) without any virtual machines or containers.  This implies that services run directly on the bare metal machine.
 
 
 - *NixOS as a host operating system*
@@ -126,7 +126,7 @@ So which use cases are NixOS/Nixpkgs well-suited for?  If I had to rank these de
 
 - *NixOS without virtualization*
 
-  This typically entails running NixOS on a bare-metal rack server and you still use NixOS to manage all of your services without containers.
+  This typically entails running NixOS on a physical rack server and you still use NixOS to manage all of your services without containers.
 
   This can potentially be the most cost-effective deployment model if you're willing to manage your own hardware (including RAID and backup/restore) or you operate your own data center.
 
@@ -135,7 +135,7 @@ So which use cases are NixOS/Nixpkgs well-suited for?  If I had to rank these de
 
   NixOS also works well when you want to statically specify a set of containers to run.  Not only can NixOS run Docker containers or OCI containers, but NixOS also provides special support for "NixOS containers" (which are `systemd-nspawn` containers under the hood) or application containers built by Nixpkgs.
 
-  I rank this lower than "NixOS without virtualization" because NixOS obviates some (but not all) of the reasons for using containers.  In other words, once you switch to using NixOS you might find that you can do just fine without containers.
+  I rank this lower than "NixOS without virtualization" because NixOS obviates some (but not all) of the reasons for using containers.  In other words, once you switch to using NixOS you might find that you can do just fine without containers or at least use them much more sparingly.
 
 
 - *NixOS as a host operating system - Dynamic containers*
@@ -197,10 +197,10 @@ NixOS competes more with the Docker ecosystem, meaning that a lot of the value t
   … analogous to `Dockerfile`s.
 
 
-So you can think of NixOS as the Docker killer.  The use cases for NixOS overlap substantially with the use cases for the Docker ecosystem.
-
 You *can* use NixOS in conjunction with Docker containers since NixOS supports declaratively launching containers, but you probably want to avoid buying further into the broader Docker ecosystem if you use NixOS.  You don't want to be in a situation where your engineering organization fragments and does everything in two different ways: the NixOS way and the Docker way.
 
 {blurb, class:information}
-For those familiar with the Gentoo Linux distribution, **NixOS is like Gentoo, but for Docker**.  Similar to Gentoo, NixOS is an operating system that provides unparalleled control over the machine while targeting use cases and workflows similar to the Docker ecosystem.
+For those familiar with the Gentoo Linux distribution, **NixOS is like Gentoo, but for Docker**[^1].  Similar to Gentoo, NixOS is an operating system that provides unparalleled control over the machine while targeting use cases and workflows similar to the Docker ecosystem.
 {/blurb}
+
+[^1]: Thank you to [Adam Gordon Bell](https://adamgordonbell.com/) for this analogy
