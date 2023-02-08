@@ -9,6 +9,11 @@
         path = ./templates/server;
         description = "A prototype TODO list web application";
       };
+
+      terraform = {
+        path = ./templates/terraform;
+        description = "A terraform project to deploy the web application";
+      };
     };
   };
 }

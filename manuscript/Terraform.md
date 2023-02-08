@@ -12,7 +12,7 @@ Even if there were no free tier, the cost of a `t3.micro` instance is currently 
 Throughout this book I'll take care to minimize your expenditures by showing how you to develop and test locally as much as possible.
 {/blurb}
 
-In the spirit of Infrastructure as Code, we'll be using `terraform` to declaratively provision AWS resources, but before doing so we need to generate AWS access keys for programmatic access.
+In the spirit of Infrastructure as Code, we'll be using Terraform to declaratively provision AWS resources, but before doing so we need to generate AWS access keys for programmatic access.
 
 ## Configuring your access keys
 
@@ -32,7 +32,7 @@ If you generated the access credential correctly you should have:
 If you haven't already, configure your development environment to use these tokens by running:
 
 ```bash
-$ nix run github:NixOS/nixpkgs/22.11#awscli configure
+$ nix run github:NixOS/nixpkgs/22.11#awscli -- configure --profile nixos-in-production
 AWS Access Key ID [None]: …
 AWS Secret Access Key [None]: …
 Default region name [None]: …
@@ -41,3 +41,96 @@ Default output format [None]:
 
 If you're not sure what region to use, pick the one closest to you based on
 the list of [AWS service endpoints](https://docs.aws.amazon.com/general/latest/gr/rande.html).
+
+## Generating an SSH key
+
+You will need an SSH key pair as well.  If you don't already have one then run:
+
+```bash
+$ nix shell github:NixOS/nixpkgs/22.11#openssh --command \
+    ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ''
+```
+
+## A minimal Terraform specification
+
+Now run the following command to bootstrap our first Terraform project:
+
+```bash
+$ nix flake init --template github:Gabriella439/nixos-in-production#server
+```
+
+… which will generate the following files:
+
+- `module.nix` + `www/index.html`
+
+  The NixOS configuration for our TODO list web application, except adapted to run on AWS instead of inside of a `qemu` VM.
+
+
+- `flake.nix`
+
+  A Nix flake that wraps our NixOS configuration so that we can refer to the configuration using a flake URI.
+
+
+- `main.tf`
+
+  The Terraform specification for deploying our NixOS configuration to AWS.
+
+## Deploying our configuration
+
+To deploy the Terraform configuration, run the following commands:
+
+```bash
+$ nix shell github:NixOS/nixpkgs/22.11#terraform
+$ terraform init
+$ terraform apply
+```
+
+… and when prompted to enter the `private_key_file`, use the appropriate path to the private key.  If you generated the key following the instructions earlier in this chapter then you would specify:
+
+```
+var.private_key_file
+  Enter a value: ~/.ssh/id_ed25519
+```
+
+… and when prompted to enter the `region`, use the same AWS region you specified earlier when running `aws configure`:
+
+```
+var.region
+  Enter a value: us-east-1
+```
+
+After that, `terraform` will display the execution plan and ask you to confirm the plan:
+
+```
+module.ami.data.external.ami: Reading...
+module.ami.data.external.ami: Read complete after 1s [id=-]
+
+Terraform used the selected providers to generate the following execution plan.
+Resource actions are indicated with the following symbols:
+  + create
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+…
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+```
+
+… and if you confirm then `terraform` will deploy that execution plan:
+
+```
+…
+
+Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+public_dns = "ec2-…-2.compute.amazonaws.com"
+```
+
+The final output will include the URL for your server.  If you open that URL in your browser you will see the exact same TODO server as before, except now running on AWS instead of inside of a `qemu` virtual machine.  If this is your first time deploying something to AWS then congratulations!

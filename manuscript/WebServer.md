@@ -132,8 +132,8 @@ The previous example illustrates how NixOS promotes DevOps on a small scale.  If
        let
          renderPort = port: "<li>${toString port}</li>\n";
 
-        in
-          lib.concatMapStrings renderPort config.networking.firewall.allowedTCPPorts
+       in
+         lib.concatMapStrings renderPort config.networking.firewall.allowedTCPPorts
        }
        </ul>
        </body>
