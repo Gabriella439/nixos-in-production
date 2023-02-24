@@ -146,6 +146,7 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
 
   Most companies these days use version control, so this is not a surprising requirement.
 
+
 - *Product servers*
 
   These are the NixOS servers that actually host your product-related services.
