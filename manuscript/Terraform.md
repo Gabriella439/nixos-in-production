@@ -119,6 +119,39 @@ public_dns = "ec2-….compute.amazonaws.com"
 
 The final output will include the URL for your server.  If you open that URL in your browser you will see the exact same TODO server as before, except now running on AWS instead of inside of a `qemu` virtual machine.  If this is your first time deploying something to AWS then congratulations!
 
+## Cleaning up
+
+Once you verify that everything works you can destroy all deployed resources by running:
+
+```bash
+$ terraform apply -destroy
+```
+
+`terraform` will prompt you for the same information (i.e. the same region) and also prompt for confirmation just like before:
+
+```
+var.region
+  Enter a value: …
+
+…
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+```
+
+… and once you confirm then `terraform` will destroy everything:
+
+```
+…
+
+Apply complete! Resources: 0 added, 0 changed, 7 destroyed.
+```
+
+Now you can read the rest of this chapter in peace knowing that you are no longer being billed for this example.
+
 ## Terraform walkthrough
 
 The key file in our Terraform project is `main.tf` containing the Terraform logic for how to deploy our TODO list application.
@@ -323,7 +356,7 @@ resource "aws_key_pair" "nixos-in-production" {
 ```
 
 {blurb, class: warning}
-The [`tls_private_key` resource](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) is currently not secure because the deployment state is stored locally unencrypted.  You can and should fix this by storing the deployment state using the [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) but that will not be covered in this book, for simplicity.
+The [`tls_private_key` resource](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) is currently not secure because the deployment state is stored locally unencrypted.  You can and should fix this by storing the deployment state using the [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) but that won't be covered until the next chapter.
 {/blurb}
 
 After that we get to the actual server:
