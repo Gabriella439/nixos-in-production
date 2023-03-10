@@ -81,7 +81,7 @@ You can read the above code as saying:
 {blurb, class: information}
 You always want to specify a system state version that matches the starting version of Nixpkgs for that machine and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
 
-Nixpkgs uses the state version to migrate your NixOS system because in order to migrate your system because each migration needs to know where your system started from.
+Nixpkgs uses the state version to migrate your NixOS system because in order to migrate your system each migration needs to know where your system started from.
 
 Two common mistakes NixOS users sometimes make are:
 

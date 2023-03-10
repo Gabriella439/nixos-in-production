@@ -6,7 +6,7 @@ I'd like you to be able to follow along with the examples in this book, so this 
 
 You've likely already installed Nix if you're reading this book, but I'll still cover how to do this because I have a few tips to share that can help you author a more reliable installation script for your colleagues.
 
-Needless to say, if you or any of your colleagues are using NixOS as your operating system then you don't need to install Nix and you can skip to the [Running a NixOS Virtual Machine](#running-a-nixos-virtual-machine) section below.
+Needless to say, if you or any of your colleagues are using NixOS as your development operating system then you don't need to install Nix and you can skip to the [Running a NixOS Virtual Machine](#running-a-nixos-virtual-machine) section below.
 
 ### Default installation
 
@@ -143,7 +143,7 @@ So the final installation script we'll end up with is:
 ```bash
 $ VERSION='2.11.0'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
-$ CONFIGURATION="\
+$ CONFIGURATION="
 extra-experimental-features = nix-command flakes repl-flake
 extra-trusted-users = ${USER}
 "
@@ -165,7 +165,7 @@ Now that you've installed Nix I'll show you how to launch a NixOS virtual machin
 
 ### macOS-specific instructions
 
-If you are using macOS, then follow the instructions in the [Nixpkgs manual](https://nixos.org/manual/nixpkgs/unstable/#sec-darwin-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
+If you are using macOS, then follow the instructions in the [Nixpkgs manual](https://nixos.org/manual/nixpkgs/stable/#sec-darwin-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
 
 If you are using Linux (including NixOS or the Windows Subsystem for Linux) you can skip to the next step.
 
@@ -280,8 +280,7 @@ For example, let's test that right now; save the following file to `module.nix`:
 }
 ```
 
-… then start the virtual machine and log into the machine.  As the `root` user,
-run:
+… then start the virtual machine and log into the machine.  As the `root` user, run:
 
 ```bash
 [root@nixos:~]# sudo --user postgres psql

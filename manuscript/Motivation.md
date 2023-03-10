@@ -107,7 +107,7 @@ You might be interested in how NixOS fares with respect to virtualization or con
 
 - *NixOS as a guest operating system*
 
-  Virtual machines or [OS containers](https://blog.risingstack.com/operating-system-containers-vs-application-containers/) can run a full-fledged operating system inside of them, which can itself be a NixOS operating system.  I consider this similar in spirit to the "NixOS without virtualization" case above because in both cases the services are managed by NixOS.
+  Virtual machines or [OS containers](https://blog.risingstack.com/operating-system-containers-vs-application-containers/) can run a fully-fledged operating system inside of them, which can itself be a NixOS operating system.  I consider this similar in spirit to the "NixOS without virtualization" case above because in both cases the services are managed by NixOS.
 
 
 - *Application containers*
@@ -173,7 +173,7 @@ The reason why NixOS fits the DevOps space so well is because NixOS unifies all 
 This means that a DevOps engineer or DevOps team is best situated to introduce NixOS within an engineering organization.
 
 {blurb, class: information}
-DevOps is more of a set of cultural practices than a team, but some organizations explicitly create a DevOps team or hire engineers for their DevOps expertise in order support to support tools (like NixOS) that enable those cultural practices.
+DevOps is more of a set of cultural practices than a team, but some organizations explicitly create a DevOps team or hire engineers for their DevOps expertise in order to support tools (like NixOS) that enable those cultural practices.
 {/blurb}
 
 ## What does NixOS replace?

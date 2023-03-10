@@ -134,7 +134,7 @@ NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) princi
   - Environment variables
 
 
-In extreme cases, you can even embed non-Nix code inside of Nix and do "pure software development".  In other words, you can author inline code written within another language inside of a NixOS configuration file.  We'll include one example of this later on in the "Our first web server" chapter.
+In extreme cases, you can even embed non-Nix code inside of Nix and do "pure software development".  In other words, you can author inline code written within another language inside of a NixOS configuration file.  I'll include one example of this later on in the "Our first web server" chapter.
 
 ## Architecture
 
@@ -142,7 +142,7 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
 
 - *Version control*
 
-  If you're going to use GitOps then you had better use `git`!  More specifically, you'll likely use a `git` hosting provider like [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) which support pull requests and continuous integration.
+  If you're going to use GitOps then you had better use `git`!  More specifically, you'll likely use a `git` hosting provider like [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) which supports pull requests and continuous integration.
 
   Most companies these days use version control, so this is not a surprising requirement.
 
@@ -178,13 +178,13 @@ A NixOS-centric architecture tends to have the following key pieces of infrastru
 
   This server will play a role analogous to a container engine or virtual machine hypervisor in other software architectures, except that we won't necessarily be using virtual machines or containers: many things will run natively on the host as NixOS services.  Of course, you can also use this machine to run a container engine or hypervisor in addition to running things natively on the host.
 
-Moreover, you will either need a cloud platform (e.g. [AWS](https://aws.amazon.com/)) or data center for hosting these machines.  In this book we'll primarily focus on hosting infrastructure on AWS.
-
-These are not the only components you will need to build out your product, but these should be the only components necessary to support DevOps workflows, including continuous integration and continuous deployment.
-
 {blurb, class:warning}
 A "utility" server should **not** be part of your continuous integration or continuous deployment pipeline.  You should think of such a server as a "junk drawer" for stuff that does not belong in CI/CD.
 {/blurb}
+
+Moreover, you will either need a cloud platform (e.g. [AWS](https://aws.amazon.com/)) or data center for hosting these machines.  In this book we'll primarily focus on hosting infrastructure on AWS.
+
+These are not the only components you will need to build out your product, but these should be the only components necessary to support DevOps workflows, including continuous integration and continuous deployment.
 
 Notably absent from the above list are:
 
