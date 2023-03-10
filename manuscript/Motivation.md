@@ -79,7 +79,7 @@ Furthermore, NixOS possesses several unique advantages compared to other server-
 
 - *On-premises ("on-prem" for short)*
 
-  "On-premises" software runs within the within the end user's environment.  For example, if the software product is a server then an on-premises deployment runs within the customer's data center, either as a virtual machine or a physical rack server.
+  "On-premises" software runs within the end user's environment.  For example, if the software product is a server then an on-premises deployment runs within the customer's data center, either as a virtual machine or a physical rack server.
 
 
 - *Software as a service ("SaaS" for short)*
