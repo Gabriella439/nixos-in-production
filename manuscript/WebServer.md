@@ -265,7 +265,16 @@ However, we can pass through our local filesystem to the virtual machine so that
   };
 ```
 
-… and then restart the machine, except with a slightly modified version of our original `nix run` command:
+… and change `module.nix` to reference `/var/www`, like this:
+
+```nix
+    virtualHosts.localhost.locations."/" = {
+      index = "index.html";
+      root = "/var/www";
+    };
+```
+
+Finally, restart the machine, except with a slightly modified version of our original `nix run` command:
 
 ```bash
 $ WWW="$PWD/www" nix run
