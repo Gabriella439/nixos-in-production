@@ -68,8 +68,9 @@ However, there are a few more options that the script accepts that we're going t
 $ VERSION='2.11.0'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
 $ sh <(curl --location "${URL}") --help
-…
+```
 
+```
 Nix Installer [--daemon|--no-daemon] [--daemon-user-count INT] [--no-channel-add] [--no-modify-profile] [--nix-extra-conf-file FILE]
 Choose installation method.
 
