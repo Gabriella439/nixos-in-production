@@ -336,7 +336,7 @@ However, we can use `mkOverride` to annotate our value with a higher priority so
 }
 ```
 
-… and now that works, since we specified a new priority of `50` takes priority over the default priority of `100`.  There is also a pre-existing utility named `lib.mkForce` which sets the priority to 50, so we could have also used that instead:
+… and now that works, since we specified a new priority of `50` that takes priority over the default priority of `100`.  There is also a pre-existing utility named `lib.mkForce` which sets the priority to 50, so we could have also used that instead:
 
 ```nix
 { lib, ... }:
@@ -530,7 +530,7 @@ The reason why is because the recursion is not well-founded:
 
 ```nix
 # This attribute directly depends on itself
-# ↓           ↓
+# |           |
   config = if config.services.cowsay.enable then {
 ```
 
@@ -612,7 +612,7 @@ The NixOS module system strives to make the behavior of our system depend as lit
 { imports = [ ./B.nix ./A.nix ]; }
 ```
 
-… and in *most cases* that is true.  99% of the time you can safely sort your import list and either your NixOS system will be *exactly* the same as before (down to the hash) or *essentially* the same as before, meaning that the difference is irrelevant.  However, for those 1% of cases where order matters we need the `lib.mkOrder` function.
+… and in *most cases* that is true.  99% of the time you can safely sort your import list and either your NixOS system will be *exactly* the same as before (producing the exact same Nix store build product) or *essentially* the same as before, meaning that the difference is irrelevant.  However, for those 1% of cases where order matters we need the `lib.mkOrder` function.
 
 Here's one example of where ordering matters:
 
@@ -635,14 +635,14 @@ in
 
 Both the `gcc` package and `clang` package add a `cc` executable to the `PATH`, so the order matters here because the first `cc` on the `PATH` wins.
 
-Surprisingly, `clang`'s `cc` is the first one on the `PATH`, even though we imported `moduleB` second:
+In the above example, `clang`'s `cc` is the first one on the `PATH`, because we imported `moduleB` second:
 
 ```bash
 [root@nixos:~]# readlink $(type -p cc)
 /nix/store/6szy6myf8vqrmp8mcg8ps7s782kygy5g-clang-wrapper-11.1.0/bin/cc
 ```
 
-… and if we flip the order imports:
+… but if we flip the order imports:
 
 ```nix
     imports = [ moduleB moduleA ];
@@ -659,7 +659,7 @@ This sort of order-sensitivity frequently arises for "list-like" option types, i
 
 Fortunately, we can fix situations like these with the `lib.mkOrder` function, which specifies a numeric ordering that NixOS will respect when merging multiple definitions of the same option.
 
-Every option's numeric order is `1000` by default, so if we set the numeric order of `clang` to `1001`:
+Every option's numeric order is `1000` by default, so if we set the numeric order of `clang` to `1500`:
 
 ```nix
 let
@@ -668,7 +668,7 @@ let
   };
 
   moduleB = { lib, pkgs, ... }: {
-    environment.defaultPackages = lib.mkOrder 1001 [ pkgs.clang ];
+    environment.defaultPackages = lib.mkOrder 1500 [ pkgs.clang ];
   };
 
 in

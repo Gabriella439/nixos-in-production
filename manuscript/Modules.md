@@ -321,7 +321,7 @@ The NixOS module system lets modules refer to the final composite configuration 
 
 ```nix
 # This represents the final composite configuration
-# v
+# |
 { config, lib, ... }:
 
 { …
@@ -329,7 +329,7 @@ The NixOS module system lets modules refer to the final composite configuration 
   config = {
     system.build.toplevel =
       "Fake NixOS - version ${config.system.nixos.release}";
-                            # ^
+                            # |
                             # … which we can use within our configuration
   };
 }
@@ -373,7 +373,7 @@ We can better understand why this recursion is well-founded by simulating how `l
 
 - compute the [fixed point](https://en.wikipedia.org/wiki/Fixed_point_(mathematics)) of this composite module
 
-We'll walk through this by performing the same steps as `lib.evalModules` by hand.  First, to simplify things we'll consolidate the prior example into a single flake that we can evaluate as we go:
+We'll walk through this by performing the same steps as `lib.evalModules`.  First, to simplify things we'll consolidate the prior example into a single flake that we can evaluate as we go:
 
 ```nix
 # Save this to `./evalModules/flake.nix`

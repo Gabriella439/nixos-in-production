@@ -197,7 +197,7 @@ variable "region" {
   …
 ```
 
-When you run `terraform apply` you will be automatically prompted to supply any input variables which do not have default values:
+When you run `terraform apply` you will be automatically prompted to supply all input variables:
 
 ```bash
 $ terraform apply
@@ -248,6 +248,13 @@ In between the input variables and the output values the Terraform module declar
 ```hcl
 resource "aws_security_group" "todo" {
   …
+}
+
+resource "tls_private_key" "nixos-in-production" {
+  …
+}
+
+resource "local_sensitive_file" "ssh_key_file" {
 }
 
 resource "aws_key_pair" "nixos-in-production" {
@@ -356,7 +363,7 @@ resource "aws_key_pair" "nixos-in-production" {
 ```
 
 {blurb, class: warning}
-The [`tls_private_key` resource](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) is currently not secure because the deployment state is stored locally unencrypted.  You can and should fix this by storing the deployment state using the [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) but that won't be covered until the next chapter.
+The [`tls_private_key` resource](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) is currently not secure because the deployment state is stored locally unencrypted.  We can and will fix this by storing the deployment state using the [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) but that won't be covered until the next chapter.
 {/blurb}
 
 After that we get to the actual server:
