@@ -136,6 +136,7 @@ NixOS also exemplifies the [DevOps](https://en.wikipedia.org/wiki/DevOps) princi
 
 In extreme cases, you can even embed non-Nix code inside of Nix and do "pure software development".  In other words, you can author inline code written within another language inside of a NixOS configuration file.  I'll include one example of this later on in the "Our first web server" chapter.
 
+{id: big-picture-architecture}
 ## Architecture
 
 A NixOS-centric architecture tends to have the following key pieces of infrastructure:
