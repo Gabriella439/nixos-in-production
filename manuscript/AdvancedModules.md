@@ -140,8 +140,8 @@ If you specify a list-valued option twice, the lists are combined, so the above 
 { lib, ... }:
 
 { config = lib.mkMerge [
-    networking.firewall.allowedTCPPorts = [ 80 443 ]; }
-    users.users.root.initialPassword = "";
+    { networking.firewall.allowedTCPPorts = [ 80 443 ]; }
+    { users.users.root.initialPassword = ""; }
   ];
 }
 ```
