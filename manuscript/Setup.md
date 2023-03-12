@@ -166,7 +166,19 @@ Now that you've installed Nix I'll show you how to launch a NixOS virtual machin
 
 ### macOS-specific instructions
 
-If you are using macOS, then follow the instructions in the [Nixpkgs manual](https://nixos.org/manual/nixpkgs/stable/#sec-darwin-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
+If you are using macOS, then follow the instructions in the [Nixpkgs manual](https://nixos.org/manual/nixpkgs/unstable/#sec-darwin-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
+
+In particular, you will need to leave that builder running in the background while following the remaining examples in this chapter.  In other words, in one terminal window you will need to run:
+
+```bash
+$ nix run nixpkgs#darwin.builder
+```
+
+… and you will need that to be running whenever you need to build a NixOS system.  However, you can shut down the builder down when you're not using it by giving the builder the `shutdown now` command.
+
+{blurb, class:warning}
+The `nix run nixpkgs#darwin.builder` command is not enough to set up Linux builds on macOS.  Read and follow the full set of instructions from the Nixpkgs manual linked above.
+{/blurb}
 
 If you are using Linux (including NixOS or the Windows Subsystem for Linux) you can skip to the next step.
 
