@@ -4,7 +4,7 @@
     virtualHosts.localhost.locations."/" = {
       index = "index.html";
 
-      root = ./www;
+      root = "/var/www";
     };
   };
 
