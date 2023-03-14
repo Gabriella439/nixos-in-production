@@ -187,7 +187,7 @@ If you are using Linux (including NixOS or the Windows Subsystem for Linux) you 
 Run the following command to generate your first project:
 
 ```bash
-$ nix flake init --template github:Gabriella439/nixos-in-production#setup
+$ nix flake init --template 'github:Gabriella439/nixos-in-production#setup'
 ```
 
 … that will generate the following `flake.nix` file:
