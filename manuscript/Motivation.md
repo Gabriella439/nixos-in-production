@@ -72,7 +72,7 @@ Furthermore, NixOS possesses several unique advantages compared to other server-
 
   You get several security improvements for free or almost free by virtue of using NixOS.  For example, your system's footprint is immutable and internal references to filepaths or executables are almost always fully qualified.
 
-
+{id: on-off-prem}
 ## On-premises vs. Software as a service
 
 "Server operating systems" is still a fairly broad category and we can narrow things down further depending on where we deploy the server:
@@ -91,6 +91,7 @@ NixOS is better suited for SaaS than on-prem deployments, because NixOS fares wo
 
 You can still deploy NixOS for on-prem deployments and I will cover that in a later chapter, but you will have a much better time using NixOS for SaaS deployments.
 
+{id: virtualization}
 ## Virtualization
 
 You might be interested in how NixOS fares with respect to virtualization or containers, so I'll break things down into these four potential use cases:

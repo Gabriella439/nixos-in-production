@@ -12,4 +12,12 @@ The ["big picture"](#big-picture-architecture) chapter briefly introduced these 
 
 ## Product servers
 
-These servers are the "business end" of your organization so we obviously can't omit them from our architecture diagram!
+These servers are the "business end" of your organization so we obviously can't omit them from our architecture diagram!  For our running example, we will have just one product server that runs our TODO web application.
+
+These product server are going to be NixOS servers, which could be virtual machines hosted by a cloud provider or physical servers in your organization's datacenter (See: [Virtualization](#virtualization)).  Either way, we're going to run and manage product-related services directly using NixOS as `systemd` services.
+
+For this chapter, we're assuming that these product servers are hosted within your cloud provider or data center and not hosted by one of your customers (See: [On-premises vs. Software as a service](#on-off-prem)).  We'll cover the latter type of deployments ("on-premises") in a subsequent chapter.
+
+One important requirement for product servers is the 
+
+## Utility servers
