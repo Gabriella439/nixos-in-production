@@ -4,6 +4,18 @@ I'd like you to be able to follow along with the examples in this book, so this 
 
 ## Installing Nix
 
+In order to follow along with this book you will need the following requirements:
+
+- Nix version 2.11 or newer
+
+- Flake support enabled
+
+  Specifically, you'll need to enable the following experimental features in your [Nix configuration file](https://nixos.org/manual/nix/stable/command-ref/conf-file.html):
+
+  ```
+  extra-experimental-features = nix-command flakes repl-flake
+  ```
+
 You've likely already installed Nix if you're reading this book, but I'll still cover how to do this because I have a few tips to share that can help you author a more reliable installation script for your colleagues.
 
 Needless to say, if you or any of your colleagues are using NixOS as your development operating system then you don't need to install Nix and you can skip to the [Running a NixOS Virtual Machine](#running-a-nixos-virtual-machine) section below.
