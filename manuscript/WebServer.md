@@ -164,7 +164,7 @@ If you restart the machine and refresh [http://localhost:8080](http://localhost:
 There are less roundabout ways to query our system's configuration that don't involve serving a web page.  For example, using the same `flake.nix` file we can more directly query the open ports using:
 
 ```bash
-$ nix eval .#machine.config.networking.firewall.allowedTCPPorts
+$ nix eval '.#machine.config.networking.firewall.allowedTCPPorts'
 [ 80 ]
 ```
 {/blurb}

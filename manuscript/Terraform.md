@@ -32,7 +32,7 @@ If you generated the access credentials correctly you should have:
 If you haven't already, configure your development environment to use these tokens by running:
 
 ```bash
-$ nix run github:NixOS/nixpkgs/22.11#awscli -- configure --profile nixos-in-production
+$ nix run 'github:NixOS/nixpkgs/22.11#awscli' -- configure --profile nixos-in-production
 AWS Access Key ID [None]: …
 AWS Secret Access Key [None]: …
 Default region name [None]: …
@@ -71,7 +71,7 @@ $ nix flake init --template 'github:Gabriella439/nixos-in-production#terraform'
 To deploy the Terraform configuration, run the following commands:
 
 ```bash
-$ nix shell github:NixOS/nixpkgs/22.11#terraform
+$ nix shell 'github:NixOS/nixpkgs/22.11#terraform'
 $ terraform init
 $ terraform apply
 ```

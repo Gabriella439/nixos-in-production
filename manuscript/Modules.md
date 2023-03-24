@@ -412,12 +412,28 @@ We'll walk through this by performing the same steps as `lib.evalModules`.  Firs
 You can evaluate the above flake like this:
 
 ```bash
-$ nix eval ./evalModules#config
+$ nix eval './evalModules#config'
 { system = { build = { toplevel = "Fake NixOS - version 22.05"; }; nixos = { release = "22.05"; }; }; }
 
-$ nix eval ./evalModules#config.system.build.toplevel 
+$ nix eval './evalModules#config.system.build.toplevel'
 "Fake NixOS - version 22.05"
 ```
+
+{blurb, class:warning}
+Various `nix` commands (like `nix eval`) take a flake reference as an argument which has the form:
+
+```
+${URI}#${ATTRIBUTE_PATH}
+```
+
+In the previous example, the `URI` was `./evalModules` (a file path in this case) and the `ATTRIBUTE_PATH` was `config.system.build.toplevel`.
+
+However, if you use `zsh` as your shell with `EXTENDED_GLOB` glob support (i.e. `setopt extended_glob`) then `zsh` interprets `#` as a special character.  This is why all of the examples from this book quote the flake reference as a precaution, but if you're not using `zsh` or its extended globbing support then you can remove the quotes, like this:
+
+```bash
+$ nix eval ./evalModules#config.system.build.toplevel
+```
+{/blurb}
 
 The first thing that `lib.evalModules` does is to merge the `other` module into the `topLevel` module, which we will simulate by hand by performing the same merge ourselves:
 

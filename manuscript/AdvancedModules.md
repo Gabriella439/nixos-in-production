@@ -130,7 +130,7 @@ You can merge configuration sets that define same option multiple times, like th
 For example, the `networking.firewall.allowedTCPPorts` option's type is:
 
 ```bash
-$ nix eval .#machine.options.networking.firewall.allowedTCPPorts.type.description
+$ nix eval '.#machine.options.networking.firewall.allowedTCPPorts.type.description'
 "list of 16 bit unsigned integer; between 0 and 65535 (both inclusive)"
 ```
 
@@ -149,14 +149,14 @@ If you specify a list-valued option twice, the lists are combined, so the above 
 … and we can even prove that by querying the final value of the option from the command line:
 
 ```bash
-$ nix eval .#machine.config.networking.firewall.allowedTCPPorts
+$ nix eval '.#machine.config.networking.firewall.allowedTCPPorts'
 [ 80 443 ]
 ```
 
 However, you might find the `nix repl` more convenient if you prefer to interactively browse the available options.  Run this command:
 
 ```bash
-$ nix repl .#machine
+$ nix repl '.#machine'
 …
 Added 7 variables.
 ```
@@ -291,7 +291,7 @@ The most common exception to this rule of thumb is the "lines" type (`lib.types.
 … and merging multiple occurrences of that option concatenates them as lines by inserting an intervening newline character:
 
 ```bash
-$ nix eval .#machine.config.services.zookeeper.extraConf
+$ nix eval '.#machine.config.services.zookeeper.extraConf'
 "initLimit=5\nsyncLimit=2"
 ```
 
@@ -391,7 +391,7 @@ In extreme cases you might still need to specify an explicit numeric priority.  
 … which will produce a final value of:
 
 ```BashSession
-$ nix eval .#machine.config.systemd.services.nginx.serviceConfig.RestartSec
+$ nix eval '.#machine.config.systemd.services.nginx.serviceConfig.RestartSec'
 "3s"
 ```
 
