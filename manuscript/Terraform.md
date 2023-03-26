@@ -1,3 +1,4 @@
+{id: terraform}
 # Deploying to AWS using Terraform
 
 Up until now we've been playing things safe and test-driving everything locally on our own machine.  We could even prolong this for quite a while because NixOS has advanced support for building and testing clusters of NixOS machines locally using virtual machines.  However, at some point we need to dive in and deploy a server if we're going to use NixOS for real.

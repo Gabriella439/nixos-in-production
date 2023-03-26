@@ -10,6 +10,7 @@ Before diving in further you might want to get some idea of what a "real" NixOS 
 
 Here I'll do my best to answer those questions so that you can get a better idea of what you would be signing up for.
 
+{id: zen}
 ## The Zen of NixOS
 
 I like to use the term "master cue" to denote an overarching sign that indicates that you're doing things right.  This master cue might not tell you *how* to do things right, but it can still provide a high-level indicator of whether you are on the right track.
