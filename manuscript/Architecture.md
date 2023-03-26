@@ -4,6 +4,7 @@ In the previous chapter we deployed a standalone web server and that would likel
 
 The following diagram shows a more complete NixOS architecture that we will cover in this chapter:
 
+{width: "100%"}
 ![](resources/architecture.png)
 
 … and this chapter will include a sample Terraform template you can use for deploying this architecture diagram.
