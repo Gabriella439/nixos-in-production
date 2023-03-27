@@ -7,7 +7,7 @@ The following diagram shows a more complete NixOS architecture that we will cove
 {width: "100%"}
 ![](resources/architecture.png)
 
-… and this chapter will include a sample Terraform template you can use for deploying this architecture diagram.
+… and this chapter will include a sample Terraform template and instructions you can use for deploying this architecture diagram.
 
 The ["big picture"](#big-picture-architecture) chapter briefly introduced these architectural components, but we'll cover them in more detail here.
 
@@ -15,15 +15,13 @@ The ["big picture"](#big-picture-architecture) chapter briefly introduced these 
 
 These servers are the "business end" of your organization so we obviously can't omit them from our architecture diagram!  For our running example, we will have just one product server that runs our TODO web application.
 
-These product server are going to be NixOS servers, which could be virtual machines hosted by a cloud provider or physical servers in your organization's datacenter (See: [Virtualization](#virtualization)).  Either way, we're going to run and manage product-related services directly using NixOS as `systemd` services.
+These product server are going to be NixOS servers, which could be virtual machines hosted by a cloud provider or physical servers in your organization's datacenter (See: [Virtualization](#virtualization)).  Either way, we're going to run and manage product-related services `systemd` services managed by NixOS.
 
-For this chapter, we're assuming that these product servers are hosted within your cloud provider or data center (i.e. "SaaS") and not hosted by one of your customers (See: [On-premises vs. Software as a service](#on-off-prem)).  We'll cover the latter type of deployments ("on-prem") in a subsequent chapter.
-
-You can deploy product servers with no supporting infrastructure (see the previous [Deploying to AWS using Terraform](#terraform) chapter, which does exactly that), but you will usually only do that if you are a one-person shop.
+For this chapter, we're assuming that these product servers are hosted within your cloud provider or data center (i.e. "SaaS") and not hosted by one of your customers (See: [On-premises vs. Software as a service](#on-off-prem)).  We'll cover "on-prem" deployments in a subsequent chapter.
 
 ## Version control system
 
-Software development organizations of all sizes use some form of version control (most commonly `git`) and typically also a supporting platform (e.g. GitHub).  In our running example we'll be using GitHub as our version control platform and we'll be using the following features:
+Software development organizations of all sizes use some form of version control (most commonly `git`) and typically also a supporting platform (e.g. GitHub).  In our running example we'll be using GitHub as our version control platform so that we can make use of the following features:
 
 - *hosting a `git` repository*
 
@@ -34,12 +32,12 @@ Software development organizations of all sizes use some form of version control
 
   We will use [pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) as our change management system to propose changes and solicit approvals from other developers.
 
-  Change management systems sometimes support a notion of [code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) which allow you to specify which developers own different files within a repository in order to notify them of relevant pull requests and/or require their approval for changes to files they own.
+  Version control platforms sometimes support a notion of [code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) which allow you to specify which developers own different files within a repository in order to notify them of relevant pull requests and/or require their approval for changes to files they own.
 
 
 - *continuous integration*
 
-  We might want to prevent people from making changes to the central development branch unless they pass certain criteria.  Those criteria might include automated tests passing, requiring a certain number of approvals, or successfully uploading build products to a cache.
+  We might want to prevent people from merging changes to the main development branch unless they pass certain criteria.  Those criteria might include automated tests passing, obtaining a certain number of approvals, or successfully uploading build products to a cache.
 
 ## Central build server
 
@@ -51,7 +49,7 @@ Remember that Nix builds also include tests, so whichever servers perform builds
 
 In the complete architecture, this central build server (the "hub") only *initiates* builds using Nix's support for [remote builds](https://nixos.org/manual/nix/stable/advanced-topics/distributed-builds.html) but the actual builds are carried out by separate build servers for each supported platform (the "spokes").  In a simpler version of this architecture you might be able to get away with just a hub and no spokes if you only need to build for one platform.
 
-You might wonder why we even need the central build server at all.  For example, if we're using GitHub then in theory we could initiate the builds directly on the spokes without going through an intermediate build server.
+You might wonder why we even need the central build server at all.  In theory we could initiate the builds directly on the spokes without going through an intermediate build server.
 
 However, there are a few important advantages to initiating all builds on a central server:
 
@@ -69,8 +67,9 @@ However, there are a few important advantages to initiating all builds on a cent
 
 - *better resource utilization*
 
-  Nix's support for remote builds comes in handy if you want to make use of different builder "profiles".  In other words, you may want to delegate some types of builds (e.g. NixOS tests) to memory-optimized machines and other types of builds (e.g. expensive builds like `chromium` or the Linux kernel) to CPU-optimized machines.  Remote builds make it much easier to support these sort of heterogeneous builds.
+  A hub can make use of spare build capacity across all available spokes, so a particularly expensive build (e.g. a mass upgrade) can be powered by a large number of spokes.  In contrast, confining each build to a single spoke means that spokes have to be over-provisioned and often most of their build capacity sits idle.
 
-  Also a hub can make use of spare build capacity across all available spokes, so a particularly expensive build (e.g. a mass upgrade) can be powered by a large number of spokes.  In contrast, and complthe entire build to a single spoke means that spokes have to be over-provisioned and often most of their build capacity sits idle.
 
-  In contrast, if you initiate and complete a build entirely withing a single spoke then the spoke needs to be grossly overprovisioned and most of the spoke's build capacity tends to remain idle.
+- *heterogeneous builders*
+
+  Nix's support for remote builds comes in handy if you want to make use of different builder hardware profiles.  In other words, you may want to delegate some types of builds (e.g. NixOS tests) to memory-optimized machines and other types of builds (e.g. expensive builds like `chromium` or the Linux kernel) to CPU-optimized machines.  Remote builds make it much easier to support these sort of heterogeneous builds.
