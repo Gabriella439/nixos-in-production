@@ -186,7 +186,7 @@ In particular, you will need to leave that builder running in the background whi
 $ nix run 'nixpkgs#darwin.builder'
 ```
 
-… and you will need that to be running whenever you need to build a NixOS system.  However, you can shut down the builder down when you're not using it by giving the builder the `shutdown now` command.
+… and you will need that to be running whenever you need to build a NixOS system.  However, you can shut down the builder when you're not using it by giving the builder the `shutdown now` command.
 
 {blurb, class:warning}
 The `nix run nixpkgs#darwin.builder` command is not enough to set up Linux builds on macOS.  Read and follow the full set of instructions from the Nixpkgs manual linked above.
