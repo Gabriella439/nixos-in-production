@@ -69,6 +69,8 @@
 - Talk about the NixOS option idiom of using an attribute set instead of a list
 - Use flake templates to simplify authoring flakes
 - Expand Terraform chapter to manage Terraform state using S3 bucket
+- Talk about garbage collection and how GC roots work
+  - Also buildtime vs runtime dependencies
 
 - Read through various nix CLI commands to see if new functionality was added
 
