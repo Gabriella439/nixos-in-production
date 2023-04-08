@@ -74,49 +74,50 @@ However, there are a few important advantages to initiating all builds on a cent
 
 ## Build servers
 
-You'll need to supplement the central build server (the hub) with satellite
-build servers (the spokes) if you want to be able to build products for more
-than one platform.
+You'll need to supplement the central build server (the hub) with satellite build servers (the spokes) if you want to be able to build products for more than one platform.
 
-There is one special case where you don't need spokes: if you only require
-build products for the same platform as your central build server.  For example,
-if your central build server is an `x86_64-linux` NixOS machine and all of your
-other machines (including developer machines) share the same `x86_64-linux`
-platform then you can build all build products on the hub and skip the spokes.
+There is one special case where you don't need spokes: if you only require build products for the same platform as your central build server.  For example, if your central build server is an `x86_64-linux` NixOS machine and all of your other machines (including developer machines) share the same `x86_64-linux` platform then you can build all build products on the hub and skip the spokes.
 
-However, this scenario is not that common because you usually have to support
-more than one platform, such as macOS laptops for developers (e.g.
-`x86_64-darwin` for Intel Macs or `aarch64-darwin` for M1 Macs) or even multiple
-Linux platforms (e.g. `x86_64-linux` and `aarch64-linux`).  So you should
-budget the time and money to set up spokes as part of your NixOS infrastructure.
+However, this scenario is not that common because you usually have to support more than one platform, such as macOS laptops for developers (e.g. `x86_64-darwin` for Intel Macs or `aarch64-darwin` for M1 Macs) or even multiple Linux platforms (e.g. `x86_64-linux` and `aarch64-linux`).  So you should budget the time and money to set up spokes as part of your NixOS infrastructure.
 
-There's another reason you want to set up satellite build machines: developers
-can make use of them, too!  You can allocate spare build slots or even reserve
-entire machines for developers to use for remote builds, which comes in handy
-for two reasons:
+There's another reason you want to set up satellite build machines: developers can make use of them, too!  You can allocate spare build slots or even reserve entire machines for developers to use for remote builds, which comes in handy for two reasons:
 
 - *accelerating builds*
 
-  A developer might want to offload an expensive build (or set of builds) to a
-  much more powerful machine, both to speed up the build and also reduce the
-  computational load on their local machine.
+  A developer might want to offload an expensive build (or set of builds) to a much more powerful machine, both to speed up the build and also reduce the computational load on their local machine.
 
 
 - *creating/debugging build products for other platforms*
 
-  For example, one of your developers might use a macOS development machine, but
-  need to reproduce a Linux build that failed in CI.  Or, vice versa, a
-  developer using Linux might need to reproduce a failed macOS build.  Granting
-  them access to a remote build machine for the appropriate platform can help
-  them reproduce builds for all supported platforms.
+  For example, one of your developers might use a macOS development machine, but need to reproduce a Linux build that failed in CI.  Or, vice versa, a developer using Linux might need to reproduce a failed macOS build.  Granting them access to a remote build machine for the appropriate platform can help them reproduce builds for all supported platforms.
 
 {blurb, class:information}
-Note: macOS developers can in some cases build Linux build products locally
-using the Nixpkgs support for local Darwin builders on Linux.  Revisit the
-[macOS-specific setup instructions](#macos-instructions) from the
-[Setting up your development environment](#setup) chapter for more details.
+Note: macOS developers can in some cases build Linux build products locally using the Nixpkgs support for local Darwin builders on Linux.  Revisit the [macOS-specific setup instructions](#macos-instructions) from the [Setting up your development environment](#setup) chapter for more details.
 
-However, this only works for Linux build products that share the same
-architecture (e.g. building `aarch64-linux` build products on an
-`aarch64-darwin` machine).
+However, this only works for Linux build products that share the same architecture (e.g. building `aarch64-linux` build products on an `aarch64-darwin` machine).
 {/blurb}
+
+## Cache
+
+There are two broad approaches to hosting a cache of Nix build products:
+
+- Serving the Nix build products directly from the central build server
+
+  Specifically, you can use [`nix-serve`](https://github.com/edolstra/nix-serve) or [`nix-serve-ng`](https://github.com/aristanetworks/nix-serve-ng) to let the central build server double as a cache.  Both of those services make the host machine's Nix store directly available as a cache.
+
+- Uploading the build products to a global cache (e.g. S3)
+
+  For example, you could add a [`post-build-hook`](https://nixos.org/manual/nix/stable/command-ref/conf-file.html#conf-post-build-hook) to automatically `nix copy` the build product to an S3 cache, which is the approach outlined later in this chapter.
+
+By default I recommend the latter approach (a dedicated cache) for two reasons:
+
+- *global distribution*
+
+  Upload build products to a global cache is the most efficient way to distribute cache products to geographically distributed developers or servers.  For example, you wouldn't want developers who work further away from your datacenters to take a needless hit to their productivity.
+
+
+- *bandwidth conservation*
+
+  Network bandwidth is a crucial resource for your hub because remote builds entail copying dependencies from the hub to the spokes and then copying the final build products from the spokes back to the hub.  Uploading build products (once) to your global cache places less network strain on your hub than serving cache products (repeatedly) directly from the hub.
+
+However, the former approach (a central build server doubling as a cache) is simpler to deploy and maintain and can sometimes be appropriate for smaller and more geographically centralized development teams.
