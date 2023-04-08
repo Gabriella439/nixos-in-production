@@ -55,9 +55,7 @@ However, there are a few important advantages to initiating all builds on a cent
 
 - *cache coherence*
 
-  If all builds are initiated on the hub then the same build will never be performed twice so long as the first build remains cached.  In contrast, if you initiate builds directly on the spokes then the same build product could be built multiple times if you have multiple spokes building products for the same platform.
-
-  Most of the time this is a minor issue since most Nix builds are deterministic enough that small differences between repeated builds (like timestamps) don't matter.  However, there are some situations where the differences matter and you don't want build products to change depending on which machine you download them from.
+  If you initiate all builds on the hub then you never perform the same build twice so long as the first build remains cached.  In contrast, if you initiate builds directly on the spokes then the same build product could be built multiple times if you have multiple spokes building products for the same platform.
 
 
 - *avoiding duplicate work*
@@ -67,9 +65,58 @@ However, there are a few important advantages to initiating all builds on a cent
 
 - *better resource utilization*
 
-  A hub can make use of spare build capacity across all available spokes, so a particularly expensive build (e.g. a mass upgrade) can be powered by a large number of spokes.  In contrast, confining each build to a single spoke means that spokes have to be over-provisioned and often most of their build capacity sits idle.
+  A hub can make use of spare build capacity across all available spokes, so a particularly expensive build (e.g. a change that upgrades multiple dependencies) can be powered by a large number of spokes.  In contrast, confining each build to a single spoke means that spokes have to be over-provisioned and often most of their build capacity sits idle.
 
 
 - *heterogeneous builders*
 
-  Nix's support for remote builds comes in handy if you want to make use of different builder hardware profiles.  In other words, you may want to delegate some types of builds (e.g. NixOS tests) to memory-optimized machines and other types of builds (e.g. expensive builds like `chromium` or the Linux kernel) to CPU-optimized machines.  Remote builds make it much easier to support these sort of heterogeneous builds.
+  Nix's support for remote builds comes in handy if you want to make use of different builder hardware profiles.  In other words, you may want to delegate some types of builds (e.g. NixOS tests) to memory-optimized machines and other types of builds (e.g. expensive builds like `chromium` or the Linux kernel) to CPU-optimized machines.  Remote builds make it much easier to support these sort of heterogeneous build architectures.
+
+## Build servers
+
+You'll need to supplement the central build server (the hub) with satellite
+build servers (the spokes) if you want to be able to build products for more
+than one platform.
+
+There is one special case where you don't need spokes: if you only require
+build products for the same platform as your central build server.  For example,
+if your central build server is an `x86_64-linux` NixOS machine and all of your
+other machines (including developer machines) share the same `x86_64-linux`
+platform then you can build all build products on the hub and skip the spokes.
+
+However, this scenario is not that common because you usually have to support
+more than one platform, such as macOS laptops for developers (e.g.
+`x86_64-darwin` for Intel Macs or `aarch64-darwin` for M1 Macs) or even multiple
+Linux platforms (e.g. `x86_64-linux` and `aarch64-linux`).  So you should
+budget the time and money to set up spokes as part of your NixOS infrastructure.
+
+There's another reason you want to set up satellite build machines: developers
+can make use of them, too!  You can allocate spare build slots or even reserve
+entire machines for developers to use for remote builds, which comes in handy
+for two reasons:
+
+- *accelerating builds*
+
+  A developer might want to offload an expensive build (or set of builds) to a
+  much more powerful machine, both to speed up the build and also reduce the
+  computational load on their local machine.
+
+
+- *creating/debugging build products for other platforms*
+
+  For example, one of your developers might use a macOS development machine, but
+  need to reproduce a Linux build that failed in CI.  Or, vice versa, a
+  developer using Linux might need to reproduce a failed macOS build.  Granting
+  them access to a remote build machine for the appropriate platform can help
+  them reproduce builds for all supported platforms.
+
+{blurb, class:information}
+Note: macOS developers can in some cases build Linux build products locally
+using the Nixpkgs support for local Darwin builders on Linux.  Revisit the
+[macOS-specific setup instructions](#macos-instructions) from the
+[Setting up your development environment](#setup) chapter for more details.
+
+However, this only works for Linux build products that share the same
+architecture (e.g. building `aarch64-linux` build products on an
+`aarch64-darwin` machine).
+{/blurb}
