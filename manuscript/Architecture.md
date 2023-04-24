@@ -13,9 +13,9 @@ The ["big picture"](#big-picture-architecture) chapter briefly introduced these 
 
 ## Product servers
 
-These servers are the "business end" of your organization so we obviously can't omit them from our architecture diagram!  For our running example, we will have just one product server that runs our TODO web application.
+Product servers are the "business end" of your organization so we obviously can't omit them from our architecture diagram!  For our running example, we will have just one product server that runs our TODO web application.
 
-These product server are going to be NixOS servers, which could be virtual machines hosted by a cloud provider or physical servers in your organization's datacenter (See: [Virtualization](#virtualization)).  Either way, we're going to run and manage product-related services `systemd` services managed by NixOS.
+Our product servers will to be NixOS servers, which could be virtual machines hosted by a cloud provider or physical servers in your organization's datacenter (See: [Virtualization](#virtualization)).  Either way, we're going to run product-related services as `systemd` services managed by NixOS.
 
 For this chapter, we're assuming that these product servers are hosted within your cloud provider or data center (i.e. "SaaS") and not hosted by one of your customers (See: [On-premises vs. Software as a service](#on-off-prem)).  We'll cover "on-prem" deployments in a subsequent chapter.
 
@@ -122,3 +122,23 @@ I recommend the latter approach (a dedicated global cache) for two reasons:
   Network bandwidth is a crucial resource for your hub because remote builds entail copying dependencies from the hub to the spokes and then copying the final build products from the spokes back to the hub.  Uploading build products (once) to your global cache places less network strain on your hub than serving cache products (repeatedly) directly from the hub.
 
 However, the former approach (a central build server doubling as a cache) is simpler to deploy and maintain and can sometimes be appropriate for smaller, centralized development teams.
+
+## Utility servers
+
+Utility servers host everything else that is not part of your continuous integration or continuous deployment pipeline.  This comes up frequently for paid products that provide SaaS offerings by default but also offer the option to host their software on-premises.  GitHub is an example of this: both open source and proprietary users of GitHub tend to use [github.com](https://github.com/) to host their repositories, but some proprietary users might choose to pay for GitHub's "enterprise" offering so that they can host GitHub's product within their own datacenter.  For example, they might do this to implement additional security measures or to avoid mixing their data with other organizations.
+
+Also, some services might not even have a SaaS offering at all.  For example, open source software might require you to host your own server if there isn't a SaaS offering built around that software.  [Hydra](https://nixos.org/hydra/manual/) (a continuous integration service for the Nix ecosystem) is an example of this: you have to host it yourself if you want to use it[^1].
+
+Here are some example products that you might choose to host on your utility servers:
+
+- Version control platforms
+
+  e.g. GitHub / GitLab / Gitea
+
+- Issue tracking software
+
+  e.g. Jira, Redmine
+
+- Code documentation
+
+[^1]: Technically there is a work-in-progress SaaS offering built around Hydra which is [Cloudscale Hydra](https://cloudscalehydra.com/), but at the time of this writing that is still in beta.
