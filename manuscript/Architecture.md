@@ -125,20 +125,34 @@ However, the former approach (a central build server doubling as a cache) is sim
 
 ## Utility servers
 
-Utility servers host everything else that is not part of your continuous integration or continuous deployment pipeline.  This comes up frequently for paid products that provide SaaS offerings by default but also offer the option to host their software on-premises.  GitHub is an example of this: both open source and proprietary users of GitHub tend to use [github.com](https://github.com/) to host their repositories, but some proprietary users might choose to pay for GitHub's "enterprise" offering so that they can host GitHub's product within their own datacenter.  For example, they might do this to implement additional security measures or to avoid mixing their data with other organizations.
+Utility servers host everything else that is not part of your continuous integration or continuous deployment pipeline.  Specifically, you don't want utility servers to produce, transform, or host build products that might be used by other workflows (those should only be handled by the build servers).
+
+Paid products often provide SaaS offerings by default but also offer the option to host their software on-premises and utility servers work well for hosting these on-premises offerings.  GitHub is an example of this: both open source and proprietary users of GitHub tend to use [github.com](https://github.com/) to host their repositories, but some proprietary users might choose to pay for GitHub's "enterprise" offering so that they can host GitHub's product within their own datacenter.  For example, they might do this to implement additional security measures or to avoid mixing their data with other organizations.
 
 Also, some services might not even have a SaaS offering at all.  For example, open source software might require you to host your own server if there isn't a SaaS offering built around that software.  [Hydra](https://nixos.org/hydra/manual/) (a continuous integration service for the Nix ecosystem) is an example of this: you have to host it yourself if you want to use it[^1].
 
-Here are some example products that you might choose to host on your utility servers:
+Here are some example products and services that you might choose to host on your utility servers:
 
 - Version control platforms
 
-  e.g. GitHub / GitLab / Gitea
+  e.g. [GitHub enterprise server](https://docs.github.com/en/enterprise-server@3.5/admin/overview/about-github-enterprise-server), [self-managed GitLab](https://about.gitlab.com/install/), or [Gitea](https://gitea.io/en-us/)
 
-- Issue tracking software
+- Project management software
 
-  e.g. Jira, Redmine
+  e.g. [Atlassian Data Center](https://www.atlassian.com/enterprise/data-center) or [Redmine](https://www.redmine.org/)
 
 - Code documentation
+
+  e.g. an internal [docs.rs](https://forge.rust-lang.org/docs-rs/self-hosting.html) or [Hackage](https://github.com/haskell/hackage-server) server
+
+- Merge automation
+
+  e.g. [`bors-ng`](https://bors.tech/) or [Mergify enterprise](https://mergify.com/)
+
+  Note that this is an exception to the "no continuous integration on utility servers" rule because merge automation software does not produce any build products that might be sourced by other workflows.
+
+- Security software
+
+  e.g. [SentinelOne](https://www.sentinelone.com/)
 
 [^1]: Technically there is a work-in-progress SaaS offering built around Hydra which is [Cloudscale Hydra](https://cloudscalehydra.com/), but at the time of this writing that is still in beta.
