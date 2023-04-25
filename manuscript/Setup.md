@@ -282,7 +282,11 @@ Run 'nixos-help' for the NixOS manual.
 nixos login: 
 ```
 
-You can then log into the virtual machine as the `root` user and an empty password.  After you successfully log in, shut down the virtual machine by typing `Ctrl`-`a` + `c` to open the `qemu` prompt and then type `quit` followed by `Enter` to exit.
+You can then log into the virtual machine as the `root` user and an empty password.  After you successfully log in, shut down the virtual machine by entering `shutdown now`.
+
+{blurb, class: info}
+If you're unable to log into the machine for any reason and need to shut down the machine non-gracefully you can type`Ctrl`-`a` + `c` to open the `qemu` prompt and then enter `quit` to exit.
+{/blurb}
 
 If you successfully log into the virtual machine then you're ready to follow along with the remaining examples throughout this book.  If you see an example in this book that begins with this line:
 
