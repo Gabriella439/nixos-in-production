@@ -1,5 +1,4 @@
-{ inputs.nixpkgs.url =
-    "github:NixOS/nixpkgs/f1a49e20e1b4a7eeb43d73d60bae5be84a1e7610";
+{ inputs.nixpkgs.url = "github:NixOS/nixpkgs/22.11";
 
   outputs = { nixpkgs, ... }: {
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {
