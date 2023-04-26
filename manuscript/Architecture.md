@@ -155,4 +155,10 @@ Here are some example products and services that you might choose to host on you
 
   e.g. [SentinelOne](https://www.sentinelone.com/)
 
+## Developer machines
+
+You don't need to do much for developer machines other than to ensure that they install Nix correctly and the [Setting up your development environment](#setup) chapter already covers that in detail.  Once they have Nix installed developers will be able to provision everything else they need (including development environments) using Nix.
+
+The only change we're going to make to the setup process is to adjust the user's starting `nix.conf` configuration file to mention the cache and any remote builders we provision (which we'll cover in more detail below).
+
 [^1]: Technically there is a work-in-progress SaaS offering built around Hydra which is [Cloudscale Hydra](https://cloudscalehydra.com/), but at the time of this writing that is still in beta.
