@@ -261,13 +261,9 @@ $ nix flake init --template 'github:Gabriella439/nixos-in-production#setup'
 ```nix
 # module.nix
 
-{ users.users.root.initialPassword = "";
+{ services.getty.autologinUser = "root";
 }
 ```
-
-{blurb, class: warning}
-Obviously, the above NixOS configuration is not secure since it leaves the `root` account wide open.  We'll change this to something more secure later.
-{/blurb}
 
 Then run this command within the same directory to run our test virtual machine:
 
@@ -279,16 +275,19 @@ $ nix run
 
 Run 'nixos-help' for the NixOS manual.
 
-nixos login: 
+nixos login: root (automatic login)
+
+
+[root@nixos:~]# 
 ```
 
-You can then log into the virtual machine as the `root` user and an empty password.  After you successfully log in, shut down the virtual machine by entering `shutdown now`.
+You can then shut down the virtual machine by entering `shutdown now`.
 
 {blurb, class: info}
-If you're unable to log into the machine for any reason and need to shut down the machine non-gracefully you can type`Ctrl`-`a` + `c` to open the `qemu` prompt and then enter `quit` to exit.
+If you're unable to shut down the machine gracefully for any reason you can shut down the machine non-gracefully by typing `Ctrl`-`a` + `c` to open the `qemu` prompt and then entering `quit` to exit.
 {/blurb}
 
-If you successfully log into the virtual machine then you're ready to follow along with the remaining examples throughout this book.  If you see an example in this book that begins with this line:
+If you were able to successfully launch and shut down the virtual machine then you're ready to follow along with the remaining examples throughout this book.  If you see an example in this book that begins with this line:
 
 ```nix
 # module.nix
@@ -303,7 +302,7 @@ For example, let's test that right now; save the following file to `module.nix`:
 ```nix
 # module.nix
 
-{ users.users.root.initialPassword = "";
+{ services.getty.autologinUser = "root";
 
   services.postgresql.enable = true;
 }

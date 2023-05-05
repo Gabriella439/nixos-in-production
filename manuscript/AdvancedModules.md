@@ -14,7 +14,7 @@ You can put inline NixOS configurations in the `imports` list, like these:
 { imports = [
     { services.openssh.enable = true; }
 
-    { users.users.root.initialPassword = ""; }
+    { services.getty.autologinUser = "root"; }
   ];
 }
 ```
@@ -27,7 +27,7 @@ In fact, anything that is a valid NixOS module can go in the import list, includ
 { imports = [
     { services.openssh.enable = true; }
 
-    ({ lib, ... }: { users.users.root.initialPassword = lib.mkDefault ""; })
+    ({ lib, ... }: { services.getty.autologinUser = lib.mkDefault "root"; })
   ];
 }
 ```
@@ -66,7 +66,7 @@ For example, the following NixOS module:
 
 { config = lib.mkMerge [
     { services.openssh.enable = true; }
-    { users.users.root.initialPassword = ""; }
+    { services.getty.autologinUser = "root"; }
   ];
 }
 ```
@@ -76,7 +76,7 @@ For example, the following NixOS module:
 ```nix
 { config = {
     services.openssh.enable = true;
-    users.users.root.initialPassword = "";
+    services.getty.autologinUser = "root";
   };
 }
 ```
@@ -87,7 +87,7 @@ You might wonder whether you should merge modules using `lib.mkMerge` or merge t
 ```nix
 { imports = [
     { services.openssh.enable = true; }
-    { users.users.root.initialPassword = ""; }
+    { services.getty.autologinUser = "root"; }
   ];
 }
 ```
@@ -120,7 +120,6 @@ You can merge configuration sets that define same option multiple times, like th
 { config = lib.mkMerge [
     { networking.firewall.allowedTCPPorts = [ 80 ]; }
     { networking.firewall.allowedTCPPorts = [ 443 ]; }
-    { users.users.root.initialPassword = ""; }
   ];
 }
 ```
@@ -141,7 +140,6 @@ If you specify a list-valued option twice, the lists are combined, so the above 
 
 { config = lib.mkMerge [
     { networking.firewall.allowedTCPPorts = [ 80 443 ]; }
-    { users.users.root.initialPassword = ""; }
   ];
 }
 ```
@@ -188,7 +186,6 @@ nix-repl> config.networking.firewall.allowedTCPPorts
 > { config = {
 >     networking.firewall.allowedTCPPorts = [ 80 ];
 >     networking.firewall.allowedTCPPorts = [ 443 ];
->     users.users.root.initialPassword = "";
 >   };
 > }
 > ```
@@ -464,13 +461,12 @@ in
     config = {
       services.cowsay.enable = true;
 
-      users.users.root.initialPassword = "";
+      services.getty.autologinUser = "root";
     };
   }
 ```
 
-If you launch the above NixOS configuration and log in as `root` you should be
-able to verify that the `cowsay` service is running like this:
+If you launch the above NixOS configuration you should be able to verify that the `cowsay` service is running like this:
 
 ```
 [root@nixos:~]# systemctl status cowsay
@@ -627,10 +623,7 @@ let
   };
 
 in
-  { imports = [ moduleA moduleB ];
-
-    users.users.root.initialPassword = "";
-  }
+  { imports = [ moduleA moduleB ]; }
 ```
 
 Both the `gcc` package and `clang` package add a `cc` executable to the `PATH`, so the order matters here because the first `cc` on the `PATH` wins.
@@ -672,10 +665,7 @@ let
   };
 
 in
-  { imports = [ moduleA moduleB ];
-
-    users.users.root.initialPassword = "";
-  }
+  { imports = [ moduleA moduleB ]; }
 ```
 
 … then `gcc` will always come first on the `PATH`, no matter which order we import the modules.
@@ -701,8 +691,5 @@ let
   };
 
 in
-  { imports = [ moduleA moduleB ];
-
-    users.users.root.initialPassword = "";
-  }
+  { imports = [ moduleA moduleB ]; }
 ```

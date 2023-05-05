@@ -1,2 +1,2 @@
-{ users.users.root.initialPassword = "";
+{ services.getty.autologinUser = "root";
 }

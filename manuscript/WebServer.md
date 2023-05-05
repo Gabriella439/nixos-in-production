@@ -23,19 +23,23 @@ Let's modify `module.nix` to specify a machine that serves a simple static "Hell
 
 { pkgs, ... }:
 
-{ services.nginx = {
-    enable = true;
+{ services = {
+    getty.autologinUser = "root";
 
-    virtualHosts.localhost.locations."/" = {
-      index = "index.html";
+    nginx = {
+      enable = true;
 
-      root = pkgs.writeTextDir "index.html" ''
-       <html>
-       <body>
-       Hello, world!
-       </body>
-       </html>
-     '';
+      virtualHosts.localhost.locations."/" = {
+        index = "index.html";
+
+        root = pkgs.writeTextDir "index.html" ''
+          <html>
+          <body>
+          Hello, world!
+          </body>
+          </html>
+        '';
+      };
     };
   };
 
@@ -44,8 +48,6 @@ Let's modify `module.nix` to specify a machine that serves a simple static "Hell
   virtualisation.forwardPorts = [
     { from = "host"; guest.port = 80; host.port = 8080; }
   ];
-
-  users.users.root.initialPassword = "";
 
   system.stateVersion = "22.11";
 }
@@ -116,29 +118,33 @@ The previous example illustrates how NixOS promotes DevOps on a small scale.  If
 
 { config, lib, pkgs, ... }:
 
-{ services.nginx = {
-    enable = true;
+{ services = {
+    getty.autologinUser = "root";
 
-    virtualHosts.localhost.locations."/" = {
-      index = "index.html";
+    nginx = {
+      enable = true;
 
-      root = pkgs.writeTextDir "index.html" ''
-       <html>
-       <body>
-       This server's firewall has the following open ports:
+      virtualHosts.localhost.locations."/" = {
+        index = "index.html";
 
-       <ul>
-       ${
-       let
-         renderPort = port: "<li>${toString port}</li>\n";
+        root = pkgs.writeTextDir "index.html" ''
+         <html>
+         <body>
+         This server's firewall has the following open ports:
 
-       in
-         lib.concatMapStrings renderPort config.networking.firewall.allowedTCPPorts
-       }
-       </ul>
-       </body>
-       </html>
-     '';
+         <ul>
+         ${
+         let
+           renderPort = port: "<li>${toString port}</li>\n";
+
+         in
+           lib.concatMapStrings renderPort config.networking.firewall.allowedTCPPorts
+         }
+         </ul>
+         </body>
+         </html>
+       '';
+      };
     };
   };
 
@@ -147,8 +153,6 @@ The previous example illustrates how NixOS promotes DevOps on a small scale.  If
   virtualisation.forwardPorts = [
     { from = "host"; guest.port = 80; host.port = 8080; }
   ];
-
-  users.users.root.initialPassword = "";
 
   system.stateVersion = "22.11";
 }
@@ -214,13 +218,17 @@ Now save the following NixOS configuration to `module.nix`:
 ```nix
 # module.nix
 
-{ services.nginx = {
-    enable = true;
+{ services = {
+    getty.autologinUser = "root";
 
-    virtualHosts.localhost.locations."/" = {
-      index = "index.html";
+    nginx = {
+      enable = true;
 
-      root = ./www;
+      virtualHosts.localhost.locations."/" = {
+        index = "index.html";
+
+        root = ./www;
+      };
     };
   };
 
@@ -229,8 +237,6 @@ Now save the following NixOS configuration to `module.nix`:
   virtualisation.forwardPorts = [
     { from = "host"; guest.port = 80; host.port = 8080; }
   ];
-
-  users.users.root.initialPassword = "";
 
   system.stateVersion = "22.11";
 }

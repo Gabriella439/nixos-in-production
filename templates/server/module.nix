@@ -1,10 +1,14 @@
-{ services.nginx = {
-    enable = true;
+{ services = {
+    getty.autologinUser = "root";
 
-    virtualHosts.localhost.locations."/" = {
-      index = "index.html";
+    nginx = {
+      enable = true;
 
-      root = "/var/www";
+      virtualHosts.localhost.locations."/" = {
+        index = "index.html";
+
+        root = "/var/www";
+      };
     };
   };
 
@@ -18,8 +22,6 @@
     source = "$WWW";
     target = "/var/www";
   };
-
-  users.users.root.initialPassword = "";
 
   system.stateVersion = "22.11";
 }
