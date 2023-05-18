@@ -6,4 +6,5 @@ WebServer.md
 Modules.md
 AdvancedModules.md
 Terraform.md
+ContinuousIntegration.md
 Architecture.md
