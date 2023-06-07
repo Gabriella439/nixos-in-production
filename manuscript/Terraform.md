@@ -66,6 +66,10 @@ $ nix flake init --template 'github:Gabriella439/nixos-in-production#terraform'
 
   The Terraform specification for deploying our NixOS configuration to AWS.
 
+- `backend/main.tf`
+
+  This Terraform configuration provisions an S3 bucket for use with Terraform's [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3).  We won't use this until the very end of this chapter, though, so we'll ignore it for now.
+
 ## Deploying our configuration
 
 To deploy the Terraform configuration, run the following commands:
@@ -210,6 +214,14 @@ var.region
 ```bash
 $ terraform apply -var region=…
 ```
+
+… and if you really want to make the whole command non-interactive you can also add the `-auto-approve` flag:
+
+```bash
+$ terraform apply -var region=… -auto-approve
+```
+
+… so that you don't have to manually confirm the deployment by entering "yes".
 
 ### Output variables
 
@@ -363,7 +375,7 @@ resource "aws_key_pair" "nixos-in-production" {
 ```
 
 {blurb, class: warning}
-The [`tls_private_key` resource](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) is currently not secure because the deployment state is stored locally unencrypted.  We can and will fix this by storing the deployment state using the [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) but that won't be covered until the next chapter.
+The [`tls_private_key` resource](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) is currently not secure because the deployment state is stored locally unencrypted.  We will fix this later on in this chapter by storing the deployment state using Terraform's [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 {/blurb}
 
 After that we get to the actual server:
@@ -514,3 +526,177 @@ In this example we build our NixOS configuration on our web server so that this 
 
 The next chapter will cover how to provision a dedicated builder for this purpose.
 {/blurb}
+
+## S3 Backend
+
+The above Terraform deployment doesn't properly protect the key pair used to `ssh` into and manage the NixOS machine.  By default the private key of the key pair is stored in a world-readable `terraform.tfstate` file.  However, even if we were to restrict that file's permissions we wouldn't be able to easily share our Terraform deployment with colleagues.  In particular, we wouldn't want to add the `terraform.tfstate` file to version control in a shared repository since it contains sensitive secrets.
+
+The good news is that we can fix both of those problems by setting up an [S3 backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) for Terraform which allows the secret to be securely stored in an S3 bucket that can be shared by multiple people managing the same Terraform deployment.
+
+The template for this chapter's Terraform configuration already comes with a `backend/` subdirectory containing a Terraform specification that provisions a suitable S3 bucket and DynamoDB table for an S3 backend.  All you have to do is run:
+
+```bash
+$ cd ./backend
+$ terraform apply
+var.region
+  Enter a value: …
+
+…
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+```
+
+Just make sure to use the same region as our original Terraform deployment when prompted.
+
+When the deployment succeeds it will output the name of the randomly-generated S3 bucket, which will look something like this (with a timestamp in place of the `X`s):
+
+```
+…
+Apply complete! Resources: 4 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+bucket = "nixos-in-productionXXXXXXXXXXXXXXXXXXXXXXXXXX"
+```
+
+Then switch back to the original Terraform deployment in the parent directory:
+
+```bash
+$ cd ..
+```
+
+… and modify that deployment's `main.tf`  to reference the newly-created `bucket` like this:
+
+```hcl
+terraform {
+  required_version = ">= 1.3.0"
+
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 4.56"
+    }
+  }
+
+  # This is the new bit you want to add
+  backend "s3" {
+    bucket = "nixos-in-productionXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    key = "terraform"
+    region = "…"  # Use the same region here that you used before
+    dynamodb_table = "terraform-state"
+    profile = "nixos-in-production"
+  }
+}
+```
+
+{blurb, class:information}
+These last few manual steps to update the S3 backend are a bit gross but this is primarily to work around limitations in Terraform.  In particular, Terraform doesn't provide a way for our main deployment to automatically reference the S3 backend we created.  Terraform specifically prohibits `backend` stanzas from referencing variables so all of the backend options have to be hard-coded values.
+{/blurb}
+
+Then you can upgrade your existing deployment to reference the S3 backend you just provisioned by re-running `terraform init` with the `-migrate-state` option:
+
+```bash
+$ terraform init -migrate-state
+Initializing modules...
+
+Initializing the backend...
+Do you want to copy existing state to the new backend?
+  Pre-existing state was found while migrating the previous "local" backend to the
+  newly configured "s3" backend. No existing state was found in the newly
+  configured "s3" backend. Do you want to copy this state to the new "s3"
+  backend? Enter "yes" to copy and "no" to start with an empty state.
+
+  Enter a value: yes
+```
+
+… and once that's done you can verify that nothing broke by running `terraform apply` again, which should report that no new changes need to be deployed:
+
+```bash
+$ terraform apply
+var.region
+  Enter a value: …
+
+…
+
+No changes. Your infrastructure matches the configuration.
+```
+
+The difference is that now the terraform state is securely stored in an S3 bucket instead of on your filesystem so you'd now be able to store your Terraform configuration in version control and let other developers manage the same deployment.  There's just one last thing you need to do, which is to remove the `terraform.tfstate.backup` file, which contains the old (pre-S3-backend) Terraform state, including the secrets:
+
+```bash
+$ rm terraform.tfstate.backup
+```
+
+You can also remove the `terraform.tfstate` file, too, since it's empty and no longer used:
+
+```bash
+$ rm terraform.tfstate
+```
+
+{blurb, class:information}
+Future Terraform examples in this book won't include the S3 backend code to keep them shorter, but feel free to reuse the same S3 bucket created in this chapter to upgrade any of those examples with an S3 backend.  However, if you do keep in mind that you need to use a different key for storing Terraform's state if you want to keep those examples separate.
+
+In other words, when adding the S3 backend to the `terraform` clause, specify a different key for each separate deployment:
+
+```hcl
+terraform {
+  …
+
+  backend "s3" {
+    …
+    key = "…"  # This is what needs to be unique per deployment
+    …
+  }
+}
+```
+{/blurb}
+
+This key is used by Terraform to record where to store the deployment's state within the S3 bucket, so if you use the same key for two different deployments they will will interfere with one another.
+
+## Version control
+
+Once you create the S3 backend you can safely store your Terraform configuration in version control.  Specifically, these are the files that you want to store in version control:
+
+- `flake.nix` / `module.nix` / `www/`
+
+  These provide the configuration for the machine we're deploying so we obviously need to keep these.
+
+
+- `flake.lock`
+
+  It's also worth keeping this in version control even though it's not strictly necessary.  The lock file slightly improves the determinism of the deployment, although the flake included in the template is already fairly deterministic even without the lockfile because it references a specific tag from Nixpkgs.
+
+
+- `main.tf` / `backend/main.tf`
+
+  We definitely want to keep the Terraform deployments for our main deployment and the S3 backend.
+
+
+- `terraform.tfstate`
+
+  You don't need to keep this in version control (it's an empty file
+
+Just as important, you do **NOT** want to keep the `id_ed25519` file in version control (since this contains the private key).  In fact, the provided template includes a `.gitignore` file to prevent you from accidentally adding the private key to version control.
+
+Terraform will recreate this private key file locally for each developer that manages the deployment.  For example, if another developer were to apply the deployment for the first time, they would see this diff:
+
+```bash
+Terraform will perform the following actions:
+
+  # local_sensitive_file.ssh_key_file will be created
+  + resource "local_sensitive_file" "ssh_key_file" {
+      + content              = (sensitive value)
+      + directory_permission = "0700"
+      + file_permission      = "0700"
+      + filename             = "./id_ed25519"
+      + id                   = (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+```
+
+… indicating that Terraform will download the private key from the S3 backend and create a secure local copy in order to `ssh` into the machine.
