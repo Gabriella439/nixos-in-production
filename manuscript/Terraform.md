@@ -47,7 +47,7 @@ the list of [AWS service endpoints](https://docs.aws.amazon.com/general/latest/g
 Now run the following command to bootstrap our first Terraform project:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production#terraform'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.4#terraform'
 ```
 
 … which will generate the following files:
