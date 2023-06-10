@@ -1,0 +1,23 @@
+<html>
+<body>
+<button id='add'>+</button>
+</body>
+<script>
+let add = document.getElementById('add');
+function newTask() {
+let subtract = document.createElement('button');
+subtract.textContent = "-";
+let input = document.createElement('input');
+input.setAttribute('type', 'text');
+let div = document.createElement('div');
+div.replaceChildren(subtract, input);
+function remove() {
+div.replaceChildren();
+div.remove();
+}
+subtract.addEventListener('click', remove);
+add.before(div);
+}
+add.addEventListener('click', newTask);
+</script>
+</html>

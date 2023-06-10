@@ -82,6 +82,7 @@ Some of these potential improvements are not specific to the Nix ecosystem.  Aft
 
 You can save yourself a lot of headaches by taking time to learn and use the Nix ecosystem as idiomatically as possible instead of learning these lessons the hard way.
 
+{id: gitops}
 ## GitOps
 
 NixOS exemplifies the [Infrastructure as Code (IaC)](https://en.wikipedia.org/wiki/Infrastructure_as_code) paradigm, meaning that every aspect of your organization (including hardware/systems/software) is stored in code or configuration files that are the source of truth for how everything is built.  In particular, you don't make undocumented changes to your infrastructure that cause it to diverge from what is recorded within those files.

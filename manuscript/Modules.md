@@ -232,6 +232,7 @@ true
 
 This illustrates that our NixOS module really is just a function whose input is an attribute set and whose output is also an attribute set.  There is nothing special about this function other than it happens to be the same shape as what the NixOS module system accepts.
 
+{id: nixos}
 ## NixOS
 
 So if NixOS modules are just pure functions or pure attribute sets, what turns those functions or attribute sets into a useful operating system?  In other words, what puts the "NixOS" in the "NixOS module system"?

@@ -1,3 +1,4 @@
+{id: terraform}
 # Deploying to AWS using Terraform
 
 Up until now we've been playing things safe and test-driving everything locally on our own machine.  We could even prolong this for quite a while because NixOS has advanced support for building and testing clusters of NixOS machines locally using virtual machines.  However, at some point we need to dive in and deploy a server if we're going to use NixOS for real.
@@ -266,7 +267,10 @@ resource "tls_private_key" "nixos-in-production" {
   …
 }
 
-resource "local_sensitive_file" "ssh_key_file" {
+resource "local_sensitive_file" "ssh_private_key" {
+}
+
+resource "local_file" "ssh_public_key" {
 }
 
 resource "aws_key_pair" "nixos-in-production" {
@@ -301,7 +305,9 @@ let
 
   tls_private_key.nixos-in-production = tls_private_key { … };
 
-  local_sensitive_file.ssh_key_file = ssh_key_file { … };
+  local_sensitive_file.ssh_private_key = local_sensitive_file { … };
+
+  local_file.ssh_public_key = local_file { … };
 
   aws_key_pair.nixos-in-production = aws_key_pair { … };
 
@@ -352,7 +358,7 @@ resource "aws_security_group" "todo" {
 }
 ```
 
-The next three resources generate an SSH key pair that we'll use to manage the machine:
+The next four resources generate an SSH key pair that we'll use to manage the machine:
 
 ```hcl
 # Generate an SSH key pair as strings stored in Terraform state
@@ -362,9 +368,14 @@ resource "tls_private_key" "nixos-in-production" {
 
 # Synchronize the SSH private key to a local file that the "nixos" module can
 # use
-resource "local_sensitive_file" "ssh_key_file" {
+resource "local_sensitive_file" "ssh_private_key" {
     filename = "${path.module}/id_ed25519"
     content = tls_private_key.nixos-in-production.private_key_openssh
+}
+
+resource "local_file" "ssh_public_key" {
+    filename = "${path.module}/id_ed25519.pub"
+    content = tls_private_key.nixos-in-production.public_key_openssh
 }
 
 # Mirror the SSH public key to EC2 so that we can later install the public key
@@ -399,6 +410,12 @@ resource "aws_instance" "todo" {
   root_block_device {
     volume_size = 7
   }
+
+  # We will use this in a future chapter to bootstrap other secrets
+  user_data = <<-EOF
+    #!/bin/sh
+    (umask 377; echo '${tls_private_key.nixos-in-production.private_key_openssh}' > /var/lib/id_ed25519)
+    EOF
 }
 ```
 
@@ -468,7 +485,9 @@ let
 
   tls_private_key.nixos-in-production = tls_private_key { … };
 
-  local_sensitive_file.ssh_key_file = ssh_key_file { … };
+  local_sensitive_file.ssh_private_key = local_sensitive_file { … };
+
+  local_file.ssh_public_key = local_file { … };
 
   aws_key_pair.nixos-in-production = aws_key_pair { … };
 
@@ -506,7 +525,7 @@ module "nixos" {
   # Build our NixOS configuration on the same machine that we're deploying to
   arguments = [ "--build-host", "root@${aws_instance.todo.public_ip}" ]
 
-  ssh_options = "-o StrictHostKeyChecking=accept-new -i ${local_sensitive_file.ssh_key_file.filename}"
+  ssh_options = "-o StrictHostKeyChecking=accept-new -i ${local_sensitive_file.ssh_private_key.filename}"
 
   depends_on = [ null_resource.wait ]
 }
@@ -687,8 +706,8 @@ Terraform will recreate this private key file locally for each developer that ma
 ```bash
 Terraform will perform the following actions:
 
-  # local_sensitive_file.ssh_key_file will be created
-  + resource "local_sensitive_file" "ssh_key_file" {
+  # local_sensitive_file.ssh_private_key will be created
+  + resource "local_sensitive_file" "ssh_private_key" {
       + content              = (sensitive value)
       + directory_permission = "0700"
       + file_permission      = "0700"
@@ -700,3 +719,5 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 ```
 
 … indicating that Terraform will download the private key from the S3 backend and create a secure local copy in order to `ssh` into the machine.
+
+However, it's completely fine to add the public key to version control if you want.

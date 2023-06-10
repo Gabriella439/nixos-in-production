@@ -176,6 +176,7 @@ For example, the above command uses support for process substitution (which is n
 
 Now that you've installed Nix I'll show you how to launch a NixOS virtual machine (VM) so that you can easily test the examples throughout this book.
 
+{id: darwin-builder}
 ### macOS-specific instructions
 
 If you are using macOS, then follow the instructions in the [Nixpkgs manual](https://nixos.org/manual/nixpkgs/unstable/#sec-darwin-builder) to set up a local Linux builder.  We'll need this builder to create other NixOS machines, since they require Linux build products.
