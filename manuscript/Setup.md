@@ -269,6 +269,8 @@ Then run this command within the same directory to run our test virtual machine:
 
 ```
 $ nix run
+warning: creating lock file '…/flake.lock'
+trace: warning: system.stateVersion is not set, defaulting to 22.11. …
 …
 
 <<< Welcome to NixOS 22.11.20220918.f1a49e2 (aarch64) - ttyAMA0 >>>
@@ -283,8 +285,10 @@ nixos login: root (automatic login)
 
 You can then shut down the virtual machine by entering `shutdown now`.
 
-{blurb, class: info}
+{blurb, class:information}
 If you're unable to shut down the machine gracefully for any reason you can shut down the machine non-gracefully by typing `Ctrl`-`a` + `c` to open the `qemu` prompt and then entering `quit` to exit.
+
+Also, don't worry about the `system.stateVersion` warning for now.  We'll fix that later.
 {/blurb}
 
 If you were able to successfully launch and shut down the virtual machine then you're ready to follow along with the remaining examples throughout this book.  If you see an example in this book that begins with this line:
