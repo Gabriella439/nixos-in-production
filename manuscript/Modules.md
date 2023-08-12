@@ -434,6 +434,7 @@ However, if you use `zsh` as your shell with `EXTENDED_GLOB` glob support (i.e. 
 ```bash
 $ nix eval ./evalModules#config.system.build.toplevel
 ```
+
 {/blurb}
 
 The first thing that `lib.evalModules` does is to merge the `other` module into the `topLevel` module, which we will simulate by hand by performing the same merge ourselves:
