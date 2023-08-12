@@ -657,7 +657,7 @@ $ rm terraform.tfstate
 ```
 
 {blurb, class:information}
-Future Terraform examples in this book won't include the S3 backend code to keep them shorter, but feel free to reuse the same S3 bucket created in this chapter to upgrade any of those examples with an S3 backend.  However, if you do keep in mind that you need to use a different key for storing Terraform's state if you want to keep those examples separate.
+Future Terraform examples in this book won't include the S3 backend code to keep them shorter, but feel free to reuse the same S3 bucket created in this chapter to upgrade any of those examples with an S3 backend.  However, if you do that then keep in mind that you need to use a different key for storing Terraform's state if you want to keep those examples separate.
 
 In other words, when adding the S3 backend to the `terraform` clause, specify a different key for each separate deployment:
 
@@ -672,15 +672,15 @@ terraform {
   }
 }
 ```
-{/blurb}
 
 This key is used by Terraform to record where to store the deployment's state within the S3 bucket, so if you use the same key for two different deployments they will will interfere with one another.
+{/blurb}
 
 ## Version control
 
 Once you create the S3 backend you can safely store your Terraform configuration in version control.  Specifically, these are the files that you want to store in version control:
 
-- `flake.nix` / `module.nix` / `www/`
+- `flake.nix`, `module.nix`, `www/`
 
   These provide the configuration for the machine we're deploying so we obviously need to keep these.
 
@@ -690,7 +690,7 @@ Once you create the S3 backend you can safely store your Terraform configuration
   It's also worth keeping this in version control even though it's not strictly necessary.  The lock file slightly improves the determinism of the deployment, although the flake included in the template is already fairly deterministic even without the lockfile because it references a specific tag from Nixpkgs.
 
 
-- `main.tf` / `backend/main.tf`
+- `main.tf`, `backend/main.tf`
 
   We definitely want to keep the Terraform deployments for our main deployment and the S3 backend.
 
