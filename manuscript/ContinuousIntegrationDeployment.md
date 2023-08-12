@@ -51,13 +51,13 @@ This exercise will build upon the same example as the [previous chapter on Terra
 ```bash
 $ mkdir todo-app
 $ cd todo-app
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.4#terraform'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.5#terraform'
 ```
 
 … or you can skip straight to the final result (minus the secrets file) by running:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.4#continuous-deployment'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.5#continuous-deployment'
 ```
 
 garnix requires the use of Nix flakes in order to support [efficient evaluation caching](https://www.tweag.io/blog/2020-06-25-eval-cache/) and the good news is that we can already build our NixOS system without any changes to our flake, but it might not be obvious how at first glance.
