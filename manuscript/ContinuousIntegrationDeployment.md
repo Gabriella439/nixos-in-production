@@ -457,8 +457,7 @@ but none were.
 
 ### Installing the secret
 
-Now we can distribute the GitHub personal access token stored inside of `secrets.yaml`.  First we'll need to import the `sops-nix` NixOS module by modifying our `flake.nix` file
-like this:
+Now we can distribute the GitHub personal access token stored inside of `secrets.yaml`.  First we'll need to import the `sops-nix` NixOS module by modifying our `flake.nix` file like this:
 
 ```nix
 { inputs = {
