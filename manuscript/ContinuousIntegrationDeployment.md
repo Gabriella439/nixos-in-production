@@ -206,7 +206,7 @@ The next thing you need to do is to enable branch protection settings so that th
 "Settings → Branches → Add branch protection rule" page of your repository (which you can also find at `https://github.com/${OWNER}/${REPOSITORY}/settings/branch_protection_rules/new` where `${OWNER}` is your username and `${REPOSITORY}` is the repository name you chose).  Then select the following options:
 
 - Branch name pattern: `main`
-- ☑ Require status checks to pass before merging
+- Require status checks to pass before merging
   - Status checks that are required:
     - "Evaluate flake.nix"
     - "nixosConfig default"
@@ -632,7 +632,7 @@ Add the following option to `module.nix`:
 
 … which will now work without the `--extra-experimental-features` option.
 
-Congratulations!  You've now set up a continuous deployment system! 🎉
+Congratulations!  You've now set up a continuous deployment system!
 
 [^1]: At the time of this writing there is work in progress on a hosted Hydra solution called [Cloudscale Hydra](https://cloudscalehydra.com/), but that is not currently available.
 [^2]: Okay, there is actually a limit to how much you can scale out build capacity.  After a certain point you will begin to hit bottlenecks in instantiating derivations at scale, but even in this scenario Hydra still has a higher performance ceiling than the the non-Nix-aware alternatives.
