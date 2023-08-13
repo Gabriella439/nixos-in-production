@@ -4,8 +4,6 @@
 - Generating AMIs
 - Explain the benefits of using NixOS and (later on) Nix more pervasively
 - Go into more detail about what the adoption model looks like
-- Continuous integration
-- Continuous deployment
 - Migrating existing workflows to Nix
 - One-step build and publish
 - Nix under the hood / Interpretation pipeline
@@ -25,7 +23,6 @@
 - Other forms of testing, too (e.g. Nix builds as tests)
   - Serving test results
 - Using Hydra (even if it is shitty)
-- Probably include sample repo as companion to the book
 - Mine old blog posts, presentations, and tweets for material
 - Talk about using stock NixOS services instead of containers
 - How to author your own NixOS service
@@ -50,7 +47,6 @@
 - NixOS options
   - How to query NixOS options (e.g. using `nixos-option` or evaluation)
   - How to browse/search NixOS options?
-- Manage secrets
 - Caching
   - Setting up a cache
   - Uploading to a cache
@@ -59,16 +55,13 @@
   - Opening up a flake attribute in `nix repl`
 - How to write your own deploy tool
   - i.e. the same as my "NixOS in production" post
+  - or maybe just teach people how to use `nixos-rebuild` as a deploy tool
 - NixOS system administration
-- Show an example of embedding code inline within a NixOS configuration file
- - … and also having that code reference NixOS options
- - … and how to deal with the code getting rebuilt if the options changed
+  - Brief systemd tutorial
 - How to distribute and install a patched Nix build
-- Brief systemd tutorial
 - How to generate NixOS options documentation (and search?)
 - Talk about the NixOS option idiom of using an attribute set instead of a list
 - Use flake templates to simplify authoring flakes
-- Expand Terraform chapter to manage Terraform state using S3 bucket
 - Talk about garbage collection and how GC roots work
   - Also buildtime vs runtime dependencies
 
