@@ -437,6 +437,28 @@ $ nix eval ./evalModules#config.system.build.toplevel
 
 {/blurb}
 
+{blurb, class:warning}
+If you run into an error like:
+
+```
+error: getting status of '/nix/store/…-source/evalModules': No such file or directory
+```
+
+… this can happen because you created the `./evalModules` directory inside of a `git` repository.  When you use flakes inside of a repository you need to explicitly add them and all files they depend on to the repository using:
+
+```bash
+$ git add ./evalModules/flake.nix
+```
+
+Technically, the bare minimum you need to do is actually:
+
+```bash
+$ git add --intent-to-add ./evalModules/flake.nix
+```
+
+… which comes in handy if you don't plan to ever actually commit the file.
+{/blurb}
+
 The first thing that `lib.evalModules` does is to merge the `other` module into the `topLevel` module, which we will simulate by hand by performing the same merge ourselves:
 
 ```nix
