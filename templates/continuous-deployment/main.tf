@@ -72,7 +72,7 @@ resource "aws_key_pair" "nixos-in-production" {
 }
 
 module "ami" {
-  source = "github.com/Gabriella439/terraform-nixos-ng//ami?ref=d8563d06cc65bc699ffbf1ab8d692b1343ecd927"
+  source = "github.com/Gabriella439/terraform-nixos-ng//ami?ref=06d207ebc1c3de68d1bc52129d0fa23d61de5525"
   release = "22.11"
   region = var.region
   system = "x86_64-linux"
@@ -117,7 +117,7 @@ resource "null_resource" "wait" {
 }
 
 module "nixos" {
-  source = "github.com/Gabriella439/terraform-nixos-ng//nixos?ref=d8563d06cc65bc699ffbf1ab8d692b1343ecd927"
+  source = "github.com/Gabriella439/terraform-nixos-ng//nixos?ref=06d207ebc1c3de68d1bc52129d0fa23d61de5525"
   host = "root@${aws_instance.todo.public_ip}"
   flake = ".#default"
   arguments = [ "--build-host", "root@${aws_instance.todo.public_ip}" ]
