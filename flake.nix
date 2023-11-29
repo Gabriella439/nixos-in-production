@@ -14,6 +14,11 @@
         path = ./templates/terraform;
         description = "A terraform project to deploy the web application";
       };
+
+      continuous-deployment = {
+        path = ./templates/continuous-deployment;
+        description = "A flake for continuous integration and continuous deployment";
+      };
     };
   };
 }
