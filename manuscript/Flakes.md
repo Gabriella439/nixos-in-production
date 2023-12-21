@@ -278,7 +278,7 @@ $ nix build --impure
 Without the flag we'd get this error message:
 
 ```
-error: the path '~/proj/nixpkgs' can not be resolved in pure mode
+error: the path '~/repository/nixpkgs' can not be resolved in pure mode
 ```
 
 {blurb, class:information}
@@ -777,7 +777,7 @@ $ nix run .#cowthink -- howdy
 Apparently, the `cowthink` program produces the exact same result as the `cowsay` program.
 {/blurb}
 
-Since the `cowthink` app is indistinguishable from the `cowsay` app, let's replace it with a more interesting `kittysay` app that automatically adds the `-f kitty` flag.  However, we can't do something like this:
+Since the `cowthink` app is indistinguishable from the `cowsay` app, let's replace it with a more interesting `kittysay` app that automatically adds the `-f hellokitty` flag.  However, we can't do something like this:
 
 ```nix
           apps = {
@@ -895,7 +895,7 @@ You can exit from this development shell by either entering `exit` or typing `Ct
 
 You might wonder what's the difference between `nix develop` and `nix shell`.  The difference between the two is that:
 
-- `nix shell` adds the specified programs to your `PATH`
+- `nix shell` adds the specified programs to your executable search `PATH`
 
 - `nix develop` adds the *development dependencies of the specified programs* to your executable search `PATH`
 
@@ -966,22 +966,12 @@ You can add tests to a flake that the `nix flake check` command will run.  These
           };
 ```
 
-We can run this check using:
+The `default` check is a synonym for our `cowsay` package and just runs `cowsay`'s (non-existent) test suite.  The `diff` check is a functional test that compares some sample `cowsay` output against a golden result.
+
+We can run both checks (the `default` check and the `diff` check) using:
 
 ```bash
 $ nix flake check
-```
-
-… which is the same as running:
-
-```bash
-$ nix flake check .#default
-```
-
-… which (for our flake) is a synonym for:
-
-```bash
-$ nix flake check .#diff
 ```
 
 The `nix flake check` command also performs other hygiene checks on the given flake and you can learn more about the full set of checks by running:
@@ -1049,7 +1039,7 @@ nix-repl> packages.x86_64-linux.default.<TAB>
 packages.x86_64-linux.default.__darwinAllowLocalNetworking
 packages.x86_64-linux.default.__ignoreNulls
 packages.x86_64-linux.default.__impureHostDeps
-……
+…
 packages.x86_64-linux.default.updateScript
 packages.x86_64-linux.default.userHook
 packages.x86_64-linux.default.version
