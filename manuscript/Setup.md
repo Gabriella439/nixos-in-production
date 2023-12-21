@@ -6,7 +6,7 @@ I'd like you to be able to follow along with the examples in this book, so this 
 
 In order to follow along with this book you will need the following requirements:
 
-- Nix version 2.11 or newer
+- Nix version 2.18.1 or newer
 
 - Flake support enabled
 
@@ -58,10 +58,10 @@ Depending on your platform the download instructions might also tell you to pass
 
 ### Pinning the version
 
-First, we will want to pin the version of Nix that you install if you're creating setup instructions for others to follow.  For example, this book will be based on Nix version 2.11.0, and you can pin the Nix version like this:
+First, we will want to pin the version of Nix that you install if you're creating setup instructions for others to follow.  For example, this book will be based on Nix version 2.18.1, and you can pin the Nix version like this:
 
 ```bash
-$ VERSION='2.11.0'
+$ VERSION='2.18.1'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
 $ sh <(curl --location "${URL}")
 ```
@@ -69,7 +69,7 @@ $ sh <(curl --location "${URL}")
 … and you can find the full set of available releases by visiting the [release file server](https://releases.nixos.org/?prefix=nix/).
 
 {blurb, class: information}
-Feel free to use a Nix version newer than 2.11.0 if you want.  The above example installation script only pins the version 2.11.0 because that's what happened to be the latest stable version at the time of this writing.  That's also the Nix version that the examples from this book have been tested against.
+Feel free to use a Nix version newer than 2.18.1 if you want.  The above example installation script only pins the version 2.18.1 because that's what happened to be the latest stable version at the time of this writing.  That's also the Nix version that the examples from this book have been tested against.
 
 The only really important thing is that everyone within your organization uses the same version of Nix, if you want to minimize your support burden.
 {/blurb}
@@ -77,7 +77,7 @@ The only really important thing is that everyone within your organization uses t
 However, there are a few more options that the script accepts that we're going to make good use of, and we can list those options by supplying `--help` to the script:
 
 ```bash
-$ VERSION='2.11.0'
+$ VERSION='2.18.1'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
 $ sh <(curl --location "${URL}") --help
 ```
@@ -154,7 +154,7 @@ So what we're going to do is:
 So the final installation script we'll end up with is:
 
 ```bash
-$ VERSION='2.11.0'
+$ VERSION='2.18.1'
 $ URL="https://releases.nixos.org/nix/nix-${VERSION}/install"
 $ CONFIGURATION="
 extra-experimental-features = nix-command flakes repl-flake
@@ -184,13 +184,13 @@ If you are using macOS, then follow the instructions in the [Nixpkgs manual](htt
 In particular, you will need to leave that builder running in the background while following the remaining examples in this chapter.  In other words, in one terminal window you will need to run:
 
 ```bash
-$ nix run 'nixpkgs#darwin.builder'
+$ nix run 'nixpkgs#darwin.linux-builder'
 ```
 
 … and you will need that to be running whenever you need to build a NixOS system.  However, you can shut down the builder when you're not using it by giving the builder the `shutdown now` command.
 
 {blurb, class:warning}
-The `nix run nixpkgs#darwin.builder` command is not enough to set up Linux builds on macOS.  Read and follow the full set of instructions from the Nixpkgs manual linked above.
+The `nix run nixpkgs#darwin.linux-builder` command is not enough to set up Linux builds on macOS.  Read and follow the full set of instructions from the Nixpkgs manual linked above.
 {/blurb}
 
 If you are using Linux (including NixOS or the Windows Subsystem for Linux) you can skip to the next step.
@@ -209,7 +209,7 @@ $ nix flake init --template 'github:Gabriella439/nixos-in-production/0.6#setup'
 { inputs = {
     flake-utils.url = "github:numtide/flake-utils/v1.0.0";
 
-    nixpkgs.url = "github:NixOS/nixpkgs/f1a49e20e1b4a7eeb43d73d60bae5be84a1e7610";
+    nixpkgs.url = "github:NixOS/nixpkgs/23.11";
   };
 
   outputs = { flake-utils, nixpkgs, ... }:
@@ -271,10 +271,8 @@ Then run this command within the same directory to run our test virtual machine:
 ```
 $ nix run
 warning: creating lock file '…/flake.lock'
-trace: warning: system.stateVersion is not set, defaulting to 22.11. …
+trace: warning: system.stateVersion is not set, defaulting to 23.11. …
 …
-
-<<< Welcome to NixOS 22.11.20220918.f1a49e2 (aarch64) - ttyAMA0 >>>
 
 Run 'nixos-help' for the NixOS manual.
 

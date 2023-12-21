@@ -36,7 +36,7 @@ I will make use of this trick in a few examples below, so that we can simulate m
 
 ## `lib` utilities
 
-Nixpkgs provides several utility functions for NixOS modules that are stored underneath the "`lib`" hierarchy, and you can find the source code for those functions in [`lib/modules.nix`](https://github.com/NixOS/nixpkgs/blob/22.05/lib/modules.nix).
+Nixpkgs provides several utility functions for NixOS modules that are stored underneath the "`lib`" hierarchy, and you can find the source code for those functions in [`lib/modules.nix`](https://github.com/NixOS/nixpkgs/blob/23.11/lib/modules.nix).
 
 {blurb, class: information}
 If you want to become a NixOS module system expert, take the time to read and understand all of the code in `lib/modules.nix`.
@@ -318,7 +318,7 @@ error: The option `systemd.services.nginx.serviceConfig.RestartSec' has conflict
 (use '--show-trace' to show detailed location information)
 ```
 
-The problem is that when we enable `nginx` that automatically defines a whole bunch of other NixOS options, [including `systemd.services.nginx.serviceConfig.RestartSec`](https://github.com/NixOS/nixpkgs/blob/nixos-22.05/nixos/modules/services/web-servers/nginx/default.nix#L890).  This option is a scalar string option that disallows multiple distinct values because the NixOS module system by default has no way to known which one to pick to resolve the conflict.
+The problem is that when we enable `nginx` that automatically defines a whole bunch of other NixOS options, [including `systemd.services.nginx.serviceConfig.RestartSec`](https://github.com/NixOS/nixpkgs/blob/23.11/nixos/modules/services/web-servers/nginx/default.nix#L1234).  This option is a scalar string option that disallows multiple distinct values because the NixOS module system by default has no way to known which one to pick to resolve the conflict.
 
 However, we can use `mkOverride` to annotate our value with a higher priority so that it overrides the other conflicting definition:
 
@@ -472,7 +472,7 @@ If you launch the above NixOS configuration you should be able to verify that th
 [root@nixos:~]# systemctl status cowsay
 ○ cowsay.service
      Loaded: loaded (/etc/systemd/system/cowsay.service; enabled; preset: enabl>
-     Active: inactive (dead) since Sat 2022-11-05 20:11:05 UTC; 43s ago
+     Active: inactive (dead) since Sat 2023-11-05 20:11:05 UTC; 43s ago
    Duration: 106ms
     Process: 683 ExecStart=/nix/store/v02wsh00gi1vcblpcl8p103qhlpkaifb-unit-scr>
    Main PID: 683 (code=exited, status=0/SUCCESS)

@@ -1,5 +1,5 @@
 { inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/22.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/23.05";
 
     sops-nix.url = "github:Mic92/sops-nix/bd695cc4d0a5e1bead703cc1bec5fa3094820a81";
   };

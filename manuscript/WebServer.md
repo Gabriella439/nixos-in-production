@@ -49,7 +49,7 @@ Let's modify `module.nix` to specify a machine that serves a simple static "Hell
     { from = "host"; guest.port = 80; host.port = 8080; }
   ];
 
-  system.stateVersion = "22.11";
+  system.stateVersion = "23.11";
 }
 ```
 
@@ -78,7 +78,7 @@ You can read the above code as saying:
 - *Allow the `root` user to log in with an empty password*
 
 
-- *Set the system's "state version" to 22.11*
+- *Set the system's "state version" to 23.11*
 
 {blurb, class: information}
 You always want to specify a system state version that matches the starting version of Nixpkgs for that machine and *never change it* afterwards.  In other words, even if you upgrade Nixpkgs later on you would keep the state version the same.
@@ -94,7 +94,7 @@ Two common mistakes NixOS users sometimes make are:
 
 - *specifying a uniform state version across a fleet of NixOS machines*
 
-  For example, you might have one NixOS machine in your data center that was first deployed using Nixpkgs 21.11 and another machine in your data center that was first deployed using Nixpkgs 22.05.  If you try to change their state versions to match then one or the other might not upgrade correctly.
+  For example, you might have one NixOS machine in your data center that was first deployed using Nixpkgs 23.05 and another machine in your data center that was first deployed using Nixpkgs 23.11.  If you try to change their state versions to match then one or the other might not upgrade correctly.
 {/blurb}
 
 If you deploy that using `nix run` you can open the web page in your browser by visiting [`http://localhost:8080`](http://localhost:8080) which should display the following contents:
@@ -154,7 +154,7 @@ The previous example illustrates how NixOS promotes DevOps on a small scale.  If
     { from = "host"; guest.port = 80; host.port = 8080; }
   ];
 
-  system.stateVersion = "22.11";
+  system.stateVersion = "23.11";
 }
 ```
 
@@ -238,7 +238,7 @@ Now save the following NixOS configuration to `module.nix`:
     { from = "host"; guest.port = 80; host.port = 8080; }
   ];
 
-  system.stateVersion = "22.11";
+  system.stateVersion = "23.11";
 }
 ```
 

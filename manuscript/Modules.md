@@ -144,7 +144,7 @@ My coding style for NixOS modules is:
 
 The Nix programming language does not provide any built-in support for NixOS modules.  This sometimes confuses people new to either the Nix programming language or the NixOS module system.
 
-The NixOS module system is a domain-specific language implemented within the Nix programming language.  Specifically, the NixOS module system is (mostly) implemented within the [`lib/modules.nix` file included in Nixpkgs](https://github.com/NixOS/nixpkgs/blob/22.05/lib/modules.nix).  If you ever receive a stack trace related to the NixOS module system you will often see functions from `modules.nix` show up in the stack trace, because they are ordinary functions and not language features.
+The NixOS module system is a domain-specific language implemented within the Nix programming language.  Specifically, the NixOS module system is (mostly) implemented within the [`lib/modules.nix` file included in Nixpkgs](https://github.com/NixOS/nixpkgs/blob/23.11/lib/modules.nix).  If you ever receive a stack trace related to the NixOS module system you will often see functions from `modules.nix` show up in the stack trace, because they are ordinary functions and not language features.
 
 In fact, a NixOS module in isolation is essentially "inert" from the Nix language's point of view.  For example, if you save the following NixOS module to a file named `example.nix`:
 
@@ -242,13 +242,13 @@ The answer is that this actually happens in two steps:
 - *All NixOS modules your system depends on are combined into a single, composite
   attribute set*
 
-  In other words all of the `imports`, `options` declarations, and `config` settings are fully resolved, resulting in one giant attribute set.  The code for combining these modules lives in [`lib/modules.nix`](https://github.com/NixOS/nixpkgs/blob/22.05/lib/modules.nix) in Nixpkgs.
+  In other words all of the `imports`, `options` declarations, and `config` settings are fully resolved, resulting in one giant attribute set.  The code for combining these modules lives in [`lib/modules.nix`](https://github.com/NixOS/nixpkgs/blob/23.11/lib/modules.nix) in Nixpkgs.
 
 
 - *The final composite attribute set contains a special attribute that builds
   the system*
 
-  Specifically, there will be a `config.system.build.toplevel` attribute path which contains a derivation you can use to build a runnable NixOS system.  The top-level code for assembling an operating system lives in [`nixos/modules/system/activation/top-level.nix`](https://github.com/NixOS/nixpkgs/blob/22.05/nixos/modules/system/activation/top-level.nix) in Nixpkgs.
+  Specifically, there will be a `config.system.build.toplevel` attribute path which contains a derivation you can use to build a runnable NixOS system.  The top-level code for assembling an operating system lives in [`nixos/modules/system/activation/top-level.nix`](https://github.com/NixOS/nixpkgs/blob/23.11/nixos/modules/system/activation/top-level.nix) in Nixpkgs.
 
 
 This will probably make more sense if we use the NixOS module system ourselves to create a fake placeholder value that will stand in for a real operating system.
@@ -293,7 +293,7 @@ That imports a separate `other.nix` module which we also need to create:
   };
 
   config = {
-    system.nixos.release = "22.05";
+    system.nixos.release = "23.11";
   };
 }
 ```
@@ -301,15 +301,15 @@ That imports a separate `other.nix` module which we also need to create:
 We can then materialize the final composite attribute set like this:
 
 ```bash
-$ nix repl github:NixOS/nixpkgs/22.05
+$ nix repl github:NixOS/nixpkgs/23.11
 …
 nix-repl> result = lib.evalModules { modules = [ ./top-level.nix ]; }
 
 nix-repl> :p result.config
-{ system = { build = { toplevel = "Fake NixOS - version 22.05"; }; nixos = { release = "22.05"; }; }; }
+{ system = { build = { toplevel = "Fake NixOS - version 23.11"; }; nixos = { release = "23.11"; }; }; }
 
 nix-repl> result.config.system.build.toplevel
-"Fake NixOS - version 22.05"
+"Fake NixOS - version 23.11"
 ```
 
 In other words, `lib.evalModules` is the magic function that combines all of our NixOS modules into a composite attribute set.
@@ -361,7 +361,7 @@ As a concrete example of recursion, we can safely merge the `other.nix` module i
     system.build.toplevel =
       "Fake NixOS - version ${config.system.nixos.release}";
 
-    system.nixos.release = "22.05";
+    system.nixos.release = "23.11";
   };
 }
 ```
@@ -379,7 +379,7 @@ We'll walk through this by performing the same steps as `lib.evalModules`.  Firs
 ```nix
 # Save this to `./evalModules/flake.nix`
 
-{ inputs.nixpkgs.url = "github:NixOS/nixpkgs/22.05";
+{ inputs.nixpkgs.url = "github:NixOS/nixpkgs/23.11";
 
   outputs = { nixpkgs, ... }:
     let
@@ -390,7 +390,7 @@ We'll walk through this by performing the same steps as `lib.evalModules`.  Firs
             description = "The NixOS version";
             type = lib.types.str;
           };
-          config.system.nixos.release = "22.05";
+          config.system.nixos.release = "23.11";
         };
 
 
@@ -414,10 +414,10 @@ You can evaluate the above flake like this:
 
 ```bash
 $ nix eval './evalModules#config'
-{ system = { build = { toplevel = "Fake NixOS - version 22.05"; }; nixos = { release = "22.05"; }; }; }
+{ system = { build = { toplevel = "Fake NixOS - version 23.11"; }; nixos = { release = "23.11"; }; }; }
 
 $ nix eval './evalModules#config.system.build.toplevel'
-"Fake NixOS - version 22.05"
+"Fake NixOS - version 23.11"
 ```
 
 {blurb, class:warning}
@@ -462,7 +462,7 @@ $ git add --intent-to-add ./evalModules/flake.nix
 The first thing that `lib.evalModules` does is to merge the `other` module into the `topLevel` module, which we will simulate by hand by performing the same merge ourselves:
 
 ```nix
-{ inputs.nixpkgs.url = "github:NixOS/nixpkgs/22.05";
+{ inputs.nixpkgs.url = "github:NixOS/nixpkgs/23.11";
 
   outputs = { nixpkgs, ... }:
     let
@@ -476,7 +476,7 @@ The first thing that `lib.evalModules` does is to merge the `other` module into 
             description = "A fake NixOS, modeled as a string";
             type = lib.types.str;
           };
-          config.system.nixos.release = "22.05";
+          config.system.nixos.release = "23.11";
           config.system.build.toplevel =
             "Fake NixOS - version ${config.system.nixos.release}";
         };
@@ -489,7 +489,7 @@ The first thing that `lib.evalModules` does is to merge the `other` module into 
 After that we compute the fixed point of our module by passing the module's output as its own input, the same way that `evalModules` would:
 
 ```nix
-{ inputs.nixpkgs.url = "github:NixOS/nixpkgs/22.05";
+{ inputs.nixpkgs.url = "github:NixOS/nixpkgs/23.11";
 
   outputs = { nixpkgs, ... }:
     let
@@ -503,7 +503,7 @@ After that we compute the fixed point of our module by passing the module's outp
             description = "A fake NixOS, modeled as a string";
             type = lib.types.str;
           };
-          config.system.nixos.release = "22.05";
+          config.system.nixos.release = "23.11";
           config.system.build.toplevel =
             "Fake NixOS - version ${config.system.nixos.release}";
         };
@@ -561,7 +561,7 @@ result.config.system.build.toplevel
         description = "A fake NixOS, modeled as a string";
         type = lib.types.str;
       };
-      config.system.nixos.release = "22.05";
+      config.system.nixos.release = "23.11";
       config.system.build.toplevel =
         "Fake NixOS - version ${result.config.system.nixos.release}";
     }
@@ -595,7 +595,7 @@ result.config.system.build.toplevel
         description = "A fake NixOS, modeled as a string";
         type = lib.types.str;
       };
-      config.system.nixos.release = "22.05";
+      config.system.nixos.release = "23.11";
       config.system.build.toplevel =
         "Fake NixOS - version ${result.config.system.nixos.release}";
     }
@@ -605,12 +605,12 @@ result.config.system.build.toplevel
 
 ```nix
 # Access the `config.system.nixos.release` attribute path
-= "Fake NixOS - version ${"22.05"}"
+= "Fake NixOS - version ${"23.11"}"
 ```
 
 ```nix
 # Evaluate the string interpolation
-= "Fake NixOS - version 22.05"
+= "Fake NixOS - version 23.11"
 ```
 
 So even though our NixOS module is defined recursively in terms of itself, that recursion is still well-founded and produces an actual result.

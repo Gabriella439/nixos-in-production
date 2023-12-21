@@ -131,7 +131,7 @@ You can use `nix repl` to explore flake outputs by running:
 
 ```bash
 $ nix repl .#
-Welcome to Nix 2.11.0. Type :? for help.
+Welcome to Nix 2.18.1. Type :? for help.
 
 Loading installable 'path:/Users/gabriella/proj/todo-app#'...
 Added 1 variables.
@@ -336,7 +336,7 @@ So `sops` doesn't completely solve the problem of secrets management (you still 
 To use the `sops` command-line tool we'll need to convert our SSH primary key pair into an age key pair.  This step is performed by the admin who has access to both the SSH public key and the SSH private key and requires the `ssh-to-age` command-line tool, which you can obtain like this:
 
 ```bash
-$ nix shell 'github:NixOS/nixpkgs/22.11#ssh-to-age'
+$ nix shell 'github:NixOS/nixpkgs/23.11#ssh-to-age'
 ```
 
 The public key of our age key pair will be stored in a `.sops.yaml` configuration file which lives in version control.  To create the age public key, run:
@@ -380,7 +380,7 @@ Create a [fine-grained personal access token](https://docs.github.com/en/authent
 Fetch the `sops` command-line tool by running:
 
 ```bash
-$ nix shell 'github:NixOS/nixpkgs/22.11#sops'
+$ nix shell 'github:NixOS/nixpkgs/23.11#sops'
 ```
 
 … and then create a new secrets file by running:
@@ -461,7 +461,7 @@ Now we can distribute the GitHub personal access token stored inside of `secrets
 
 ```nix
 { inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/22.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/23.11";
 
     sops-nix.url = "github:Mic92/sops-nix/bd695cc4d0a5e1bead703cc1bec5fa3094820a81";
   };

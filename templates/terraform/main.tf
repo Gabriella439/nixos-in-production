@@ -73,7 +73,7 @@ resource "aws_key_pair" "nixos-in-production" {
 
 module "ami" {
   source = "github.com/Gabriella439/terraform-nixos-ng//ami?ref=06d207ebc1c3de68d1bc52129d0fa23d61de5525"
-  release = "22.11"
+  release = "23.05"
   region = var.region
   system = "x86_64-linux"
 }
