@@ -31,7 +31,7 @@ The reason why non-Nix-aware CI solutions tend to do worse at scale is because t
 The reason Hydra doesn't have this problem is because Hydra uses Nix's native notion of build capacity ([remote builds](https://nixos.org/manual/nix/stable/advanced-topics/distributed-builds.html)) configured via the `nix.distributedBuilds` and `nix.buildMachines` NixOS options.  That means that you can easily scale out build capacity by adding more builders[^2].
 {/blurb}
 
-This chapter will only explain how to set up garnix but the next chapter will cover how to host your own Hydra service and your own pool of builders.  This book will not cover how to set up a non-Nix-aware CI solution other than to say that I generally err on the side of using a Nix-aware CI solution, at least for the Nix-specific parts of CI.
+This chapter will focus on setting up garnix since it's dramatically simpler than the alternatives.
 
 Also, we're going to try to minimize the amount of logic that needs to live outside of Nix.  For example:
 

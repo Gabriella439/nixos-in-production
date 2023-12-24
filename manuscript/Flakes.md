@@ -940,7 +940,7 @@ The two most common arguments to `mkShell` are:
 
 This means that the `with-dev-tools` shell is essentially the same as the `default` shell, except also extended with the `vim` and `tree` packages added to the executable search path.
 
-## `nix flake check`
+### `nix flake check`
 
 You can add tests to a flake that the `nix flake check` command will run.  These tests go under the `checks` output attribute and our sample flake provides a simple functional test for the `cowsay` package:
 
@@ -980,7 +980,7 @@ The `nix flake check` command also performs other hygiene checks on the given fl
 $ nix flake check --help
 ```
 
-## `nix flake init`
+### `nix flake init`
 
 You can template a project using `nix flake init`, which we've already used a few times throughout this book (including this chapter).  Our `cowsay` flake contains the following `templates` output:
 
@@ -1004,7 +1004,7 @@ $ nix flake init --template 'github:Gabriella439/nixos-in-production/0.7?dir=tem
 
 Note that this flake output is not system-specific, which is why it's not nested inside the call to `eachDefaultSystems` in our flake.  This is because there's nothing system-dependent about templating some text files.
 
-## `nix eval`
+### `nix eval`
 
 `nix eval` is another command we've already used a few times throughout this book to query information about our flakes without building anything.  For example, if we wanted to query the version of our `cowsay` package, we could run:
 
@@ -1016,7 +1016,7 @@ This is because flake outputs are "just" attribute sets and Nix derivations are 
 
 However, you might not necessarily know what attribute paths are even available to query, which brings us to the next extremely useful Nix command:
 
-## `nix repl`
+### `nix repl`
 
 You can use the `nix repl` command to easily interactively explore what attributes are available using REPL auto-completion.  For example, if you run:
 
@@ -1065,7 +1065,7 @@ nix-repl> version
 
 The `nix repl` command comes in handy if you want to explore Nix code interactively, whereas the `nix eval` command comes more in handy for non-interactive use (e.g. scripting).
 
-## `nixos-rebuild`
+### `nixos-rebuild`
 
 Last, but not least, the `nixos-rebuild` command also accepts flake outputs that specify the system to deploy.  We already saw an example of this in the [Deploying to AWS using Terraform](#terraform) chapter where we specified our system to deploy as `.#default` which expands out to the `.#nixosConfigurations.default` flake output.
 
