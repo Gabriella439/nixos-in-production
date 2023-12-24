@@ -1,73 +1,76 @@
-- Important NixOS options
-  - `system.stateVersion`
-  - `system.extraDependencies`
-- Generating AMIs
-- Explain the benefits of using NixOS and (later on) Nix more pervasively
-- Go into more detail about what the adoption model looks like
-- Migrating existing workflows to Nix
-- One-step build and publish
-- Nix under the hood / Interpretation pipeline
-  - Evaluation / Instantiation
-  - Derivations
-  - Realization
-  - Example: Building your own distributed build system
-- Setting up distributed builds architecture
-- Debugging Nix
-  - `nix show-derivation`
-  - `nix-diff`
-  - Debugging type errors
-  - Understanding NixOS modules and overlays (possibly its own section)
-- Scaling
-  - Instantiation
-- Integration testing (i.e. NixOS tests)
+High priority:
+
+- Things to add to existing chapters
+  - Flakes
+    - How to query NixOS options using `nix eval`
+  - Setup
+    - How to upgrade everyone within an organization to the same pinned version
+      of Nix
+- New chapters
+  - Remote builders
+  - Integration testing (i.e. NixOS tests)
+  - Talk about garbage collection and how GC roots work
+    - Also buildtime vs runtime dependencies
+  - How to write your own deploy tool
+    - i.e. the same as my "NixOS in production" post
+    - or maybe just teach people how to use `nixos-rebuild` as a deploy tool
+    - Nix under the hood / Interpretation pipeline
+      - Evaluation / Instantiation
+      - Derivations
+      - Realization
+      - Example: Building your own distributed build system
+  - Containers
+    - Docker containers
+    - NixOS containers
+    - OCI containers
+    - Talk about virtualization
+      - Host OS
+      - Guest OS
+      - Application containers
+  - Generating AMIs
+  - Talk about how to work around restricted network environments
+    - i.e. on-premise deployments
+  - How to author your own NixOS service
+
+Low priority:
+
+- Using Hydra (even if it is shitty)
 - Other forms of testing, too (e.g. Nix builds as tests)
   - Serving test results
-- Using Hydra (even if it is shitty)
-- Mine old blog posts, presentations, and tweets for material
-- Talk about using stock NixOS services instead of containers
-- How to author your own NixOS service
+- Scaling
+  - Instantiation
 - Project layout - code organization best practices
-- Containers
-  - Docker containers
-  - NixOS containers
-  - OCI containers
 - Limitations of rollbacks
 - Security
   - Software supply chain security
   - Security hardening flags
   - Securing NixOS
-- Talk about how to work around restricted network environments
-  - i.e. on-premise deployments
-- Talk about virtualization
-  - Host OS
-  - Guest OS
-  - Application containers
-- How to upgrade everyone within an organization to the same pinned version of
-  Nix
-- NixOS options
-  - How to query NixOS options (e.g. using `nixos-option` or evaluation)
-  - How to browse/search NixOS options?
+
+Unprioritized:
+
+- Important NixOS options
+  - `system.extraDependencies`
+- Go into more detail about what the adoption model looks like
+- Setting up distributed builds architecture
+- Debugging Nix
+  - `nix show-derivation`
+  - `nix-diff`
+  - Debugging errors
+  - Understanding NixOS modules and overlays (possibly its own section)
+- Mine old blog posts, presentations, and tweets for material
 - Caching
   - Setting up a cache
   - Uploading to a cache
-- Flakes
-  - For managing NixOS systems
-  - Opening up a flake attribute in `nix repl`
-- How to write your own deploy tool
-  - i.e. the same as my "NixOS in production" post
-  - or maybe just teach people how to use `nixos-rebuild` as a deploy tool
 - NixOS system administration
   - Brief systemd tutorial
 - How to distribute and install a patched Nix build
 - How to generate NixOS options documentation (and search?)
 - Talk about the NixOS option idiom of using an attribute set instead of a list
-- Use flake templates to simplify authoring flakes
-- Talk about garbage collection and how GC roots work
-  - Also buildtime vs runtime dependencies
+- How to build NixOS options
 
 - Read through various nix CLI commands to see if new functionality was added
-
-- Add exercises
+- Talk about using stock NixOS services instead of containers
+- Add exercises?
 
 * * *
 
