@@ -82,7 +82,7 @@ Specifically, we're going to be testing the [`postgrest` tutorial](https://postg
 You can clone the equivalent NixOS test by running:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.7#integration-test'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.8#integration-test'
 ```
 
 One of the included files is `setup.sql` file which includes the database commands from the tutorial verbatim:
