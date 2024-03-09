@@ -8,3 +8,4 @@ AdvancedModules.md
 Terraform.md
 ContinuousIntegrationDeployment.md
 Flakes.md
+IntegrationTesting.md

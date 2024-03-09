@@ -19,6 +19,11 @@
         path = ./templates/continuous-deployment;
         description = "A flake for continuous integration and continuous deployment";
       };
+
+      integration-test = {
+        path = ./templates/integration-test;
+        description = "A sample NixOS test";
+      };
     };
   };
 }

@@ -2,6 +2,7 @@
 
 Now that we can build and run a local NixOS virtual machine we can create our first toy web server.  We will use this server throughout this book as the running example which will start off simple and slowly grow in maturity as we increase the realism of the example and build out the supporting infrastructure.
 
+{id: hello-world}
 ## Hello, world!
 
 We'll begin from the template project from "Setting up your development environment".  You can either begin from the previous chapter by running the following command (if you haven't done so already):
