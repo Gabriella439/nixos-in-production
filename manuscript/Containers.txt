@@ -1,0 +1,23 @@
+# Containers
+
+The previous chapter on [Integration Testing](#integration-testing) translated the [PostgREST tutorial](https://postgrest.org/en/v12/tutorials/tut0.html) to an equivalent NixOS test, but that translation left out one important detail: the original tutorial asks the user to run PostgREST inside of a `docker` container:
+
+> If Docker is not installed, you can get it here. Next, let’s pull and start the database image:
+>
+> ```bash
+> $ sudo docker run --name tutorial -p 5433:5432 \
+>                 -e POSTGRES_PASSWORD=mysecretpassword \
+>                 -d postgres
+> ```
+>
+> This will run the Docker instance as a daemon and expose port 5433 to the host system so that it looks like an ordinary PostgreSQL server to the rest of the system.
+
+In this chapter we're going to cover container management using that same PostgREST tutorial as the running example.
+
+## Why containers?
+
+People commonly employ containers for a wide variety of reasons, some of which are not as compelling when using NixOS and some of which are still valid.  However, we can't really dissect those reasons unless we first distinguish between two important categories of containers:
+
+- OS containers
+
+  These are containers that (like a virtual machine) run a full-fledged inside of them but (unlike a virtual machine) they're more lightweight as they reuse a lot of the host machine's infrastructure.
