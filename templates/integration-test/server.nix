@@ -27,11 +27,9 @@
     users = {
       groups.database = { };
 
-      users = {
-        authenticator = {
-          isSystemUser = true;
-          group = "database";
-        };
+      users.authenticator = {
+        isSystemUser = true;
+        group = "database";
       };
     };
   };
