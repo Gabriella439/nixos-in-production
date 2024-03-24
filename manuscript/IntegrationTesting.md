@@ -148,10 +148,10 @@ Now we need to wrap these two into a NixOS module which runs Postgres (with thos
     };
 
     users = {
-      groups."database" = { };
+      groups.database = { };
 
       users = {
-        "authenticator" = {
+        authenticator = {
           isSystemUser = true;
           group = "database";
         };

@@ -25,10 +25,10 @@
     };
 
     users = {
-      groups."database" = { };
+      groups.database = { };
 
       users = {
-        "authenticator" = {
+        authenticator = {
           isSystemUser = true;
           group = "database";
         };
