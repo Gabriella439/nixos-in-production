@@ -10,7 +10,7 @@ expected = [
 actual = json.loads(
     client.wait_until_succeeds(
         "curl --fail --silent http://server:3000/todos",
-        7,
+        55,
     )
 )
 

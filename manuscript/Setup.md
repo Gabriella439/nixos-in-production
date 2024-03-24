@@ -54,7 +54,7 @@ Depending on your platform the download instructions might also tell you to pass
 
 - *On Linux the installer defaults to a single-user Nix installation*
 
-  This is the one case where the default behavior is questionable.  Multi-user Nix installations are typically better if your Linux distribution supports `systemd`, so you should explicitly specify `--daemon` if you use `systemd`.
+  This is the one case where the default behavior is questionable.  Multi-user Nix installations are typically better if your Linux distribution supports Systemd, so you should explicitly specify `--daemon` if you use `systemd`.
 
 ### Pinning the version
 

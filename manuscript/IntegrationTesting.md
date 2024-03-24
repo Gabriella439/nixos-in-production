@@ -187,7 +187,7 @@ expected = [
 actual = json.loads(
     client.wait_until_succeeds(
         "curl --fail --silent http://server:3000/todos",
-        7,
+        55,
     )
 )
 
@@ -320,7 +320,7 @@ You can consult the [NixOS test section of the NixOS manual](https://nixos.org/m
 - `succeed(command)` - Run a command once and require it to succeed
 - `wait_until_succeeds(command, timeout)` - Keep running a command until it succeeds
 - `wait_for_open_port(port, address, timeout)` - Wait for a service to open a port
-- `wait_for_unit(unit, user, timeout)` - Wait for a `systemd` unit to start up
+- `wait_for_unit(unit, user, timeout)` - Wait for a Systemd unit to start up
 
 … but there are also some really cool methods you can use like:
 
