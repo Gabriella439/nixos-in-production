@@ -887,7 +887,7 @@ You can enter the `default` shell by running:
 $ nix develop
 ```
 
-… which will expand out to `.#devShells.${system}.default`, falling back to `.#packages.${system}.default` if the former attribute path is not present.  This will give us a development environment for building the `cowsay` executable.  You can use these `devShells` to create reusables development environments (for yourself or others) so that you don't have to build up large `nix shell` commands.
+… which will expand out to `.#devShells.${system}.default`, falling back to `.#packages.${system}.default` if the former attribute path is not present.  This will give us a development environment for building the `cowsay` executable.  You can use these `devShells` to create reusable development environments (for yourself or others) so that you don't have to build up large `nix shell` commands.
 
 {blurb, class:information}
 You can exit from this development shell by either entering `exit` or typing `Ctrl-D`.
