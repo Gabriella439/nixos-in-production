@@ -1,8 +1,9 @@
+{id: integration-testing}
 # Integration testing
 
 In [Our first web server](#hello-world) we covered how to test a server manually and in this chapter we'll go over how to use NixOS to automate this testing process.  Specifically, we're going to be authoring a NixOS test, which you can think of as the NixOS-native way of doing [integration testing](https://en.wikipedia.org/wiki/Integration_testing).  However, in this chapter we're going to depart from our running "TODO list" example[^1] and instead use NixOS tests to automate the Getting Started instructions from an open source tutorial.
 
-Specifically, we're going to be testing the [`postgrest` tutorial](https://postgrest.org/en/v12/tutorials/tut0.html).  You can read through the tutorial if you want, but the relevant bits are:
+Specifically, we're going to be testing the [PostgREST tutorial](https://postgrest.org/en/v12/tutorials/tut0.html).  You can read through the tutorial if you want, but the relevant bits are:
 
 - Install Postgres (the database)
 
