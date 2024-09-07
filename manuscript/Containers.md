@@ -21,7 +21,7 @@ More generally, in this chapter we're going to cover container management in the
 The most Docker-native approach is to fetch a container from the Docker registry and to illustrate that we're going to begin from the previous chapter's example integration test:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.7#integration-test'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.9#integration-test'
 ```
 
 … but this time instead of using the NixOS `postgres` module:
@@ -244,7 +244,7 @@ We'll delete the old `postgrest` service and instead use this `streamLayeredImag
 You can also clone an example containing all changes up to this point by running:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.7#docker'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.9#docker'
 ```
 
 This creates a new `postgrest` container that doesn't depend on the Docker registry at all.  Note that the Docker registry *does host* an official `postgrest` image but we're not going to use that image.  Instead, we're using a `postgrest` Docker image built entirely using Nix.
@@ -262,7 +262,7 @@ NixOS actually supports a more NixOS-native alternative to Docker, known as [Nix
 The easiest way to illustrate how NixOS containers work is to redo our `postgrest` example to put both Postgres and PostgREST in separate NixOS containers.  We're going to begin by resetting our example back to the non-container example from the previous chapter:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.7#integration-test'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.9#integration-test'
 ```
 
 … and then we'll make two changes.  First, instead of running Postgres on the host machine like this:
