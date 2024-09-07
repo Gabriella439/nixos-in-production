@@ -543,7 +543,7 @@ In this example we build our NixOS configuration on our web server so that this 
 
   For example, if we didn't have to build on our web server then we wouldn't need to permit outbound connections on that server since it would no longer need to fetch build-time dependencies.
 
-The next chapter will cover how to provision a dedicated builder for this purpose.
+A future chapter will cover how to provision a dedicated builder for this purpose.
 {/blurb}
 
 ## S3 Backend

@@ -71,7 +71,7 @@ $ nix build '.#nixosConfigurations.default.config.system.build.toplevel'
 {blurb, class:warning}
 If your development system is Apple Silicon (i.e. `aarch64-darwin`) you will not yet be able to build that locally.  Even if you use the Linux builder from the [Setting up your development environment](#darwin-builder) chapter that won't work because the builder's architecture (`aarch64-linux`) won't match the architecture of the system we're deploying (`x86_64-linux`).
 
-In the next chapter we'll cover how to set up an `x86_64-linux` remote builders that you can use for testing builds like these, but until then you will have to settle for just *evaluating* the system configuration instead of *building* it, like this:
+In a future chapter we'll cover how to set up an `x86_64-linux` remote builders that you can use for testing builds like these, but until then you will have to settle for just *evaluating* the system configuration instead of *building* it, like this:
 
 ```bash
 $ nix eval '.#nixosConfigurations.default.config.system.build.toplevel'

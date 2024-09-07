@@ -1,8 +1,9 @@
+{id: integration-testing}
 # Integration testing
 
 In [Our first web server](#hello-world) we covered how to test a server manually and in this chapter we'll go over how to use NixOS to automate this testing process.  Specifically, we're going to be authoring a NixOS test, which you can think of as the NixOS-native way of doing [integration testing](https://en.wikipedia.org/wiki/Integration_testing).  However, in this chapter we're going to depart from our running "TODO list" example[^1] and instead use NixOS tests to automate the Getting Started instructions from an open source tutorial.
 
-Specifically, we're going to be testing the [`postgrest` tutorial](https://postgrest.org/en/v12/tutorials/tut0.html).  You can read through the tutorial if you want, but the relevant bits are:
+Specifically, we're going to be testing the [PostgREST tutorial](https://postgrest.org/en/v12/tutorials/tut0.html).  You can read through the tutorial if you want, but the relevant bits are:
 
 - Install Postgres (the database)
 
@@ -46,7 +47,7 @@ Specifically, we're going to be testing the [`postgrest` tutorial](https://postg
   … with this configuration file:
 
   ```ini
-  db-uri = "postgres://authenticator:mysecretpassword@localhost:5433/postgres"
+  db-uri = "postgres://authenticator:mysecretpassword@localhost:5432/postgres"
   db-schemas = "api"
   db-anon-role = "web_anon"
   ```
@@ -112,7 +113,7 @@ grant web_anon to authenticator;
 Similarly, another file is `tutorial.conf` which includes the PostgREST configuration from the tutorial verbatim:
 
 ```ini
-db-uri = "postgres://authenticator:mysecretpassword@localhost:5433/postgres"
+db-uri = "postgres://authenticator:mysecretpassword@localhost:5432/postgres"
 db-schemas = "api"
 db-anon-role = "web_anon"
 ```
@@ -127,9 +128,6 @@ Now we need to wrap these two into a NixOS module which runs Postgres (with thos
 
     services.postgresql = {
       enable = true;
-
-      # To match the tutorial
-      port = 5433;
 
       initialScript = ./setup.sql;
     };
@@ -147,11 +145,12 @@ Now we need to wrap these two into a NixOS module which runs Postgres (with thos
     };
 
     users = {
-      groups."database" = { };
+      groups.database = { };
 
       users = {
-        "authenticator" = {
+        authenticator = {
           isSystemUser = true;
+
           group = "database";
         };
       };
@@ -186,7 +185,7 @@ expected = [
 actual = json.loads(
     client.wait_until_succeeds(
         "curl --fail --silent http://server:3000/todos",
-        7,
+        55,
     )
 )
 
@@ -319,7 +318,7 @@ You can consult the [NixOS test section of the NixOS manual](https://nixos.org/m
 - `succeed(command)` - Run a command once and require it to succeed
 - `wait_until_succeeds(command, timeout)` - Keep running a command until it succeeds
 - `wait_for_open_port(port, address, timeout)` - Wait for a service to open a port
-- `wait_for_unit(unit, user, timeout)` - Wait for a `systemd` unit to start up
+- `wait_for_unit(unit, user, timeout)` - Wait for a Systemd unit to start up
 
 … but there are also some really cool methods you can use like:
 
@@ -366,6 +365,7 @@ First, we'll factor out the `"authenticator"` username into a shared constant, w
       users = {
         "${config.tutorial.user}" = {
           isSystemUser = true;
+
           group = "database";
         };
       };
@@ -401,7 +401,7 @@ One way to do this is to inline `setup.sql` and `tutorial.conf` into our `server
       script =
         let
           configurationFile = pkgs.writeText "tutorial.conf" ''
-            db-uri = "postgres://${config.tutorial.user}:mysecretpassword@localhost:5433/postgres"
+            db-uri = "postgres://${config.tutorial.user}:mysecretpassword@localhost:5432/postgres"
             db-schemas = "api"
             db-anon-role = "web_anon"
           '';
@@ -422,7 +422,7 @@ This solution isn't great, though, because it gets cramped pretty quickly and it
 Alternatively, we can keep the files separate and use the [Nixpkgs `substituteAll` utility](https://nixos.org/manual/nixpkgs/stable/#fun-substituteAll) to interpolate the Nix variables into the file.  The way it works is that instead of using `${user}` to interpolate a variable you use `@user@`, like this new `tutorial.conf` file does:
 
 ```ini
-db-uri = "postgres://@user@:mysecretpassword@localhost:5433/postgres"
+db-uri = "postgres://@user@:mysecretpassword@localhost:5432/postgres"
 db-schemas = "api"
 db-anon-role = "web_anon"
 ```
@@ -483,7 +483,7 @@ The downside to using `pkgs.substituteAll` is that it's easier for there to be a
 We can do something fairly similar to also thread through the PostgREST port everywhere it's needed.  The original PostgREST tutorial doesn't specify the port in the `tutorial.conf` file, but we can add it for completeness:
 
 ```ini
-db-uri = "postgres://@user@:mysecretpassword@localhost:5433/postgres"
+db-uri = "postgres://@user@:mysecretpassword@localhost:5432/postgres"
 db-schemas = "api"
 db-anon-role = "web_anon"
 server-port = @port@

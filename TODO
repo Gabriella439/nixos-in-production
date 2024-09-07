@@ -8,7 +8,6 @@ High priority:
       of Nix
 - New chapters
   - Remote builders
-  - Integration testing (i.e. NixOS tests)
   - Talk about garbage collection and how GC roots work
     - Also buildtime vs runtime dependencies
   - How to write your own deploy tool
@@ -19,18 +18,11 @@ High priority:
       - Derivations
       - Realization
       - Example: Building your own distributed build system
-  - Containers
-    - Docker containers
-    - NixOS containers
-    - OCI containers
-    - Talk about virtualization
-      - Host OS
-      - Guest OS
-      - Application containers
   - Generating AMIs
   - Talk about how to work around restricted network environments
     - i.e. on-premise deployments
   - How to author your own NixOS service
+  - How to generate NixOS options documentation (and search?)
 
 Low priority:
 
@@ -64,7 +56,6 @@ Unprioritized:
 - NixOS system administration
   - Brief systemd tutorial
 - How to distribute and install a patched Nix build
-- How to generate NixOS options documentation (and search?)
 - Talk about the NixOS option idiom of using an attribute set instead of a list
 - How to build NixOS options
 

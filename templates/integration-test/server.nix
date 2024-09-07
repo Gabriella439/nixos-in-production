@@ -6,9 +6,6 @@
     services.postgresql = {
       enable = true;
 
-      # To match the tutorial
-      port = 5433;
-
       initialScript = ./setup.sql;
     };
 
@@ -25,13 +22,12 @@
     };
 
     users = {
-      groups."database" = { };
+      groups.database = { };
 
-      users = {
-        "authenticator" = {
-          isSystemUser = true;
-          group = "database";
-        };
+      users.authenticator = {
+        isSystemUser = true;
+
+        group = "database";
       };
     };
   };
