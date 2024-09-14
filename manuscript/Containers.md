@@ -173,7 +173,7 @@ Switching from Docker to Podman is pretty easy: we only need to change the `virt
 +      backend = "podman";
 ```
 
-… and then change all command-line references from `podman` to `docker`:
+… and then change all command-line references from `docker` to `podman`:
 
 ```diff
 -          path = [ pkgs.docker ];
