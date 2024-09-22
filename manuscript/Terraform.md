@@ -445,7 +445,7 @@ module "ami" {
 }
 
 module "nixos" {
-  source = "github.com/Gabriella439/terraform-nixos-ng//nixos?ref=d8563d06cc65bc699ffbf1ab8d692b1343ecd927"
+  source = "github.com/Gabriella439/terraform-nixos-ng//nixos?ref=af1a0af57287851f957be2b524fcdc008a21d9ae"
   host = "root@${aws_instance.todo.public_ip}"
   flake = ".#default"
   arguments = [ "--build-host", "root@${aws_instance.todo.public_ip}" ]
@@ -467,7 +467,7 @@ let
       source = fetchFromGitHub {
         owner = "Gabriella439";
         repo = "terraform-nixos-ng";
-        rev = "d8563d06cc65bc699ffbf1ab8d692b1343ecd927";
+        rev = "af1a0af57287851f957be2b524fcdc008a21d9ae";
         hash = …;
       };
 
@@ -503,7 +503,7 @@ The first child module selects the correct NixOS AMI to use:
 
 ```hcl
 module "ami" {
-  source = "github.com/Gabriella439/terraform-nixos-ng//ami?ref=d8563d06cc65bc699ffbf1ab8d692b1343ecd927"
+  source = "github.com/Gabriella439/terraform-nixos-ng//ami?ref=af1a0af57287851f957be2b524fcdc008a21d9ae"
   release = "23.05"
   region = var.region
   system = "x86_64-linux"
@@ -514,7 +514,7 @@ module "ami" {
 
 ```hcl
 module "nixos" {
-  source = "github.com/Gabriella439/terraform-nixos-ng//nixos?ref=d8563d06cc65bc699ffbf1ab8d692b1343ecd927"
+  source = "github.com/Gabriella439/terraform-nixos-ng//nixos?ref=af1a0af57287851f957be2b524fcdc008a21d9ae"
 
   host = "root@${aws_instance.todo.public_ip}"
 
