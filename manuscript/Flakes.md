@@ -507,7 +507,7 @@ The Nix command-line interface provides several commands that are flake-aware, a
 We'll be using the following flake as the running example for our commands:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.9?dir=templates/cowsay'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.10?dir=templates/cowsay'
 ```
 
 … which will have this structure:
@@ -670,7 +670,7 @@ $ nix build 'github:NixOS/nixpkgs/23.11#cowsay'  # Exact same result
 In fact, we don't even need to create a local copy of the `cowsay` template flake.  We could also have run the flake directly from the GitHub repository where it's hosted:
 
 ```bash
-$ nix build 'github:Gabriella439/nixos-in-production/0.9?dir=templates/cowsay'
+$ nix build 'github:Gabriella439/nixos-in-production/0.10?dir=templates/cowsay'
 ```
 
 This works because flakes support GitHub URIs, so all of the flake operations in this chapter work directly on the GitHub repository without having to clone or template the repository locally.  However, for simplicity all of the following examples will still assume you templated the flake locally.
@@ -997,7 +997,7 @@ You can template a project using `nix flake init`, which we've already used a fe
 … so earlier when we ran:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.9?dir=templates/cowsay'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.10?dir=templates/cowsay'
 ```
 
 … that copied the directory pointed to by the `templates.default.path` flake output to our local directory.

@@ -8,13 +8,13 @@ Now that we can build and run a local NixOS virtual machine we can create our fi
 We'll begin from the template project from "Setting up your development environment".  You can either begin from the previous chapter by running the following command (if you haven't done so already):
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.9#setup'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.10#setup'
 ```
 
 … or if you want to skip straight to the final result at the end of this chapter you can run:
 
 ```bash
-$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.9#server'
+$ nix flake init --template 'github:Gabriella439/nixos-in-production/0.10#server'
 ```
 
 Let's modify `module.nix` to specify a machine that serves a simple static "Hello, world!" page on `http://localhost`:
