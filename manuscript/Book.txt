@@ -10,3 +10,4 @@ ContinuousIntegrationDeployment.md
 Flakes.md
 IntegrationTesting.md
 Containers.md
+NixStore.md
