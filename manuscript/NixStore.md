@@ -28,7 +28,7 @@ You don't really need to understand how the Nix store works on the happy path (i
 
 So what *is* the Nix store?
 
-The most important part[^1] of the Nix store is the `/nix/store` directory[^2], which stores two types of things:
+The most important part of the Nix store is the `/nix/store` directory[^1], which stores two types of things:
 
 - Derivations
 
@@ -72,14 +72,19 @@ The process of converting a Nix expression to a derivation is called "instantiat
 
 ![](./pipeline.png)
 
-You can think of the "Nix store" as not just a repository of derivations and build products but more like a service.  The input to the Nix store
-The Nix programming language and the Nix store work together to provide the complete build pipeline.
+You can think of the "Nix store" as more of a service rather than a store.  Most Nix experts who use the phrase "Nix store" are referring not just to the repository of derivations and build products but all of the supporting infrastructure (like the Nix daemon and Nix command-line interface) that converts derivations to build products.
 
-Nix separates the programming language
+The Nix programming language and the Nix store work together to provide the complete build pipeline and derivations are the interface between the two.
 
-[^1]: You might think that the Nix store comprises *only* the `/nix/store` directory, but it's actually supported by a few other things, including the Nix SQLite database (which tracks a bunch of metadata about Nix store paths and build products) and the Nix garbage collection roots directory.
+{blurb, class:information}
+The reason for this separation of responsibilities is so that you can (in principle) swap out the front-end language and replace the Nix programming language with a different language if you don't like Nix while still getting all the nice feature of the Nix store like caching, remote builds, and closure management.  In fact, if you're a company with an existing build tool that is showing its age you might consider swapping out your tool's backend with the Nix store while keeping your existing frontend the same.  This is outside the scope of this book, though.
 
-[^2]: Technically the location of this directory is configurable using [the `store` `nix.conf` option](https://nixos.org/manual/nix/stable/command-ref/conf-file.html#conf-store) but the vast majority of Nix installations will use the default.  Moreover, you probably don't want to change the store path because then you can't use the public Nix cache or share build products with Nix stores that use a different store path.
+In fact, this is not a hypothetical scenario: [Guix](https://guix.gnu.org/) works this way.  Guix is sort of based on the Nix store[^2], but replaces the frontend language with Guile Scheme.  Any language that can generate derivation files can interoperate with the Nix store.
+{/blurb}
+
+[^1]: Technically the location of this directory is configurable using [the `store` `nix.conf` option](https://nixos.org/manual/nix/stable/command-ref/conf-file.html#conf-store) but the vast majority of Nix installations will use the default.  Moreover, you probably don't want to change the store path because then you can't use the public Nix cache or share build products with Nix stores that use a different store path.
+
+[^2]: Guix technically uses a fork of the original Nix store, so unfortunately it won't interoperate with Nix's store.  This is partly because at the time Nix's store supported some features specific to the Nix programming language and Guix also wanted its store to support features specific to Guile Scheme.  In other words, both tools were guilty of "layer violations" although Nix has been steadily fixing its own layer violations.
 
 TODO:
 
@@ -88,5 +93,4 @@ TODO:
   - Buildtime
 - GC roots
 - `nix` commands
-- `nix.conf` options (e.g. `auto-optimise-store` or `keep-{outputs,derivations}`
-  or `min-free` / `max-free`)
+- `nix.conf` options (e.g. `auto-optimise-store` or `keep-{outputs,derivations}` or `min-free` / `max-free`)
