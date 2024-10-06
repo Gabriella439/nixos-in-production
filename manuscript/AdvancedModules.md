@@ -453,7 +453,7 @@ let
           script = "${pkgs.cowsay}/bin/cowsay ${config.services.cowsay.greeting}";
         };
       };
-    }
+    };
 
 in
   { imports = [ cowsay ];
