@@ -259,6 +259,28 @@ Each time you click the `+` button it will add a TODO list item consisting of:
 {align: left}
 ![](./todo-list.png)
 
+{blurb, class:warning}
+If you run into an error like:
+
+```
+error: getting status of '/nix/store/…-source/www': No such file or directory
+```
+
+… this can happen because you created the `./www` directory inside of a `git` repository.  When you use flakes inside of a repository you need to explicitly add them and all files they depend on to the repository using:
+
+```bash
+$ git add ./www
+```
+
+Technically, the bare minimum you need to do is actually:
+
+```bash
+$ git add --intent-to-add ./www
+```
+
+… which comes in handy if you are not yet ready to commit the file.
+{/blurb}
+
 ## Passing through the filesystem
 
 The previous NixOS configuration requires rebuilding and restarting the virtual machine every time we change the web page.  If you try to change the `./www/index.html` file while the virtual machine is running you won't see any changes take effect.
