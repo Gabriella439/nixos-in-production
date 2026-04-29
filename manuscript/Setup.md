@@ -237,7 +237,7 @@ $ nix flake init --template 'github:Gabriella439/nixos-in-production/0.10#setup'
         };
 
         program = pkgs.writeShellScript "run-vm.sh" ''
-          export NIX_DISK_IMAGE=$(mktemp -u -t nixos.qcow2)
+          export NIX_DISK_IMAGE=$(mktemp -u -t nixosXXX.qcow2)
 
           trap "rm -f $NIX_DISK_IMAGE" EXIT
 

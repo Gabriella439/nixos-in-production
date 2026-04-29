@@ -29,7 +29,7 @@
         };
 
         program = pkgs.writeShellScript "run-vm.sh" ''
-          export NIX_DISK_IMAGE=$(mktemp -u -t nixos.qcow2)
+          export NIX_DISK_IMAGE=$(mktemp -u -t nixosXXX.qcow2)
 
           trap "rm -f $NIX_DISK_IMAGE" EXIT
 
